@@ -1,0 +1,10 @@
+Coloque aqui os prints das avaliações:
+
+  wave/    capturas do relatório do WAVE (wave.webaim.org)
+  ases/    capturas do relatório do ASES (asesweb.governoeletronico.gov.br)
+  mobile/  capturas do celular e as geradas por ferramenta/simulador_mobile.py
+
+Nomeie os arquivos de forma descritiva, por exemplo:
+  wave/home-wave-resumo.png
+  ases/home-ases-nota.png
+  mobile/home-talkback-botao-sem-rotulo.png

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Portal Exemplo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#333}
+  .topo{background:#1a5c38;color:#9fd3b4;padding:12px}
+  .menu a{color:#cfe8da;margin-right:10px;font-size:13px;text-decoration:none}
+  a:focus,button:focus{outline:none}
+  .card{padding:16px;border:1px solid #ddd;margin:12px}
+  .aviso{color:#bdbdbd;font-size:12px}
+  .mini{width:18px;height:18px;border:0;background:#1a5c38;color:#fff}
+  .larga{width:900px;background:#eee;padding:8px}
+  footer{background:#222;color:#5a5a5a;padding:14px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="topo">
+  <img src="brasao.png">
+  <div class="menu" onclick="void 0">
+    <a href="/">Início</a><a href="/noticias">Notícias</a><a href="/editais">Editais</a>
+    <a href="/x">clique aqui</a>
+  </div>
+</div>
+
+<h2>Bem-vindo ao portal</h2>
+<h4>Últimas notícias</h4>
+
+<div class="card">
+  <img src="foto1.jpg" alt="foto1.jpg">
+  <p>Publicação do edital de monitoria para o semestre letivo.</p>
+  <a href="/e1">Saiba mais</a>
+  <p class="aviso">Atualizado há 2 dias</p>
+</div>
+
+<div class="card">
+  <a href="/e2"><img src="icone.png"></a>
+  <button></button>
+  <button class="mini">x</button>
+</div>
+
+<form>
+  <input type="text" name="busca" placeholder="Buscar no portal">
+  <label for="email">E-mail</label>
+  <input id="email" type="email" name="email">
+  <select name="setor"><option>Escolha</option></select>
+  <button type="submit">Enviar</button>
+</form>
+
+<div class="larga">Tabela de horários com largura fixa que não se adapta à tela.</div>
+
+<table><tr><td>Seg</td><td>08h</td></tr></table>
+<iframe src="about:blank" width="200" height="80"></iframe>
+
+<div id="rodape"></div><div id="rodape"></div>
+<footer>Instituto Exemplo &middot; Todos os direitos reservados</footer>
+</body>
+</html>

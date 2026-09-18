@@ -1,0 +1,157 @@
+{
+  "paginas": [
+    {
+      "pagina": "http://localhost:8765/pagina_teste.html",
+      "tamanho_html_kb": 1.9,
+      "total_nao_conforme": 8,
+      "total_conforme": 1,
+      "total_manual": 6,
+      "total_ocorrencias": 19,
+      "itens": [
+        {
+          "item": 1,
+          "nome": "Texto alternativo em imagens",
+          "status": "nao_conforme",
+          "detalhe": "3 imagens; 2 sem atributo alt; 1 com alt genérico/nome de arquivo.",
+          "ocorrencias": 3,
+          "exemplos": [
+            "brasao.png",
+            "icone.png",
+            "foto1.jpg"
+          ]
+        },
+        {
+          "item": 2,
+          "nome": "Hierarquia de cabeçalhos",
+          "status": "nao_conforme",
+          "detalhe": "2 cabeçalhos; 0 elemento(s) h1; 1 salto(s) de nível; 0 cabeçalho(s) vazio(s).",
+          "ocorrencias": 2,
+          "exemplos": [
+            "h2 -> h4"
+          ]
+        },
+        {
+          "item": 3,
+          "nome": "Idioma da página declarado",
+          "status": "nao_conforme",
+          "detalhe": "A tag <html> não declara o atributo lang.",
+          "ocorrencias": 1,
+          "exemplos": [
+            "None"
+          ]
+        },
+        {
+          "item": 4,
+          "nome": "Título de página descritivo",
+          "status": "conforme",
+          "detalhe": "<title> = 'Portal Exemplo' (14 caracteres).",
+          "ocorrencias": 0,
+          "exemplos": [
+            "Portal Exemplo"
+          ]
+        },
+        {
+          "item": 5,
+          "nome": "Contraste mínimo de cores",
+          "status": "verificar_manualmente",
+          "detalhe": "Critério subjetivo: exige inspeção humana com o site aberto.",
+          "ocorrencias": 0,
+          "exemplos": []
+        },
+        {
+          "item": 6,
+          "nome": "Cor não e o único meio de transmitir informação",
+          "status": "verificar_manualmente",
+          "detalhe": "Critério subjetivo: exige inspeção humana com o site aberto.",
+          "ocorrencias": 0,
+          "exemplos": []
+        },
+        {
+          "item": 7,
+          "nome": "Redimensionamento de texto até 200%",
+          "status": "nao_conforme",
+          "detalhe": "meta viewport = 'width=device-width, initial-scale=1, user-scalable=no'. A página bloqueia o zoom do usuário.",
+          "ocorrencias": 1,
+          "exemplos": [
+            "width=device-width, initial-scale=1, user-scalable=no"
+          ]
+        },
+        {
+          "item": 8,
+          "nome": "Navegação completa por teclado",
+          "status": "verificar_manualmente",
+          "detalhe": "Critério subjetivo: exige inspeção humana com o site aberto.",
+          "ocorrencias": 0,
+          "exemplos": []
+        },
+        {
+          "item": 9,
+          "nome": "Indicador de foco visível",
+          "status": "verificar_manualmente",
+          "detalhe": "Critério subjetivo: exige inspeção humana com o site aberto. ATENÇÃO: o CSS da página contém 'outline: none' - conferir se há foco substituto.",
+          "ocorrencias": 0,
+          "exemplos": []
+        },
+        {
+          "item": 10,
+          "nome": "Link para pular ao conteúdo principal",
+          "status": "nao_conforme",
+          "detalhe": "Nenhum link de salto para o conteúdo foi encontrado no início da página.",
+          "ocorrencias": 1,
+          "exemplos": []
+        },
+        {
+          "item": 11,
+          "nome": "Rótulos associados aos campos de formulário",
+          "status": "nao_conforme",
+          "detalhe": "3 campos analisados; 2 sem rótulo associado (1 contando apenas com placeholder).",
+          "ocorrencias": 2,
+          "exemplos": [
+            "input[text] name='busca'",
+            "select[select] name='setor'"
+          ]
+        },
+        {
+          "item": 12,
+          "nome": "Identificacao e sugestao de correção de erros",
+          "status": "verificar_manualmente",
+          "detalhe": "Critério subjetivo: exige inspeção humana com o site aberto.",
+          "ocorrencias": 0,
+          "exemplos": []
+        },
+        {
+          "item": 13,
+          "nome": "Links com texto descritivo",
+          "status": "nao_conforme",
+          "detalhe": "6 links; 1 sem texto acessível; 2 com texto genérico ou URL crua.",
+          "ocorrencias": 3,
+          "exemplos": [
+            "/e2",
+            "clique aqui",
+            "Saiba mais"
+          ]
+        },
+        {
+          "item": 14,
+          "nome": "Controle de conteúdo em movimento",
+          "status": "verificar_manualmente",
+          "detalhe": "Critério subjetivo: exige inspeção humana com o site aberto. Indicios de carrossel/slider no código: 0 ocorrência(s).",
+          "ocorrencias": 0,
+          "exemplos": []
+        },
+        {
+          "item": 15,
+          "nome": "Estrutura semântica e marcação válida",
+          "status": "nao_conforme",
+          "detalhe": "1 id(s) duplicado(s); landmarks ausentes: aside, header, main, nav; 1 div/span clicavel sem role/tabindex; 1/1 iframe(s) sem title; 1/1 tabela(s) sem <th>; 1 botao(oes) sem nome acessível; 1 manipulador(es) de evento inline.",
+          "ocorrencias": 6,
+          "exemplos": [
+            "rodape",
+            "aside",
+            "header"
+          ]
+        }
+      ]
+    }
+  ]
+}

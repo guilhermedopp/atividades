@@ -1,0 +1,133 @@
+{
+  "_leia_me": "Preencha os campos com valor null após executar as inspecoes. Todo campo null aparece destacado em amarelo nos documentos gerados como [PREENCHER: ...].",
+  "instituicao": {
+    "nome": "INSTITUTO FEDERAL DE ALAGOAS",
+    "campus": "CAMPUS MACEIÓ",
+    "curso": "BACHARELADO EM SISTEMAS DE INFORMAÇÃO",
+    "disciplina": "Interação Humano-Computador",
+    "cidade": "Maceió - AL",
+    "data": "09 / 2026",
+    "data_acesso": "18 set. 2026",
+    "curso_nominal": "Bacharelado em Sistemas de Informação"
+  },
+  "equipe": [
+    "Guilherme de Oliveira Pontes Pinto",
+    "Kelven Eduardo Terto dos Santos"
+  ],
+  "site": {
+    "nome": "Portal do Instituto Federal de Alagoas - Campus Maceió",
+    "nome_curto": "Portal do IFAL - Campus Maceió",
+    "url": "https://www2.ifal.edu.br/campus/maceio",
+    "responsavel": "Instituto Federal de Alagoas (IFAL)",
+    "justificativa": "Trata-se de um sítio institucional público, de escopo reduzido e navegação simples (página inicial, noticias, editais e contato), o que permite auditar integralmente o conjunto de páginas dentro do prazo do trabalho. Por pertencer a administração pública federal, esta sujeito ao Decreto n. 5.296/2004, a Lei Brasileira de Inclusão (Lei n. 13.146/2015) e ao eMAG 3.1, o que torna a avaliação juridicamente relevante além de tecnicamente pertinente. Por fim, e o portal utilizado cotidianamente pelos próprios autores e demais estudantes, incluindo colegas com deficiência, o que aproxima o exercício acadêmico de um problema real da comunidade acadêmica.",
+    "paginas_avaliadas": [
+      "https://www2.ifal.edu.br/campus/maceio",
+      "https://www2.ifal.edu.br/campus/maceio/noticias",
+      "https://www2.ifal.edu.br/campus/maceio/contato"
+    ]
+  },
+  "checklist_manual": {
+    "1": {
+      "situacao": null,
+      "observacao": null
+    },
+    "2": {
+      "situacao": null,
+      "observacao": null
+    },
+    "3": {
+      "situacao": null,
+      "observacao": null
+    },
+    "4": {
+      "situacao": null,
+      "observacao": null
+    },
+    "5": {
+      "situacao": null,
+      "observacao": null
+    },
+    "6": {
+      "situacao": null,
+      "observacao": null
+    },
+    "7": {
+      "situacao": null,
+      "observacao": null
+    },
+    "8": {
+      "situacao": null,
+      "observacao": null
+    },
+    "9": {
+      "situacao": null,
+      "observacao": null
+    },
+    "10": {
+      "situacao": null,
+      "observacao": null
+    },
+    "11": {
+      "situacao": null,
+      "observacao": null
+    },
+    "12": {
+      "situacao": null,
+      "observacao": null
+    },
+    "13": {
+      "situacao": null,
+      "observacao": null
+    },
+    "14": {
+      "situacao": null,
+      "observacao": null
+    },
+    "15": {
+      "situacao": null,
+      "observacao": null
+    }
+  },
+  "wave": {
+    "ferramenta": "WAVE Web Accessibility Evaluation Tool (WebAIM)",
+    "url_ferramenta": "https://wave.webaim.org/",
+    "errors": null,
+    "contrast_errors": null,
+    "alerts": null,
+    "features": null,
+    "structural_elements": null,
+    "aria": null,
+    "principais_erros": null
+  },
+  "ases": {
+    "ferramenta": "ASES - Avaliador e Simulador de Acessibilidade de Sítios (Governo Federal)",
+    "url_ferramenta": "https://asesweb.governoeletronico.gov.br/",
+    "nota_geral": null,
+    "marcacao_erros": null,
+    "marcacao_avisos": null,
+    "comportamento_erros": null,
+    "comportamento_avisos": null,
+    "conteudo_erros": null,
+    "conteudo_avisos": null,
+    "apresentacao_erros": null,
+    "apresentacao_avisos": null,
+    "multimidia_erros": null,
+    "multimidia_avisos": null,
+    "formularios_erros": null,
+    "formularios_avisos": null
+  },
+  "mobile": {
+    "dispositivo": null,
+    "sistema": null,
+    "leitor_tela": null,
+    "tarefa_testada": "Localizar, a partir da página inicial, o edital mais recente publicado pelo campus e abrir o documento correspondente.",
+    "tempo_gasto": null,
+    "tarefa_concluida": null,
+    "relato": null
+  },
+  "conformidade": {
+    "nivel_atingido": null,
+    "criterios_a_falhos": null,
+    "criterios_aa_falhos": null
+  }
+}
