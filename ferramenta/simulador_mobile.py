@@ -275,6 +275,15 @@ def testar(url, ap, swipes, tabs, headless=True):
             locale="pt-BR",
         )
         pg = ctx.new_page()
+
+        # Recursos que não carregam (CDN bloqueado, domínio fora do allowlist)
+        # distorcem silenciosamente o contraste e o reflow: a página é medida
+        # sem o CSS que ela deveria ter. Por isso são contados e reportados.
+        falhas_rede = []
+        pg.on("requestfailed", lambda r: falhas_rede.append({
+            "url": r.url[:120], "tipo": r.resource_type,
+            "motivo": (r.failure or "")[:60]}))
+
         pg.goto(url, wait_until="domcontentloaded", timeout=60000)
         try:
             pg.wait_for_load_state("networkidle", timeout=15000)
@@ -286,6 +295,18 @@ def testar(url, ap, swipes, tabs, headless=True):
         pg.screenshot(path=cap, full_page=True)
         r["captura_tela"] = os.path.relpath(cap, RAIZ)
         r["titulo_pagina"] = pg.title()
+
+        criticos = [f for f in falhas_rede
+                    if f["tipo"] in ("stylesheet", "script", "font", "image")]
+        dominios = sorted({re.sub(r"^https?://([^/]+).*", r"\1", f["url"])
+                           for f in criticos})
+        r["recursos_nao_carregados"] = {
+            "total": len(falhas_rede),
+            "criticos_para_a_medicao": len(criticos),
+            "dominios": dominios[:10],
+            "medicao_confiavel": not criticos,
+            "detalhe": criticos[:10],
+        }
 
         # A) leitor de tela
         sess = ctx.new_cdp_session(pg)
@@ -381,6 +402,15 @@ def imprimir(r):
     lt, fk, at, rf, zm, ct = (r["leitor_tela"], r["foco_teclado"], r["alvos_toque"],
                               r["reflow_320px"], r["zoom"], r["contraste"])
     p = print
+    rec = r.get("recursos_nao_carregados") or {}
+    if rec and not rec.get("medicao_confiavel", True):
+        p("\n" + "!" * 78)
+        p(f"ATENÇÃO: {rec['criticos_para_a_medicao']} recurso(s) de CSS/fonte/script/imagem")
+        p("não carregaram. A página foi medida sem parte da sua aparência real, portanto")
+        p("o CONTRASTE e o REFLOW abaixo NÃO são confiáveis.")
+        p(f"Domínios envolvidos: {', '.join(rec['dominios']) or '(desconhecido)'}")
+        p("Libere esses domínios no ambiente e rode de novo.")
+        p("!" * 78)
     p("\n" + "=" * 78)
     p(f"SIMULAÇÃO MOBILE COM ACESSIBILIDADE - {r['aparelho']}")
     p(f"URL: {r['url']}")
@@ -431,6 +461,9 @@ def imprimir(r):
     for x in ct["exemplos"][:5]:
         p(f"      - {x['razao']}:1 (exige {x['exigido']}:1)  {x['seletor'][:22]:<22} \"{x['texto'][:26]}\"")
 
+    if rec.get("medicao_confiavel", True):
+        p(f"\n[G] INTEGRIDADE DA MEDIÇÃO")
+        p(f"    Todos os recursos da página carregaram — contraste e reflow confiáveis.")
     p(f"\n    Capturas: {r['captura_tela']} | {rf['captura']}")
 
 
