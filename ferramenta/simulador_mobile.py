@@ -394,7 +394,7 @@ def imprimir(r):
     d = lt["deslizes_ate_conteudo"]
     p(f"    Deslizes até o conteúdo principal {d if d else 'NÃO ENCONTRADO (sem <main> nem h1)'}"
       + ("   <- WCAG 2.4.1 (A)" if (d is None or d > 15) else ""))
-    p("    Transcricao (primeiros 12 anúncios):")
+    p("    Transcrição (primeiros 12 anúncios):")
     for i, l in enumerate(lt["transcricao"][:12], 1):
         p(f"      {i:>2}. {l[:68]}")
 
@@ -416,18 +416,18 @@ def imprimir(r):
     p(f"    Conteúdo: {rf['largura_conteudo']} px / tela: {rf['largura_tela']} px -> "
       f"rolagem horizontal: {'SIM' if rf['rolagem_horizontal'] else 'não'}   <- WCAG 1.4.10 (AA)")
 
-    p("\n[E] ZOOM E ESPACAMENTO DE TEXTO")
+    p("\n[E] ZOOM E ESPAÇAMENTO DE TEXTO")
     p(f"    meta viewport: {zm['meta_viewport'][:62]!r}")
     p(f"    Zoom bloqueado .................. {'SIM' if zm['zoom_bloqueado'] else 'não'}"
       "   <- WCAG 1.4.4 (AA)")
     e = zm["espacamento_texto"]
-    p(f"    Espacamento ampliado: rolagem horizontal={'SIM' if e['rolagem_horizontal'] else 'não'}, "
+    p(f"    Espaçamento ampliado: rolagem horizontal={'SIM' if e['rolagem_horizontal'] else 'não'}, "
       f"{e['elementos_cortados']} elemento(s) cortado(s)   <- WCAG 1.4.12 (AA)")
 
-    p("\n[F] CONTRASTE DE CORES (pagina renderizada)")
+    p("\n[F] CONTRASTE DE CORES (página renderizada)")
     p(f"    Trechos de texto analisados ..... {ct['trechos_analisados']}")
     p(f"    Reprovados ...................... {ct['reprovados']}   <- WCAG 1.4.3 (AA)")
-    p(f"    Pior razao encontrada ........... {ct['pior_razao']}:1")
+    p(f"    Pior razão encontrada ........... {ct['pior_razao']}:1")
     for x in ct["exemplos"][:5]:
         p(f"      - {x['razao']}:1 (exige {x['exigido']}:1)  {x['seletor'][:22]:<22} \"{x['texto'][:26]}\"")
 

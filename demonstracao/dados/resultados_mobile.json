@@ -1,0 +1,789 @@
+{
+  "execucoes": [
+    {
+      "url": "http://localhost:8777/index.html",
+      "aparelho": "Google Pixel 7 (TalkBack)",
+      "leitor_tela_simulado": "TalkBack",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "dpr": 2.625,
+      "captura_tela": "evidencias/mobile/http-localhost-8777-index-html-412px.png",
+      "titulo_pagina": "Portal do Campus - Instituto Municipal de Tecnologia",
+      "leitor_tela": {
+        "anuncios_analisados": 80,
+        "elementos_sem_rotulo": 4,
+        "detalhe_sem_rotulo": [
+          {
+            "papel": "image",
+            "posicao": 8
+          },
+          {
+            "papel": "image",
+            "posicao": 22
+          },
+          {
+            "papel": "image",
+            "posicao": 32
+          },
+          {
+            "papel": "image",
+            "posicao": 44
+          }
+        ],
+        "deslizes_ate_conteudo": 3,
+        "transcricao": [
+          "cabeçalho da página",
+          "região de navegação",
+          "região principal",
+          "rodapé da página",
+          "Acessibilidade, link",
+          "Alto contraste, link",
+          "Mapa do site, link",
+          "<<imagem SEM RÓTULO>>",
+          "Instituto Municipal de Tecnologia · Campus Centro, título nível 1",
+          "Buscar no portal, caixa de edição",
+          "Ir, botão",
+          "Início, link",
+          "Notícias, link",
+          "Cursos, link",
+          "Editais, link",
+          "Biblioteca, link",
+          "Contato, link",
+          "Últimas notícias, título nível 2",
+          "noticia1.png, imagem",
+          "Campus recebe laboratório de robótica, título nível 4",
+          "Leia mais, link",
+          "<<imagem SEM RÓTULO>>",
+          "Semana de Ciência e Tecnologia, título nível 4",
+          "Leia mais, link",
+          "Estudantes apresentando projetos na mostra de tecnologia, imagem",
+          "Estudantes premiados em feira estadual, título nível 4",
+          "Leia a matéria completa sobre a premiação, link",
+          "Acesso rápido, título nível 4",
+          "Horário de funcionamento, título nível 3",
+          "tabela",
+          "quadro embutido",
+          "<<imagem SEM RÓTULO>>",
+          "Acessibilidade, texto",
+          "Alto contraste, texto",
+          "Mapa do site, texto",
+          "Instituto Municipal de Tecnologia · Campus Centro, texto",
+          "Ir, texto",
+          "Início, texto",
+          "Notícias, texto",
+          "Cursos, texto",
+          "Editais, texto",
+          "Biblioteca, texto",
+          "Contato, texto",
+          "<<imagem SEM RÓTULO>>",
+          "Últimas notícias, texto",
+          "Campus recebe laboratório de robótica, texto",
+          "Novo espaço atenderá estudantes dos cursos técnicos e superiores., texto",
+          "Leia mais, texto",
+          "Publicado há 2 dias, texto",
+          "Semana de Ciência e Tecnologia, texto",
+          "Programação completa com oficinas, palestras e mostra de projetos., texto",
+          "Publicado há 5 dias, texto",
+          "Estudantes premiados em feira estadual, texto",
+          "Projeto de monitoramento de qualidade do ar conquistou o primeiro lugar., texto",
+          "Leia a matéria completa sobre a premiação, texto",
+          "Publicado há 1 semana, texto",
+          "Acesso rápido, texto",
+          "Matrícula, link",
+          "Calendário, link",
+          "Biblioteca, link",
+          "Restaurante, link",
+          "Ouvidoria, link",
+          "clique aqui, link",
+          "https://portal.exemplo.edu.br/sistemas, link",
+          "Horário de funcionamento, texto",
+          "row",
+          "row",
+          "row",
+          "Ver todos os serviços, texto",
+          "Instituto Municipal de Tecnologia · Rua das Palmeiras, 100, texto",
+          "Telefone: (82) 3000-0000 ·, texto",
+          "Fale conosco, link",
+          "Inscrições abertas para o Processo Seletivo 2026, texto",
+          "Matrícula, texto",
+          "Calendário, texto",
+          "Restaurante, texto",
+          "Ouvidoria, texto",
+          "clique aqui, texto",
+          "https://portal.exemplo.edu.br/sistemas, texto",
+          "Secretaria, cell"
+        ]
+      },
+      "foco_teclado": {
+        "elementos_focaveis": 23,
+        "sem_indicador_visivel": 23,
+        "fora_da_tela_ao_focar": 1,
+        "sem_nome_acessivel": 2,
+        "possivel_armadilha_foco": false,
+        "ordem": [
+          {
+            "tag": "a",
+            "nome": "Acessibilidade",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 8
+          },
+          {
+            "tag": "a",
+            "nome": "Alto contraste",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 109,
+            "y": 8
+          },
+          {
+            "tag": "a",
+            "nome": "Mapa do site",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 196,
+            "y": 8
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 183,
+            "y": 116
+          },
+          {
+            "tag": "button",
+            "nome": "Ir",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 383,
+            "y": 116
+          },
+          {
+            "tag": "a",
+            "nome": "Início",
+            "href": "index.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 229
+          },
+          {
+            "tag": "a",
+            "nome": "Notícias",
+            "href": "noticias.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 82,
+            "y": 229
+          },
+          {
+            "tag": "a",
+            "nome": "Cursos",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 163,
+            "y": 229
+          },
+          {
+            "tag": "a",
+            "nome": "Editais",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 238,
+            "y": 229
+          },
+          {
+            "tag": "a",
+            "nome": "Biblioteca",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 272
+          },
+          {
+            "tag": "a",
+            "nome": "Contato",
+            "href": "contato.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 109,
+            "y": 272
+          },
+          {
+            "tag": "a",
+            "nome": "Leia mais",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 32,
+            "y": 449
+          },
+          {
+            "tag": "a",
+            "nome": "Leia mais",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 163,
+            "y": 426
+          },
+          {
+            "tag": "a",
+            "nome": "Leia a matéria completa sobre a premiação",
+            "href": "noticias.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 293,
+            "y": 449
+          },
+          {
+            "tag": "a",
+            "nome": "Matrícula",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 21,
+            "y": 697
+          },
+          {
+            "tag": "a",
+            "nome": "Calendário",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 86,
+            "y": 697
+          },
+          {
+            "tag": "a",
+            "nome": "Biblioteca",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 159,
+            "y": 697
+          },
+          {
+            "tag": "a",
+            "nome": "Restaurante",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 232,
+            "y": 697
+          },
+          {
+            "tag": "a",
+            "nome": "Ouvidoria",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 312,
+            "y": 697
+          },
+          {
+            "tag": "a",
+            "nome": "clique aqui",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 21,
+            "y": 728
+          },
+          {
+            "tag": "a",
+            "nome": "https://portal.exemplo.edu.br/sistemas",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 98,
+            "y": 728
+          },
+          {
+            "tag": "iframe",
+            "nome": "",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": false,
+            "x": 18,
+            "y": 957
+          },
+          {
+            "tag": "a",
+            "nome": "Fale conosco",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 163,
+            "y": 840
+          }
+        ]
+      },
+      "alvos_toque": {
+        "total": 23,
+        "menores_que_24px_AA": 6,
+        "menores_que_44px_AAA": 22,
+        "exemplos": [
+          {
+            "tag": "a",
+            "nome": "Acessibilidade",
+            "largura": 77,
+            "altura": 14,
+            "menor": 14
+          },
+          {
+            "tag": "a",
+            "nome": "Alto contraste",
+            "largura": 73,
+            "altura": 14,
+            "menor": 14
+          },
+          {
+            "tag": "a",
+            "nome": "Mapa do site",
+            "largura": 69,
+            "altura": 14,
+            "menor": 14
+          },
+          {
+            "tag": "a",
+            "nome": "Fale conosco",
+            "largura": 71,
+            "altura": 14,
+            "menor": 14
+          },
+          {
+            "tag": "a",
+            "nome": "Leia mais",
+            "largura": 68,
+            "altura": 17,
+            "menor": 17
+          },
+          {
+            "tag": "a",
+            "nome": "Leia mais",
+            "largura": 68,
+            "altura": 17,
+            "menor": 17
+          },
+          {
+            "tag": "div",
+            "nome": "Ver todos os serviços",
+            "largura": 376,
+            "altura": 24,
+            "menor": 24
+          },
+          {
+            "tag": "a",
+            "nome": "Matrícula",
+            "largura": 59,
+            "altura": 25,
+            "menor": 25
+          },
+          {
+            "tag": "a",
+            "nome": "Calendário",
+            "largura": 67,
+            "altura": 25,
+            "menor": 25
+          },
+          {
+            "tag": "a",
+            "nome": "Biblioteca",
+            "largura": 62,
+            "altura": 25,
+            "menor": 25
+          }
+        ]
+      },
+      "reflow_320px": {
+        "largura_conteudo": 1098,
+        "largura_tela": 320,
+        "rolagem_horizontal": true,
+        "captura": "evidencias/mobile/http-localhost-8777-index-html-320px-reflow.png"
+      },
+      "zoom": {
+        "meta_viewport": "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+        "zoom_bloqueado": true,
+        "espacamento_texto": {
+          "rolagem_horizontal": true,
+          "elementos_cortados": 0
+        }
+      },
+      "contraste": {
+        "trechos_analisados": 50,
+        "reprovados": 6,
+        "pior_razao": 2.17,
+        "exemplos": [
+          {
+            "texto": "Publicado há 2 dias",
+            "razao": 2.17,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 13,
+            "peso": 400,
+            "cor": "rgb(176, 176, 176)",
+            "fundo": "rgb(255,255,255)",
+            "seletor": "p.data"
+          },
+          {
+            "texto": "Publicado há 5 dias",
+            "razao": 2.17,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 13,
+            "peso": 400,
+            "cor": "rgb(176, 176, 176)",
+            "fundo": "rgb(255,255,255)",
+            "seletor": "p.data"
+          },
+          {
+            "texto": "Publicado há 1 semana",
+            "razao": 2.17,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 13,
+            "peso": 400,
+            "cor": "rgb(176, 176, 176)",
+            "fundo": "rgb(255,255,255)",
+            "seletor": "p.data"
+          },
+          {
+            "texto": "Instituto Municipal de Tecnologia · Rua das Palmeiras, 100",
+            "razao": 3.54,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 12,
+            "peso": 400,
+            "cor": "rgb(111, 143, 128)",
+            "fundo": "rgb(13,59,38)",
+            "seletor": "div"
+          },
+          {
+            "texto": "Telefone: (82) 3000-0000 ·",
+            "razao": 3.54,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 12,
+            "peso": 400,
+            "cor": "rgb(111, 143, 128)",
+            "fundo": "rgb(13,59,38)",
+            "seletor": "div"
+          },
+          {
+            "texto": "Fale conosco",
+            "razao": 3.54,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 12,
+            "peso": 400,
+            "cor": "rgb(111, 143, 128)",
+            "fundo": "rgb(13,59,38)",
+            "seletor": "a"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://localhost:8777/contato.html",
+      "aparelho": "Apple iPhone 13 (VoiceOver)",
+      "leitor_tela_simulado": "VoiceOver",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 3,
+      "captura_tela": "evidencias/mobile/http-localhost-8777-contato-html-390px.png",
+      "titulo_pagina": "Fale conosco - Instituto Municipal de Tecnologia",
+      "leitor_tela": {
+        "anuncios_analisados": 42,
+        "elementos_sem_rotulo": 0,
+        "detalhe_sem_rotulo": [],
+        "deslizes_ate_conteudo": 4,
+        "transcricao": [
+          "Ir para o conteúdo principal, link",
+          "cabeçalho da página",
+          "região de navegação",
+          "região principal",
+          "rodapé da página",
+          "Ir para o conteúdo principal, texto",
+          "Acessibilidade, link",
+          "Alto contraste, link",
+          "Brasão do Instituto Municipal de Tecnologia, imagem",
+          "Fale conosco, título nível 1",
+          "Início, link",
+          "Notícias, link",
+          "Contato, link",
+          "Fale conosco, título nível 1",
+          "Acessibilidade, texto",
+          "Alto contraste, texto",
+          "Fale conosco, texto",
+          "Início, texto",
+          "Notícias, texto",
+          "Contato, texto",
+          "Preencha o formulário abaixo. Campos marcados com, texto",
+          "*, texto",
+          "são obrigatórios., texto",
+          "LabelText",
+          "Nome completo *, caixa de edição",
+          "LabelText",
+          "E-mail *, caixa de edição",
+          "Telefone com DDD, caixa de edição",
+          "LabelText",
+          "Assunto, lista suspensa",
+          "Escreva sua mensagem, caixa de edição",
+          "Enviar mensagem, botão",
+          "Instituto Municipal de Tecnologia, texto",
+          "Nome completo, texto",
+          "E-mail, texto",
+          "Assunto, texto",
+          "MenuListPopup",
+          "Enviar mensagem, texto",
+          "Selecione, opção",
+          "Matrícula, opção",
+          "Biblioteca, opção",
+          "Ouvidoria, opção"
+        ]
+      },
+      "foco_teclado": {
+        "elementos_focaveis": 12,
+        "sem_indicador_visivel": 10,
+        "fora_da_tela_ao_focar": 0,
+        "sem_nome_acessivel": 4,
+        "possivel_armadilha_foco": false,
+        "ordem": [
+          {
+            "tag": "a",
+            "nome": "Ir para o conteúdo principal",
+            "href": "#conteudo",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 0,
+            "y": 3
+          },
+          {
+            "tag": "a",
+            "nome": "Acessibilidade",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 32
+          },
+          {
+            "tag": "a",
+            "nome": "Alto contraste",
+            "href": "#",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 109,
+            "y": 32
+          },
+          {
+            "tag": "a",
+            "nome": "Início",
+            "href": "index.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 120
+          },
+          {
+            "tag": "a",
+            "nome": "Notícias",
+            "href": "noticias.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 77,
+            "y": 120
+          },
+          {
+            "tag": "a",
+            "nome": "Contato",
+            "href": "contato.html",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 159,
+            "y": 120
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 363
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 432
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 464
+          },
+          {
+            "tag": "select",
+            "nome": "Selecione Matrícula Biblioteca Ouvidoria",
+            "href": "",
+            "foco_visivel": true,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 533
+          },
+          {
+            "tag": "textarea",
+            "nome": "",
+            "href": "",
+            "foco_visivel": true,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 567
+          },
+          {
+            "tag": "button",
+            "nome": "Enviar mensagem",
+            "href": "",
+            "foco_visivel": false,
+            "dentro_da_tela": true,
+            "x": 18,
+            "y": 685
+          }
+        ]
+      },
+      "alvos_toque": {
+        "total": 12,
+        "menores_que_24px_AA": 3,
+        "menores_que_44px_AAA": 11,
+        "exemplos": [
+          {
+            "tag": "a",
+            "nome": "Acessibilidade",
+            "largura": 77,
+            "altura": 14,
+            "menor": 14
+          },
+          {
+            "tag": "a",
+            "nome": "Alto contraste",
+            "largura": 73,
+            "altura": 14,
+            "menor": 14
+          },
+          {
+            "tag": "a",
+            "nome": "Ir para o conteúdo principal",
+            "largura": 194,
+            "altura": 17,
+            "menor": 17
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "largura": 354,
+            "altura": 32,
+            "menor": 32
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "largura": 354,
+            "altura": 32,
+            "menor": 32
+          },
+          {
+            "tag": "input",
+            "nome": "",
+            "largura": 354,
+            "altura": 32,
+            "menor": 32
+          },
+          {
+            "tag": "select",
+            "nome": "Selecione Matrícula Biblioteca Ouvidoria",
+            "largura": 354,
+            "altura": 34,
+            "menor": 34
+          },
+          {
+            "tag": "button",
+            "nome": "Enviar mensagem",
+            "largura": 161,
+            "altura": 35,
+            "menor": 35
+          },
+          {
+            "tag": "a",
+            "nome": "Início",
+            "largura": 59,
+            "altura": 43,
+            "menor": 43
+          },
+          {
+            "tag": "a",
+            "nome": "Notícias",
+            "largura": 77,
+            "altura": 43,
+            "menor": 43
+          }
+        ]
+      },
+      "reflow_320px": {
+        "largura_conteudo": 320,
+        "largura_tela": 320,
+        "rolagem_horizontal": false,
+        "captura": "evidencias/mobile/http-localhost-8777-contato-html-320px-reflow.png"
+      },
+      "zoom": {
+        "meta_viewport": "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+        "zoom_bloqueado": true,
+        "espacamento_texto": {
+          "rolagem_horizontal": false,
+          "elementos_cortados": 0
+        }
+      },
+      "contraste": {
+        "trechos_analisados": 14,
+        "reprovados": 1,
+        "pior_razao": 3.54,
+        "exemplos": [
+          {
+            "texto": "Instituto Municipal de Tecnologia",
+            "razao": 3.54,
+            "exigido": 4.5,
+            "aprovado": false,
+            "px": 12,
+            "peso": 400,
+            "cor": "rgb(111, 143, 128)",
+            "fundo": "rgb(13,59,38)",
+            "seletor": "div"
+          }
+        ]
+      }
+    }
+  ]
+}

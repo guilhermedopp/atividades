@@ -93,6 +93,9 @@ Salva capturas de tela em `evidencias/mobile/` — servem de anexo no relatório
 ```bash
 pip install python-docx python-pptx    # uma vez
 python3 ferramenta/gerar_documentos.py
+
+# opcional: usar outro arquivo de dados / outra pasta de saída
+python3 ferramenta/gerar_documentos.py --dados outro.json --saida-dir rascunho
 ```
 
 Lê tudo de `dados/` e reescreve os dois arquivos. Ao final informa quantos campos ainda
@@ -146,27 +149,32 @@ ferramenta/
   gerar_documentos.py     montagem do .docx e do .pptx
   textos.py               textos corridos do relatório
   modelo_apresentacao.pptx  tema visual dos slides
-  exemplo/                página de teste + saídas de exemplo das ferramentas
+  exemplo/portal-demo/    portal fictício de 3 páginas para testar as ferramentas
 dados/
   checklist.json          os 15 itens, mapeados à WCAG 2.1 e ao eMAG 3.1
   dados_trabalho.json     >>> É AQUI QUE VOCÊS PREENCHEM <<<
+demonstracao/       exemplo completo das ferramentas rodando (não é a entrega)
 evidencias/         prints do WAVE, do ASES e do celular
 ```
 
 ### Testar as ferramentas sem depender do site
 
-`ferramenta/exemplo/pagina_teste.html` é uma página com defeitos propositais (imagem sem
-`alt`, cabeçalho pulando nível, campo sem `label`, contraste baixo, zoom bloqueado,
-largura fixa). Serve para conferir que tudo funciona:
+`ferramenta/exemplo/portal-demo/` é um portal fictício de três páginas com os defeitos mais
+comuns de sítios institucionais (imagens sem `alt`, cabeçalhos pulando nível, campo de busca
+sem `label`, contraste baixo, zoom bloqueado, tabela de largura fixa). Serve para conferir
+que tudo funciona:
 
 ```bash
-cd ferramenta/exemplo && python3 -m http.server 8765 &
-python3 ferramenta/auditor_wcag.py http://localhost:8765/pagina_teste.html
-python3 ferramenta/simulador_mobile.py http://localhost:8765/pagina_teste.html
+cd ferramenta/exemplo/portal-demo && python3 -m http.server 8777 &
+cd -
+python3 ferramenta/auditor_wcag.py http://localhost:8777/index.html \
+        http://localhost:8777/noticias.html http://localhost:8777/contato.html
+python3 ferramenta/simulador_mobile.py http://localhost:8777/index.html
 ```
 
-As saídas esperadas estão em `ferramenta/exemplo/resultados_*_EXEMPLO.json` e as capturas
-em `ferramenta/exemplo/capturas/`.
+A pasta `demonstracao/` traz o relatório e os slides gerados a partir desse portal, já sem
+nenhum marcador pendente, para você ver como fica o resultado final. Veja
+`demonstracao/LEIA-ME.md`.
 
 ---
 

@@ -310,26 +310,26 @@ def avaliar(p: Analisador, html: str):
     r.append(_res(15, "Estrutura semântica e marcação válida",
                   "nao_conforme" if prob15 else "conforme",
                   f"{len(dup)} id(s) duplicado(s); landmarks ausentes: {', '.join(falt) or 'nenhum'}; "
-                  f"{len(p.divs_clicaveis)} div/span clicavel sem role/tabindex; "
+                  f"{len(p.divs_clicaveis)} div/span clicável sem role/tabindex; "
                   f"{p.iframes_sem_titulo}/{p.iframes} iframe(s) sem title; "
                   f"{p.tabelas_sem_th}/{p.tabelas} tabela(s) sem <th>; "
-                  f"{len(bt_sem_nome)} botao(oes) sem nome acessível; "
+                  f"{len(bt_sem_nome)} botão(ões) sem nome acessível; "
                   f"{p.eventos_inline} manipulador(es) de evento inline.",
                   prob15, dup[:3] + falt[:2]))
 
     # itens que exigem inspecao humana
     for n, nome in ((5, "Contraste mínimo de cores"),
-                    (6, "Cor não e o único meio de transmitir informação"),
+                    (6, "Cor não é o único meio de transmitir informação"),
                     (8, "Navegação completa por teclado"),
                     (9, "Indicador de foco visível"),
-                    (12, "Identificacao e sugestao de correção de erros"),
+                    (12, "Identificação e sugestão de correção de erros"),
                     (14, "Controle de conteúdo em movimento")):
         dica = ""
         if n == 9 and re.search(r"outline\s*:\s*(none|0)", html, re.I):
             dica = " ATENÇÃO: o CSS da página contém 'outline: none' - conferir se há foco substituto."
         if n == 14:
             c = len(re.findall(r"(carousel|carrossel|slider|swiper|owl-|slick-)", html, re.I))
-            dica = f" Indicios de carrossel/slider no código: {c} ocorrência(s)."
+            dica = f" Indícios de carrossel/slider no código: {c} ocorrência(s)."
         r.append(_res(n, nome, "verificar_manualmente",
                       "Critério subjetivo: exige inspeção humana com o site aberto." + dica))
 

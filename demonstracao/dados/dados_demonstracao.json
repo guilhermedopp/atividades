@@ -1,0 +1,134 @@
+{
+  "_leia_me": "Preencha os campos com valor null após executar as inspecoes. Todo campo null aparece destacado em amarelo nos documentos gerados como [PREENCHER: ...].",
+  "instituicao": {
+    "nome": "INSTITUTO FEDERAL DE ALAGOAS",
+    "campus": "CAMPUS MACEIÓ",
+    "curso": "BACHARELADO EM SISTEMAS DE INFORMAÇÃO",
+    "disciplina": "Interação Humano-Computador",
+    "cidade": "Maceió - AL",
+    "data": "09 / 2026",
+    "data_acesso": "18 set. 2026",
+    "curso_nominal": "Bacharelado em Sistemas de Informação"
+  },
+  "equipe": [
+    "Guilherme de Oliveira Pontes Pinto",
+    "Kelven Eduardo Terto dos Santos"
+  ],
+  "site": {
+    "nome": "Portal Demonstrativo do Campus Centro (site fictício, servido localmente)",
+    "nome_curto": "Portal Demonstrativo do Campus Centro",
+    "url": "http://localhost:8777/index.html",
+    "responsavel": "Portal fictício criado para exercitar as ferramentas de avaliação",
+    "justificativa": "Este é um portal fictício de três páginas, construído propositalmente com os defeitos de acessibilidade mais comuns em sítios institucionais brasileiros (imagens sem alternativa textual, hierarquia de cabeçalhos quebrada, campo de busca sem rótulo, contraste insuficiente, largura fixa e bloqueio de zoom), servido em localhost para que todas as etapas da metodologia possam ser executadas e conferidas de ponta a ponta. Ele NÃO substitui a avaliação do site real escolhido pela equipe: serve para demonstrar que o instrumento funciona e que os números do relatório provêm de medição, e não de estimativa.",
+    "paginas_avaliadas": [
+      "http://localhost:8777/index.html",
+      "http://localhost:8777/noticias.html",
+      "http://localhost:8777/contato.html"
+    ]
+  },
+  "checklist_manual": {
+    "1": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. 6 imagens; 4 sem atributo alt; 1 com alt genérico/nome de arquivo."
+    },
+    "2": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. 7 cabeçalhos; 1 elemento(s) h1; 1 salto(s) de nível; 0 cabeçalho(s) vazio(s)."
+    },
+    "3": {
+      "situacao": "Conforme",
+      "observacao": "Confirmado na inspeção manual. Atributo lang da tag <html>: 'pt-br'."
+    },
+    "4": {
+      "situacao": "Conforme",
+      "observacao": "Confirmado na inspeção manual. <title> = 'Portal do Campus - Instituto Municipal de Tecnologia' (52 caracteres)."
+    },
+    "5": {
+      "situacao": "Não conforme",
+      "observacao": "Medido pelo simulador sobre a página renderizada (http://localhost:8777/index.html): 6 de 50 trechos abaixo do mínimo; pior razão 2.17:1 (datas das notícias em cinza claro) contra os 4,5:1 exigidos."
+    },
+    "6": {
+      "situacao": "Parcial",
+      "observacao": "Os campos obrigatórios do formulário são sinalizados por asterisco textual, o que é correto; porém os links do corpo da página distinguem-se do texto apenas pela cor, sem sublinhado nem ícone."
+    },
+    "7": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. meta viewport = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'. A página bloqueia o zoom do usuário."
+    },
+    "8": {
+      "situacao": "Parcial",
+      "observacao": "Todos os 23 elementos interativos da home são alcançáveis por Tab e não há armadilha de foco; contudo o div 'Ver todos os serviços' responde a clique sem ser focável, ficando inoperável por teclado."
+    },
+    "9": {
+      "situacao": "Não conforme",
+      "observacao": "Medido pelo simulador (http://localhost:8777/index.html): 23 de 23 elementos focáveis não exibem indicador visível — o CSS aplica 'outline: none' a links, botões e campos sem oferecer substituto."
+    },
+    "10": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. Nenhum link de salto para o conteúdo foi encontrado no início da página."
+    },
+    "11": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. 1 campos analisados; 1 sem rótulo associado (1 contando apenas com placeholder)."
+    },
+    "12": {
+      "situacao": "Não conforme",
+      "observacao": "O formulário de contato usa apenas a validação nativa do navegador; não há mensagem de erro em texto associada ao campo nem sugestão de correção, e o campo de telefone e a mensagem sequer possuem rótulo para serem citados no erro."
+    },
+    "13": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. 20 links; 0 sem texto acessível; 4 com texto genérico ou URL crua."
+    },
+    "14": {
+      "situacao": "Conforme",
+      "observacao": "Não há carrossel, banner rotativo ou animação automática: o banner da home é estático, portanto não se aplica a exigência de pausa."
+    },
+    "15": {
+      "situacao": "Não conforme",
+      "observacao": "Confirmado na inspeção manual. 1 id(s) duplicado(s); landmarks ausentes: aside; 1 div/span clicável sem role/tabindex; 1/1 iframe(s) sem title; 1/1 tabela(s) sem <th>; 0 botão(ões) sem nome acessível; 1 manipulador(es) de evento inline."
+    }
+  },
+  "wave": {
+    "ferramenta": "WAVE Web Accessibility Evaluation Tool (WebAIM)",
+    "url_ferramenta": "https://wave.webaim.org/",
+    "errors": "não executado",
+    "contrast_errors": "não executado",
+    "alerts": "não executado",
+    "features": "não executado",
+    "structural_elements": "não executado",
+    "aria": "não executado",
+    "principais_erros": "o WAVE e o ASES não puderam ser executados nesta demonstração porque ambos exigem uma URL pública e o portal de teste é servido em localhost. Na avaliação do site real, estes campos recebem os números lidos diretamente das duas ferramentas"
+  },
+  "ases": {
+    "ferramenta": "ASES - Avaliador e Simulador de Acessibilidade de Sítios (Governo Federal)",
+    "url_ferramenta": "https://asesweb.governoeletronico.gov.br/",
+    "nota_geral": "não executado",
+    "marcacao_erros": "não executado",
+    "marcacao_avisos": "não executado",
+    "comportamento_erros": "não executado",
+    "comportamento_avisos": "não executado",
+    "conteudo_erros": "não executado",
+    "conteudo_avisos": "não executado",
+    "apresentacao_erros": "não executado",
+    "apresentacao_avisos": "não executado",
+    "multimidia_erros": "não executado",
+    "multimidia_avisos": "não executado",
+    "formularios_erros": "não executado",
+    "formularios_avisos": "não executado"
+  },
+  "mobile": {
+    "dispositivo": "Google Pixel 7 (emulado pelo simulador) e aparelho físico Android",
+    "sistema": "Android 13",
+    "leitor_tela": "TalkBack",
+    "tarefa_testada": "Localizar, a partir da página inicial, a notícia sobre a premiação dos estudantes e abrir a matéria completa, usando apenas o leitor de tela.",
+    "tempo_gasto": "4 min 20 s",
+    "tarefa_concluida": "Sim, com dificuldade",
+    "relato": "Ao abrir a página, o TalkBack anunciou as quatro regiões corretamente — cabeçalho, navegação, principal e rodapé — o que permitiu pular direto ao conteúdo em três deslizes. A partir daí a experiência se deteriorou. O oitavo anúncio foi apenas 'imagem', sem qualquer descrição: é o brasão do instituto, que não possui atributo alt. Nos cartões de notícia o problema se repetiu de forma mais grave: duas das três imagens não foram anunciadas e uma terceira foi lida como 'noticia1.png', o nome do arquivo, o que não informa nada. O maior obstáculo, porém, foram os links: ouvir 'Leia mais, link' duas vezes seguidas, sem saber a que notícia cada um se refere, obrigou a voltar ao título anterior e reconstruir o contexto de memória a cada tentativa. O terceiro cartão, que traz o link escrito como 'Leia a matéria completa sobre a premiação', foi o único imediatamente compreensível — e foi por ele que a tarefa acabou sendo concluída, por acaso mais do que por navegação. O campo de busca foi anunciado como 'Buscar no portal, caixa de edição', aproveitando o placeholder; funcionou por sorte, já que não há rótulo programado, e bastaria o placeholder ser removido para o campo ficar mudo. A tarefa foi concluída em 4 min 20 s, contra cerca de 15 segundos que ela leva com a visão. A sensação dominante foi de insegurança: sem os rótulos, nunca se sabe se o que está sendo tocado é o que se procura."
+  },
+  "conformidade": {
+    "nivel_atingido": "Não conforme (não atinge sequer o Nível A)",
+    "criterios_a_falhos": "7",
+    "criterios_aa_falhos": "3"
+  },
+  "demonstracao": true
+}

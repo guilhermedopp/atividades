@@ -54,7 +54,7 @@
     },
     {
       "id": 6,
-      "nome": "Cor não e o único meio de transmitir informação",
+      "nome": "Cor não é o único meio de transmitir informação",
       "wcag": "1.4.1 Uso de cores",
       "nivel": "A",
       "emag": "3.2 - Não utilizar apenas cor para diferenciar elementos",
@@ -114,11 +114,11 @@
     },
     {
       "id": 12,
-      "nome": "Identificacao e sugestao de correção de erros",
-      "wcag": "3.3.1 Identificacao do erro / 3.3.3 Sugestao de erro",
+      "nome": "Identificação e sugestão de correção de erros",
+      "wcag": "3.3.1 Identificação do erro / 3.3.3 Sugestão de erro",
       "nivel": "A / AA",
       "emag": "6.5 - Fornecer instruções para entrada de dados",
-      "pergunta": "Ao submeter dados invalidos, o erro e descrito em texto, associado ao campo e acompanhado de sugestao?",
+      "pergunta": "Ao submeter dados invalidos, o erro e descrito em texto, associado ao campo e acompanhado de sugestão?",
       "como_testar": "Enviar um formulário (busca, contato, login) com dados invalidos e observar a mensagem retornada.",
       "automatizavel": false
     },

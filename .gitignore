@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 ~$*
 .DS_Store
+
+# saídas transitórias das ferramentas (cada execução regrava)
+dados/resultados_automaticos.json
+dados/resultados_mobile.json

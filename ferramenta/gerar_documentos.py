@@ -17,6 +17,7 @@ Uso:
     python3 ferramenta/gerar_documentos.py
 """
 
+import argparse
 import json
 import os
 import re
@@ -55,8 +56,8 @@ def carregar(nome, padrao=None):
         return json.load(f)
 
 
-def preparar():
-    d = carregar("dados_trabalho.json")
+def preparar(arquivo_dados="dados_trabalho.json"):
+    d = carregar(arquivo_dados)
     if d is None:
         sys.exit("ERRO: dados/dados_trabalho.json não encontrado.")
     ck = carregar("checklist.json")
@@ -245,6 +246,24 @@ def rotulo_situacao(valor):
     return SITUACAO.get(chave, (str(valor), None))
 
 
+def execucao_principal(d):
+    """Escolhe a execução do simulador que corresponde à página principal.
+
+    O simulador pode ter sido rodado várias vezes, em páginas e aparelhos
+    diferentes. O relatório descreve uma delas, e a escolhida deve ser a
+    primeira página declarada em site.paginas_avaliadas — caso contrário o
+    texto acaba citando uma página enquanto os números vêm de outra.
+    """
+    exes = d["_mobile"].get("execucoes", [])
+    if not exes:
+        return None
+    alvo = (d.get("site", {}).get("paginas_avaliadas") or [None])[0]
+    for e in exes:
+        if alvo and e.get("url") == alvo:
+            return e
+    return exes[-1]
+
+
 def auto_por_item(d):
     """Mapeia item do checklist -> pior resultado automático entre as páginas."""
     mapa = {}
@@ -282,6 +301,13 @@ def capa(doc, d):
         par(doc, "", espacamento=1.5)
     par(doc, ins["cidade"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     par(doc, ins["data"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
+    if d.get("demonstracao"):
+        par(doc, "", espacamento=1.0)
+        par(doc, "DOCUMENTO DE DEMONSTRAÇÃO - os dados abaixo provêm de um portal "
+                 "fictício servido localmente, criado apenas para exercitar as ferramentas. "
+                 "Não se trata da avaliação de um site real.",
+            negrito=True, tamanho=10, alinhamento=WD_ALIGN_PARAGRAPH.CENTER,
+            espacamento=1.0, cor=RGBColor(0xB7, 0x1C, 0x1C))
     doc.add_page_break()
 
 
@@ -473,12 +499,11 @@ def secao_mobile_auto(doc, d):
                "delas percorre a árvore de acessibilidade da página, que é exatamente a "
                "estrutura consumida pelo TalkBack e pelo VoiceOver, e produz a transcrição do "
                "que seria anunciado ao usuário a cada deslize.")
-    exes = d["_mobile"].get("execucoes", [])
-    if not exes:
+    e = execucao_principal(d)
+    if e is None:
         item_lista(doc, V(None, "execute 'python3 ferramenta/simulador_mobile.py <URL>' e gere "
                                 "novamente este relatório para preencher os Quadros 6 e 7"))
         return
-    e = exes[-1]
     lt, fk, at = e["leitor_tela"], e["foco_teclado"], e["alvos_toque"]
     rf, zm, ct = e["reflow_320px"], e["zoom"], e["contraste"]
     corpo(doc, f"A simulação foi executada sobre {e['url']}, emulando o aparelho "
@@ -743,16 +768,18 @@ def gerar_pptx(d):
     site = d["site"]
     ins = d["instituicao"]
     auto = auto_por_item(d)
-    exes = d["_mobile"].get("execucoes", [])
-    e = exes[-1] if exes else None
+    e = execucao_principal(d)
     w, a, m, c = d.get("wave", {}), d.get("ases", {}), d.get("mobile", {}), d.get("conformidade", {})
 
     # 1 capa
+    selo = ("\n[DEMONSTRAÇÃO - portal fictício local, não é um site real]"
+            if d.get("demonstracao") else "")
     slide_titulo(prs,
                  "Avaliação de Acessibilidade Web com as Diretrizes WCAG 2.1",
                  limpo(V(site.get("nome"), "site avaliado")) + "\n"
                  + " · ".join(d["equipe"]) + "\n"
-                 + f"{ins.get('curso_nominal') or ins['curso']} — {ins['disciplina']} — {ins['data']}")
+                 + f"{ins.get('curso_nominal') or ins['curso']} — {ins['disciplina']} — {ins['data']}"
+                 + selo)
 
     # 2 o que é
     slide_conteudo(prs, "O que são as WCAG?", [
@@ -926,7 +953,22 @@ def contar_pendencias(d):
 
 
 def main():
-    d = preparar()
+    global SAIDA_DOCX, SAIDA_PPTX
+    ap = argparse.ArgumentParser(
+        description="Monta o relatório (.docx) e a apresentação (.pptx)")
+    ap.add_argument("--dados", default="dados_trabalho.json",
+                    help="arquivo de dados dentro de dados/ (padrão: dados_trabalho.json)")
+    ap.add_argument("--saida-dir", default=None,
+                    help="grava os dois arquivos nesta pasta, em vez de relatorio/ e apresentacao/")
+    args = ap.parse_args()
+
+    if args.saida_dir:
+        destino = os.path.join(RAIZ, args.saida_dir)
+        os.makedirs(destino, exist_ok=True)
+        SAIDA_DOCX = os.path.join(destino, os.path.basename(SAIDA_DOCX))
+        SAIDA_PPTX = os.path.join(destino, os.path.basename(SAIDA_PPTX))
+
+    d = preparar(args.dados)
     docx = gerar_docx(d)
     pptx = gerar_pptx(d)
     print("Documentos gerados:")

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Fale conosco - Instituto Municipal de Tecnologia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<a href="#conteudo" class="pular">Ir para o conteúdo principal</a>
+<div class="barra-gov"><a href="#">Acessibilidade</a><a href="#">Alto contraste</a></div>
+<header>
+  <img src="brasao.png" width="38" height="38" alt="Brasão do Instituto Municipal de Tecnologia">
+  <h1>Fale conosco</h1>
+</header>
+<nav>
+  <a href="index.html">Início</a><a href="noticias.html">Notícias</a>
+  <a href="contato.html">Contato</a>
+</nav>
+<main id="conteudo">
+  <h1>Fale conosco</h1>
+  <p>Preencha o formulário abaixo. Campos marcados com <span class="obrigatorio">*</span>
+     são obrigatórios.</p>
+  <form action="#" method="post">
+    <label for="nome">Nome completo <span class="obrigatorio">*</span></label>
+    <input id="nome" type="text" name="nome" required>
+
+    <label for="email">E-mail <span class="obrigatorio">*</span></label>
+    <input id="email" type="email" name="email" required>
+
+    <input type="tel" name="telefone" placeholder="Telefone com DDD">
+
+    <label for="assunto">Assunto</label>
+    <select id="assunto" name="assunto">
+      <option>Selecione</option><option>Matrícula</option>
+      <option>Biblioteca</option><option>Ouvidoria</option>
+    </select>
+
+    <textarea name="mensagem" rows="5" placeholder="Escreva sua mensagem"></textarea>
+
+    <button class="enviar" type="submit">Enviar mensagem</button>
+  </form>
+</main>
+<footer><div id="rodape">Instituto Municipal de Tecnologia</div></footer>
+</body>
+</html>

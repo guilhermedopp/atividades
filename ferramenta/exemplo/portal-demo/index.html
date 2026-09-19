@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Portal do Campus - Instituto Municipal de Tecnologia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="barra-gov">
+  <a href="#">Acessibilidade</a><a href="#">Alto contraste</a><a href="#">Mapa do site</a>
+</div>
+
+<header>
+  <img src="brasao.png" width="38" height="38">
+  <h1>Instituto Municipal de Tecnologia &middot; Campus Centro</h1>
+  <div class="busca">
+    <input type="text" name="q" placeholder="Buscar no portal">
+    <button type="submit">Ir</button>
+  </div>
+</header>
+
+<nav>
+  <a href="index.html">Início</a>
+  <a href="noticias.html">Notícias</a>
+  <a href="#">Cursos</a>
+  <a href="#">Editais</a>
+  <a href="#">Biblioteca</a>
+  <a href="contato.html">Contato</a>
+</nav>
+
+<main>
+  <div class="banner">
+    <img src="banner.png">
+    <div class="legenda">Inscrições abertas para o Processo Seletivo 2026</div>
+  </div>
+
+  <h2>Últimas notícias</h2>
+  <div class="grade">
+    <div class="card">
+      <img src="noticia1.png" alt="noticia1.png">
+      <h4>Campus recebe laboratório de robótica</h4>
+      <p>Novo espaço atenderá estudantes dos cursos técnicos e superiores.</p>
+      <a href="#">Leia mais</a>
+      <p class="data">Publicado há 2 dias</p>
+    </div>
+    <div class="card">
+      <img src="noticia2.png">
+      <h4>Semana de Ciência e Tecnologia</h4>
+      <p>Programação completa com oficinas, palestras e mostra de projetos.</p>
+      <a href="#">Leia mais</a>
+      <p class="data">Publicado há 5 dias</p>
+    </div>
+    <div class="card">
+      <img src="noticia3.png" alt="Estudantes apresentando projetos na mostra de tecnologia">
+      <h4>Estudantes premiados em feira estadual</h4>
+      <p>Projeto de monitoramento de qualidade do ar conquistou o primeiro lugar.</p>
+      <a href="noticias.html">Leia a matéria completa sobre a premiação</a>
+      <p class="data">Publicado há 1 semana</p>
+    </div>
+  </div>
+
+  <h4>Acesso rápido</h4>
+  <div class="atalhos">
+    <a href="#">Matrícula</a><a href="#">Calendário</a><a href="#">Biblioteca</a>
+    <a href="#">Restaurante</a><a href="#">Ouvidoria</a><a href="#">clique aqui</a>
+    <a href="#">https://portal.exemplo.edu.br/sistemas</a>
+  </div>
+
+  <h3>Horário de funcionamento</h3>
+  <table class="tabela-larga">
+    <tr><td>Secretaria</td><td>Segunda a sexta</td><td>08h às 17h</td><td>Bloco A, térreo</td></tr>
+    <tr><td>Biblioteca</td><td>Segunda a sexta</td><td>07h às 21h</td><td>Bloco C, 1º andar</td></tr>
+    <tr><td>Coordenações</td><td>Segunda a sexta</td><td>09h às 16h</td><td>Bloco B, 2º andar</td></tr>
+  </table>
+
+  <div class="menu-lateral" onclick="abrirMenu()">Ver todos os serviços</div>
+  <iframe src="mapa.html" width="320" height="150"></iframe>
+</main>
+
+<footer>
+  <div id="rodape">Instituto Municipal de Tecnologia &middot; Rua das Palmeiras, 100</div>
+  <div id="rodape">Telefone: (82) 3000-0000 &middot; <a href="#">Fale conosco</a></div>
+  <img src="selo.png" width="34" height="34">
+</footer>
+</body>
+</html>
