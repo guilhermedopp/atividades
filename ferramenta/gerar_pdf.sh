@@ -9,6 +9,17 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 PERFIL="$(mktemp -d)/lo"
+# O guia de pendências é Markdown: passa antes por um .docx intermediário.
+if [ -f PENDENCIAS.md ]; then
+  echo "convertendo PENDENCIAS.md ..."
+  TMPD="$(mktemp -d)"
+  python3 ferramenta/md_para_docx.py PENDENCIAS.md "$TMPD/PENDENCIAS.docx" >/dev/null &&
+  soffice -env:UserInstallation="file://$PERFIL" --headless \
+          --convert-to pdf --outdir "$TMPD" "$TMPD/PENDENCIAS.docx" >/dev/null 2>&1 &&
+  cp "$TMPD/PENDENCIAS.pdf" PENDENCIAS.pdf && echo "  -> PENDENCIAS.pdf"
+  rm -rf "$TMPD"
+fi
+
 for ARQ in relatorio/*.docx apresentacao/*.pptx; do
   [ -e "$ARQ" ] || continue
   DEST="$(dirname "$ARQ")"
