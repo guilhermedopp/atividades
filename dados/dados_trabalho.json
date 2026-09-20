@@ -28,64 +28,64 @@
   },
   "checklist_manual": {
     "1": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "parcial",
+      "observacao": "Nas 3 páginas auditadas, 13 imagens na página inicial e nenhuma sem atributo alt nem com alt genérico ou nome de arquivo. O axe-core, porém, apontou 4 imagens cujo texto alternativo repete literalmente o texto do link ao lado, fazendo o leitor de tela anunciar a mesma informação duas vezes."
     },
     "2": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "nao_conforme",
+      "observacao": "A página inicial possui 15 cabeçalhos, mas nenhum <h1>; a página de contato não possui cabeçalho algum. Apenas a página de notícias declara um <h1>. Sem <h1>, o leitor de tela não identifica o título principal e a navegação por cabeçalhos perde o ponto de partida."
     },
     "3": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "conforme",
+      "observacao": "As 3 páginas declaram lang=\"pt-br\" na tag <html>, permitindo que o leitor de tela escolha a pronúncia correta."
     },
     "4": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "conforme",
+      "observacao": "Cada página possui <title> único e descritivo: \"Campus Maceió — Instituto Federal de Alagoas\", \"Notícias — Instituto Federal de Alagoas\" e \"Instituto Federal de Alagoas\". O título da página de contato, porém, não distingue a seção."
     },
     "5": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "nao_conforme",
+      "observacao": "Medição por amostragem de pixels reais da página renderizada. Reprovações confirmadas: botões de navegação do banner rotativo, azul rgb(44,103,205) sobre verde rgb(14,86,31), razão de 1,66:1 (exige 4,5:1); o botão do slide ativo, azul sobre âmbar rgb(255,180,0), 3,0:1; o link \"Voltar para o topo\", cinza rgb(119,119,119) sobre branco, 4,48:1; e a Barra do Governo Federal, branco sobre cinza #7F7F7F, 4,0:1. As legendas brancas sobre as fotos do banner não puderam ser medidas automaticamente e exigem conferência visual."
     },
     "6": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "nao_conforme",
+      "observacao": "No banner rotativo, o slide em exibição é sinalizado apenas pela cor de fundo do botão numérico: âmbar rgb(255,180,0) para o ativo e verde rgb(14,86,31) para os demais. Não há mudança de forma, contorno, sublinhado, ícone ou texto alternativo. Quem não distingue essas cores não identifica em que slide está."
     },
     "7": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "parcial",
+      "observacao": "O meta viewport não bloqueia ampliação e, a 200% de zoom, a página não gera rolagem horizontal. Porém, ao aplicar o espaçamento de texto exigido pelo critério 1.4.12 (entrelinha 1,5; espaçamento entre letras 0,12em; entre palavras 0,16em), surge rolagem horizontal e 3 elementos têm o conteúdo cortado."
     },
     "8": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "conforme",
+      "observacao": "Percurso completo por Tab na página inicial: 117 elementos interativos visíveis e 118 pontos de parada alcançados, ou seja, tudo que é clicável também é acessível pelo teclado. Shift+Tab retorna corretamente e não foi detectada armadilha de foco. O portal ainda oferece 4 atalhos de salto (Alt+1 a Alt+4)."
     },
     "9": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "parcial",
+      "observacao": "Todos os 118 pontos de parada exibem indicador de foco: contorno sólido de 2px na cor rgb(241,202,127). Sobre os fundos verdes do cabeçalho e do rodapé o indicador atinge 5,81:1 e 6,96:1. Sobre o fundo branco da área de conteúdo, porém, a razão cai para 1,56:1, abaixo dos 3:1 exigidos pelo critério 1.4.11, tornando o foco pouco perceptível justamente onde está a maior parte dos links."
     },
     "10": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "conforme",
+      "observacao": "O portal implementa a barra de acessibilidade padrão do Governo Federal com 4 links de salto no início do documento: \"Ir para o conteúdo\" (Alt+1), \"Ir para o menu\" (Alt+2), \"Ir para a busca\" (Alt+3) e \"Ir para o rodapé\" (Alt+4), todos visíveis e funcionais."
     },
     "11": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "conforme",
+      "observacao": "Todos os campos de formulário encontrados possuem rótulo associado: o campo de busca usa <label class=\"hiddenStructure\" for=\"nolivesearchGadget\"> mais atributo title, e o formulário de acesso usa <label for> nos campos de usuário e senha. Nenhum campo depende apenas de placeholder."
     },
     "12": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "nao_aplicavel",
+      "observacao": "As páginas avaliadas não possuem formulário de entrada de dados com validação: a página \"Contato\" apresenta apenas informações de telefone e endereço, sem formulário de mensagem. Os únicos formulários presentes são a busca do portal e o acesso restrito. Registra-se, ainda assim, que em nenhuma das páginas há qualquer semântica de erro: zero ocorrências de required, aria-required, aria-invalid, aria-describedby ou role=\"alert\"."
     },
     "13": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "parcial",
+      "observacao": "Nas 3 páginas avaliadas, os 128 links da página inicial, 128 da de notícias e 54 da de contato possuem texto acessível, sem ocorrências de \"clique aqui\" ou equivalentes. Na página institucional de Acessibilidade, porém, dois links usam a URL crua como texto visível, que o leitor de tela soletra caractere a caractere."
     },
     "14": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "nao_conforme",
+      "observacao": "A leitura do script banner_rotativo.js confirma que o banner da página inicial troca de slide sozinho a cada 4000 ms, reagendando-se indefinidamente. O movimento só é suspenso enquanto o ponteiro ou o foco permanece sobre um link do banner, e não existe botão de pausar, parar ou ocultar. Isso contraria diretamente o critério 2.2.2, de Nível A."
     },
     "15": {
-      "situacao": null,
-      "observacao": null
+      "situacao": "parcial",
+      "observacao": "Não há identificadores duplicados, iframes sem title, tabelas sem <th>, botões sem nome acessível nem manipuladores de evento embutidos. O portal declara as regiões role=\"banner\", role=\"main\" e role=\"contentinfo\", mas não declara nenhuma região de navegação (<nav> ou role=\"navigation\"). Em consequência, o axe-core apontou de 3 a 4 blocos de conteúdo fora de qualquer região em cada página."
     }
   },
   "wave": {
@@ -126,8 +126,153 @@
     "relato": null
   },
   "conformidade": {
-    "nivel_atingido": null,
-    "criterios_a_falhos": null,
-    "criterios_aa_falhos": null
+    "nivel_atingido": "Não atinge o Nível A",
+    "criterios_a_falhos": "1.4.1 Uso de cores (marcador do slide ativo diferenciado apenas pela cor de fundo) e 2.2.2 Pausar, Parar, Ocultar (banner rotativo com avanço automático a cada 4 segundos, sem mecanismo de pausa).",
+    "criterios_aa_falhos": "1.4.3 Contraste mínimo (4 reprovações confirmadas por amostragem de pixels, a pior em 1,66:1); 1.4.10 Reflow (conteúdo de 330 px em tela de 320 px, gerando rolagem horizontal); 1.4.11 Contraste não textual (indicador de foco em 1,56:1 sobre o fundo branco do conteúdo); 1.4.12 Espaçamento de texto (rolagem horizontal e 3 elementos cortados); 2.5.8 Tamanho do alvo (23 dos 51 alvos interativos da versão móvel medem menos de 24x24 px)."
+  },
+  "axe": {
+    "ferramenta": "axe-core 4.10.2 (Deque Systems)",
+    "url_ferramenta": "https://github.com/dequelabs/axe-core",
+    "como_foi_executado": "Motor injetado na página já renderizada em Chromium (viewport 1366x900), executando o conjunto completo de regras e separando violações de Critérios de Sucesso da WCAG das regras classificadas como boas práticas.",
+    "paginas": {
+      "https://www2.ifal.edu.br/campus/maceio": {
+        "passes": 41,
+        "inapplicable": 46,
+        "violacoes_wcag": 0,
+        "boas_praticas": [
+          {
+            "regra": "image-redundant-alt",
+            "impacto": "minor",
+            "ocorrencias": 4,
+            "descricao": "Alternative text of images should not be repeated as text"
+          },
+          {
+            "regra": "page-has-heading-one",
+            "impacto": "moderate",
+            "ocorrencias": 1,
+            "descricao": "Page should contain a level-one heading"
+          },
+          {
+            "regra": "region",
+            "impacto": "moderate",
+            "ocorrencias": 3,
+            "descricao": "All page content should be contained by landmarks"
+          }
+        ],
+        "revisao_manual": [
+          {
+            "regra": "color-contrast",
+            "ocorrencias": 30,
+            "descricao": "Elements must meet minimum color contrast ratio thresholds"
+          },
+          {
+            "regra": "frame-tested",
+            "ocorrencias": 1,
+            "descricao": "Frames should be tested with axe-core"
+          }
+        ]
+      },
+      "https://www2.ifal.edu.br/campus/maceio/noticias": {
+        "passes": 40,
+        "inapplicable": 49,
+        "violacoes_wcag": 0,
+        "boas_praticas": [
+          {
+            "regra": "region",
+            "impacto": "moderate",
+            "ocorrencias": 4,
+            "descricao": "All page content should be contained by landmarks"
+          }
+        ],
+        "revisao_manual": [
+          {
+            "regra": "color-contrast",
+            "ocorrencias": 25,
+            "descricao": "Elements must meet minimum color contrast ratio thresholds"
+          }
+        ]
+      },
+      "https://www2.ifal.edu.br/campus/maceio/contato": {
+        "passes": 35,
+        "inapplicable": 53,
+        "violacoes_wcag": 0,
+        "boas_praticas": [
+          {
+            "regra": "page-has-heading-one",
+            "impacto": "moderate",
+            "ocorrencias": 1,
+            "descricao": "Page should contain a level-one heading"
+          },
+          {
+            "regra": "region",
+            "impacto": "moderate",
+            "ocorrencias": 3,
+            "descricao": "All page content should be contained by landmarks"
+          }
+        ],
+        "revisao_manual": [
+          {
+            "regra": "color-contrast",
+            "ocorrencias": 25,
+            "descricao": "Elements must meet minimum color contrast ratio thresholds"
+          }
+        ]
+      }
+    }
+  },
+  "contraste_pixel": {
+    "metodo": "Amostragem de pixels reais: o texto é pintado de transparente, a área do elemento é fotografada e a cor dominante da imagem é tomada como fundo efetivo. Isso evita o erro de supor o fundo subindo a árvore do DOM, que falha quando o elemento é desenhado sobre um irmão posicionado.",
+    "reprovacoes_confirmadas": [
+      {
+        "elemento": "Botão de navegação do banner rotativo (slides 1, 3 e 4)",
+        "cor_texto": "rgb(44,103,205)",
+        "cor_fundo": "rgb(14,86,31)",
+        "razao": 1.66,
+        "exigido": 4.5,
+        "tamanho": "22x20 px"
+      },
+      {
+        "elemento": "Botão de navegação do banner rotativo (slide ativo)",
+        "cor_texto": "rgb(44,103,205)",
+        "cor_fundo": "rgb(255,180,0)",
+        "razao": 3.0,
+        "exigido": 4.5,
+        "tamanho": "22x20 px"
+      },
+      {
+        "elemento": "Link \"Voltar para o topo\"",
+        "cor_texto": "rgb(119,119,119)",
+        "cor_fundo": "rgb(255,255,255)",
+        "razao": 4.48,
+        "exigido": 4.5,
+        "tamanho": "139x19 px"
+      },
+      {
+        "elemento": "Barra do Governo Federal (barra.brasil.gov.br)",
+        "cor_texto": "rgb(255,255,255)",
+        "cor_fundo": "rgb(127,127,127)",
+        "razao": 4.0,
+        "exigido": 4.5,
+        "tamanho": "texto de 10 px"
+      }
+    ],
+    "indicador_de_foco": {
+      "cor": "rgb(241,202,127)",
+      "sobre_branco": 1.56,
+      "sobre_verde_cabecalho": 5.81,
+      "sobre_verde_rodape": 6.96,
+      "exigido_1411": 3.0
+    },
+    "nao_mensuravel": "As legendas brancas sobre as fotografias do banner rotativo não puderam ser medidas: os quatro slides ocupam a mesma posição na tela e a amostra de pixels resulta em composição das camadas. Exigem conferência visual humana no site em operação."
+  },
+  "recursos_assistivos": {
+    "vlibras": {
+      "presente": true,
+      "como_foi_constatado": "Observado em captura de tela feita pela equipe em aparelho Android real, e confirmado na leitura do código de barra.brasil.gov.br/barra.js, que injeta no corpo da página o bloco <div vw class=\"enabled\"> com o botão vw-access-button e, em seguida, carrega https://vlibras.gov.br/app2/vlibras-plugin.js chamando window.VLibras.Widget.",
+      "origem": "Barra de identidade do Governo Federal (barra.brasil.gov.br/barra.js), presente em todas as páginas do portal.",
+      "por_que_escapou": "O widget não existe no HTML entregue pelo servidor: é inserido em tempo de execução por script de terceiro. A busca pelo termo \"vlibras\" no código-fonte das quatro páginas retorna zero ocorrências, e o domínio barra.brasil.gov.br não carregou no espelho local usado para as medições de renderização.",
+      "nao_auditado": "Por não ter carregado no ambiente de medição, o próprio widget não foi avaliado quanto a contraste, tamanho de alvo, nome acessível ou operação por teclado. Fica como item para a inspeção presencial da equipe.",
+      "lacuna_documental": "A página institucional de Acessibilidade não menciona Libras nem o VLibras em nenhum momento: o portal oferece o recurso, mas não o informa a quem procuraria por ele."
+    }
   }
 }

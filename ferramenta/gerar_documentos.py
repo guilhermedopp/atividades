@@ -25,7 +25,8 @@ import sys
 
 from docx import Document
 from docx.enum.section import WD_SECTION
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_COLOR_INDEX
+from docx.enum.text import (WD_ALIGN_PARAGRAPH, WD_BREAK, WD_COLOR_INDEX,
+                            WD_TAB_ALIGNMENT, WD_TAB_LEADER)
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
@@ -105,15 +106,23 @@ def estilo_base(doc):
     pf.space_after = Pt(0)
     pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
+    # Medidas retiradas do modelo entregue pela disciplina: margens de 2,54 cm
+    # nos quatro lados, corpo em Arial 12, entrelinha 1,5.
     s = doc.sections[0]
-    s.page_width, s.page_height = Cm(21), Cm(29.7)
-    s.left_margin, s.top_margin = Cm(3), Cm(3)
-    s.right_margin, s.bottom_margin = Cm(2), Cm(2)
+    s.page_width, s.page_height = Cm(21.01), Cm(29.69)
+    s.left_margin = s.right_margin = Cm(2.54)
+    s.top_margin = s.bottom_margin = Cm(2.54)
 
 
-def numerar_paginas(doc):
-    """Insere o número da página no rodapé (campo PAGE do Word)."""
-    p = doc.sections[0].footer.paragraphs[0]
+def numerar_paginas(sec):
+    """Insere o número da página no rodapé da seção (campo PAGE do Word).
+
+    O modelo da disciplina não numera as páginas, mas ele tem seis páginas e
+    este relatório passa de trinta. Mantém-se a numeração, desligada na capa e
+    na folha de rosto: elas ficam em uma seção própria, sem rodapé.
+    """
+    sec.footer.is_linked_to_previous = False
+    p = sec.footer.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     r = p.add_run()
     r.font.name, r.font.size = FONTE, Pt(10)
@@ -128,11 +137,12 @@ def numerar_paginas(doc):
 
 
 def par(doc, texto="", *, negrito=False, tamanho=12, alinhamento=None, espaco_depois=0,
-        recuo=None, espacamento=1.5, maiusculas=False, cor=None):
+        espaco_antes=0, recuo=None, espacamento=1.5, maiusculas=False, cor=None):
     p = doc.add_paragraph()
     pf = p.paragraph_format
     pf.line_spacing = espacamento
     pf.space_after = Pt(espaco_depois)
+    pf.space_before = Pt(espaco_antes)
     if alinhamento is not None:
         pf.alignment = alinhamento
     if recuo is not None:
@@ -152,14 +162,18 @@ def par(doc, texto="", *, negrito=False, tamanho=12, alinhamento=None, espaco_de
 
 
 def titulo_secao(doc, texto, nivel=1):
-    doc.add_paragraph()
-    par(doc, texto, negrito=True, tamanho=12 if nivel == 1 else 12,
-        alinhamento=WD_ALIGN_PARAGRAPH.LEFT, espaco_depois=6,
-        maiusculas=(nivel == 1))
+    """Título de seção no formato do modelo: 14 pt no nível 1, 13 pt no nível 2,
+    negrito, justificado, com 12 pt de espaço antes e depois."""
+    par(doc, texto, negrito=True, tamanho=14 if nivel == 1 else 13,
+        alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY,
+        espaco_antes=12, espaco_depois=12, maiusculas=(nivel == 1))
 
 
 def corpo(doc, texto):
-    par(doc, texto, alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY, recuo=1.25, espaco_depois=6)
+    """Parágrafo de corpo no formato do modelo: Arial 12, justificado,
+    entrelinha 1,5, 12 pt antes e depois, sem recuo de primeira linha."""
+    par(doc, texto, alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY,
+        espaco_antes=12, espaco_depois=12)
 
 
 def item_lista(doc, texto, simbolo="•"):
@@ -185,8 +199,10 @@ def celula(cel, texto, *, negrito=False, tamanho=10, centralizar=False, cor=None
     p = cel.paragraphs[0]
     p.paragraph_format.line_spacing = 1.0
     p.paragraph_format.space_after = Pt(2)
-    if centralizar:
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    # Em coluna estreita, o justificado do corpo abre vãos enormes entre as
+    # palavras. Dentro de tabela o texto fica alinhado à esquerda.
+    p.alignment = (WD_ALIGN_PARAGRAPH.CENTER if centralizar
+                   else WD_ALIGN_PARAGRAPH.LEFT)
     for conteudo, marcador in segmentos(str(texto)):
         if not conteudo:
             continue
@@ -216,16 +232,39 @@ def tabela(doc, cabecalhos, larguras, linhas):
     t = doc.add_table(rows=1, cols=len(cabecalhos))
     t.style = "Table Grid"
     t.autofit = False
+    # Sem tblLayout fixo o Word e o LibreOffice redistribuem as colunas pelo
+    # conteúdo e ignoram as larguras pedidas.
+    tbl_pr = t._tbl.tblPr
+    layout = OxmlElement("w:tblLayout")
+    layout.set(qn("w:type"), "fixed")
+    tbl_pr.append(layout)
+    grid = OxmlElement("w:tblGrid")
+    for l in larguras:
+        col = OxmlElement("w:gridCol")
+        col.set(qn("w:w"), str(int(Cm(l).twips)))
+        grid.append(col)
+    antigo = t._tbl.find(qn("w:tblGrid"))
+    if antigo is not None:
+        t._tbl.replace(antigo, grid)
+    else:
+        t._tbl.insert(1, grid)
     for i, (h, l) in enumerate(zip(cabecalhos, larguras)):
         celula(t.rows[0].cells[i], h, negrito=True, centralizar=True)
         sombrear(t.rows[0].cells[i])
         for row in t.rows:
             row.cells[i].width = Cm(l)
+    # Centralizar é decisão de coluna, não de célula: só se todos os valores
+    # daquela coluna forem curtos, como a de numeração. Misturar centralizado e
+    # alinhado à esquerda na mesma coluna deixa a tabela visualmente torta.
+    centrar = []
+    for i in range(len(cabecalhos)):
+        valores = [str(limpo(ln[i])) for ln in linhas if i < len(ln)]
+        centrar.append(bool(valores) and max(len(v) for v in valores) <= 6)
+
     for dados in linhas:
         cels = t.add_row().cells
         for i, (valor, l) in enumerate(zip(dados, larguras)):
-            centro = i in (0, len(dados) - 1) and len(str(limpo(valor))) < 16
-            celula(cels[i], valor, centralizar=centro)
+            celula(cels[i], valor, centralizar=centrar[i])
             cels[i].width = Cm(l)
     return t
 
@@ -279,20 +318,36 @@ def auto_por_item(d):
 
 
 # ------------------------------------------------------------ montagem docx
+LOGO = os.path.join(RAIZ, "ferramenta", "logo_ifal.png")
+
+
+def inserir_logo(doc):
+    """Brasão do IFAL centralizado, nas medidas do modelo (2,15 x 2,75 cm)."""
+    if not os.path.exists(LOGO):
+        return
+    try:
+        doc.add_picture(LOGO, width=Cm(2.15), height=Cm(2.75))
+    except Exception:
+        return
+    p = doc.paragraphs[-1]
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.line_spacing = 1.0
+    p.paragraph_format.space_after = Pt(0)
+
+
 def capa(doc, d):
     ins, eq = d["instituicao"], d["equipe"]
-    for _ in range(1):
-        par(doc, "", espacamento=1.0)
+    inserir_logo(doc)
     for linha in (ins["nome"], ins["campus"], ins["curso"]):
         par(doc, linha, negrito=True, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     for _ in range(6):
         par(doc, "", espacamento=1.5)
     par(doc, "RELATÓRIO DE AVALIAÇÃO DE ACESSIBILIDADE WEB",
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
     par(doc, V(d["site"].get("nome"), "nome do site avaliado").upper()
         if not tem_marcador(V(d["site"].get("nome"), "x"))
         else V(d["site"].get("nome"), "nome do site avaliado"),
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
     for _ in range(6):
         par(doc, "", espacamento=1.5)
     for nome in eq:
@@ -313,6 +368,7 @@ def capa(doc, d):
 
 def folha_rosto(doc, d):
     ins, eq = d["instituicao"], d["equipe"]
+    inserir_logo(doc)
     for linha in (ins["nome"], ins["campus"], ins["curso"]):
         par(doc, linha, negrito=True, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     for _ in range(4):
@@ -322,24 +378,22 @@ def folha_rosto(doc, d):
     for _ in range(3):
         par(doc, "", espacamento=1.5)
     par(doc, "RELATÓRIO DE AVALIAÇÃO DE ACESSIBILIDADE WEB",
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
-    par(doc, V(d["site"].get("nome"), "nome do site avaliado"),
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
+    nome_site = V(d["site"].get("nome"), "nome do site avaliado")
+    par(doc, nome_site.upper() if not tem_marcador(nome_site) else nome_site,
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
     for _ in range(3):
         par(doc, "", espacamento=1.5)
-    p = doc.add_paragraph()
-    p.paragraph_format.left_indent = Cm(8)
-    p.paragraph_format.line_spacing = 1.0
-    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    r = p.add_run("Relatório de avaliação apresentado como requisito integrante à nota da "
-                  f"disciplina de {ins['disciplina']} do curso de "
-                  f"{ins.get('curso_nominal') or ins['curso'].title()}.")
-    r.font.name, r.font.size = FONTE, Pt(11)
+    # No modelo, a natureza do trabalho ocupa a largura da mancha, justificada,
+    # em 12 pt com 12 pt de espaço antes e depois.
+    par(doc, "Relatório de Avaliação apresentado como requisito integrante à nota da "
+             f"disciplina de {ins['disciplina']} do "
+             f"{ins.get('curso_nominal') or ins['curso'].title()}.",
+        alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY, espaco_antes=12, espaco_depois=12)
     for _ in range(6):
         par(doc, "", espacamento=1.5)
     par(doc, ins["cidade"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     par(doc, ins["data"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
-    doc.add_page_break()
 
 
 SUMARIO = [
@@ -351,26 +405,38 @@ SUMARIO = [
     ("4.1", "Resultados da inspeção manual (checklist de 15 itens)"),
     ("4.2", "Resultados do avaliador automático WAVE"),
     ("4.3", "Resultados do avaliador automático ASES"),
-    ("4.4", "Resultados da auditoria programática do código-fonte"),
-    ("4.5", "Simulação automatizada de acesso por smartphone"),
-    ("4.6", "Tarefa complementar: uso real com leitor de tela"),
-    ("4.7", "Análise do nível de conformidade WCAG"),
+    ("4.4", "Resultados do avaliador automático axe-core"),
+    ("4.5", "Medição de contraste por amostragem de pixels"),
+    ("4.6", "Evidências visuais da avaliação"),
+    ("4.7", "Recurso de tradução para Libras (VLibras)"),
+    ("4.8", "Resultados da auditoria programática do código-fonte"),
+    ("4.9", "Simulação automatizada de acesso por smartphone"),
+    ("4.10", "Tarefa complementar: uso real com leitor de tela"),
+    ("4.11", "Análise do nível de conformidade WCAG"),
     ("5", "RECOMENDAÇÕES DE CORREÇÃO"), ("6", "CONCLUSÃO"), ("7", "REFERÊNCIAS"),
 ]
 
 
 def sumario(doc):
-    par(doc, "SUMARIO", negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER,
-        espaco_depois=12)
+    """Sumário no formato do modelo: título em 16 pt e itens em 12 pt negrito,
+    ligados ao número da seção por uma linha de pontos."""
+    par(doc, "Sumário", negrito=True, tamanho=16, alinhamento=WD_ALIGN_PARAGRAPH.CENTER,
+        espaco_antes=14, espaco_depois=12)
     for num, nome in SUMARIO:
         p = doc.add_paragraph()
-        p.paragraph_format.line_spacing = 1.5
-        p.paragraph_format.space_after = Pt(0)
-        if "." in num:
-            p.paragraph_format.left_indent = Cm(0.8)
-        r = p.add_run(f"{num}  {nome}")
+        pf = p.paragraph_format
+        pf.line_spacing = 1.5
+        pf.space_after = Pt(0)
+        pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        recuo = Cm(0.635) if "." in num else Cm(0)
+        pf.left_indent = recuo
+        # Tabulação à direita da mancha (15,93 cm) com preenchimento de pontos:
+        # assim toda a linha pontilhada termina rente à margem.
+        pf.tab_stops.add_tab_stop(Cm(15.93) - recuo, WD_TAB_ALIGNMENT.RIGHT,
+                                  WD_TAB_LEADER.DOTS)
+        r = p.add_run(f"{num}. {nome}\t")
         r.font.name, r.font.size = FONTE, Pt(12)
-        r.bold = "." not in num
+        r.bold = True
     doc.add_page_break()
 
 
@@ -378,7 +444,7 @@ def secao_checklist(doc, d):
     titulo_secao(doc, "4.1 Resultados da inspeção manual (checklist de 15 itens)", 2)
     corpo(doc, "A inspeção manual aplicou o checklist de 15 itens essenciais sobre as páginas "
                "do recorte, com o sítio aberto no navegador e com uso das ferramentas de "
-               "desenvolvedor para leitura do código-fonte. O Quadro 1 apresenta o resultado "
+               "desenvolvedor para leitura do código-fonte. O Quadro 2 apresenta o resultado "
                "item a item, com a indicacao do critério de sucesso da WCAG 2.1 e da "
                "recomendação correspondente do eMAG 3.1.")
     auto = auto_por_item(d)
@@ -397,8 +463,8 @@ def secao_checklist(doc, d):
             obs or V(None, f"observação do item {i}"),
         ])
     tabela(doc, ["#", "Item verificado", "Critério WCAG 2.1 (nível)", "Situação", "Observação"],
-           [0.9, 4.0, 3.7, 2.2, 5.2], linhas)
-    legenda(doc, "Quadro 1 - Resultado da inspeção manual pelo checklist de 15 itens. "
+           [0.8, 3.19, 2.99, 2.0, 6.92], linhas)
+    legenda(doc, "Quadro 2 - Resultado da inspeção manual pelo checklist de 15 itens. "
                  "Fonte: elaborado pelos autores.")
 
 
@@ -408,8 +474,8 @@ def secao_wave(doc, d):
     corpo(doc, "O WAVE, desenvolvido pelo WebAIM da Utah State University, sobrepõe ícones a "
                "própria renderização da página, distinguindo erros (falhas certas de "
                "acessibilidade), alertas (situações que exigem julgamento humano) e "
-               "recursos (boas práticas já aplicadas). O Quadro 2 sintetiza a contagem obtida.")
-    tabela(doc, ["Categoria", "Quantidade", "O que significa"], [4.6, 2.8, 8.6], [
+               "recursos (boas práticas já aplicadas). O Quadro 3 sintetiza a contagem obtida.")
+    tabela(doc, ["Categoria", "Quantidade", "O que significa"], [4.29, 2.6, 9.01], [
         ["Errors", V(w.get("errors"), "n. de Errors no WAVE"),
          "Falhas certas que impedem o acesso por tecnologia assistiva."],
         ["Contrast Errors", V(w.get("contrast_errors"), "n. de Contrast Errors"),
@@ -423,7 +489,7 @@ def secao_wave(doc, d):
         ["ARIA", V(w.get("aria"), "n. de itens ARIA"),
          "Atributos ARIA presentes, que podem ajudar ou atrapalhar se mal usados."],
     ])
-    legenda(doc, "Quadro 2 - Síntese do relatório WAVE. Fonte: WebAIM (wave.webaim.org).")
+    legenda(doc, "Quadro 3 - Síntese do relatório WAVE. Fonte: WebAIM (wave.webaim.org).")
     corpo(doc, "Os erros de maior incidência relatados pela ferramenta foram: "
                + V(w.get("principais_erros"),
                    "liste os erros mais frequentes, ex.: 'Missing alternative text (12), "
@@ -441,7 +507,7 @@ def secao_ases(doc, d):
                "aderência ao eMAG 3.1, atribuindo nota de 0 a 100 e agrupando as ocorrências "
                "nas seis seções do modelo. A nota geral obtida pelo sítio avaliado foi de "
                + V(a.get("nota_geral"), "nota do ASES, ex.: 78,4") + "%.")
-    tabela(doc, ["Seção do eMAG", "Erros", "Avisos"], [8.0, 4.0, 4.0], [
+    tabela(doc, ["Seção do eMAG", "Erros", "Avisos"], [7.95, 3.98, 3.97], [
         ["1. Marcação", V(a.get("marcacao_erros"), "erros"), V(a.get("marcacao_avisos"), "avisos")],
         ["2. Comportamento", V(a.get("comportamento_erros"), "erros"),
          V(a.get("comportamento_avisos"), "avisos")],
@@ -454,12 +520,174 @@ def secao_ases(doc, d):
         ["6. Formulários", V(a.get("formularios_erros"), "erros"),
          V(a.get("formularios_avisos"), "avisos")],
     ])
-    legenda(doc, "Quadro 3 - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
+    legenda(doc, "Quadro 4 - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
                  "Fonte: asesweb.governoeletronico.gov.br.")
 
 
+def secao_axe(doc, d):
+    a = d.get("axe") or {}
+    pags = a.get("paginas") or {}
+    if not pags:
+        return
+    titulo_secao(doc, "4.4 Resultados do avaliador automático axe-core", 2)
+    corpo(doc, "O WAVE e o ASES dependem de execução interativa no navegador — o ASES, "
+               "inclusive, protege o envio com CAPTCHA. Para que a etapa de avaliação "
+               "automatizada não ficasse sem medição, utilizou-se o axe-core, motor de "
+               "auditoria mantido pela Deque Systems e empregado pelas próprias extensões "
+               "WAVE e Lighthouse. " + str(a.get("como_foi_executado", "")))
+    linhas = []
+    for url, r in pags.items():
+        linhas.append([url.replace("https://www2.ifal.edu.br", ""),
+                       str(r.get("passes", "-")), str(r.get("violacoes_wcag", "-")),
+                       str(sum(b.get("ocorrencias", 0) for b in r.get("boas_praticas", []))),
+                       str(sum(m.get("ocorrencias", 0) for m in r.get("revisao_manual", [])))])
+    tabela(doc, ["Página", "Regras aprovadas", "Violações WCAG A/AA",
+                 "Boas práticas", "Revisão manual"], [5.32, 2.4, 2.6, 2.2, 3.38], linhas)
+    legenda(doc, "Quadro 5 - Resultado do axe-core 4.10.2 por página avaliada. "
+                 "Fonte: os autores.")
+    corpo(doc, "O resultado exige leitura cuidadosa. O axe-core não encontrou nenhuma "
+               "violação direta de Critério de Sucesso da WCAG 2.1 nos níveis A e AA nas "
+               "três páginas, o que confirma que a base técnica do portal, herdada do "
+               "Plone com a Identidade Digital do Governo, é sólida: idioma declarado, "
+               "títulos presentes, rótulos associados e nenhum identificador duplicado.")
+    bp, man = {}, {}
+    for r in pags.values():
+        for b in r.get("boas_praticas", []):
+            bp.setdefault(b["regra"], [b["descricao"], 0])[1] += b.get("ocorrencias", 0)
+        for m in r.get("revisao_manual", []):
+            man.setdefault(m["regra"], [m["descricao"], 0])[1] += m.get("ocorrencias", 0)
+    if bp:
+        corpo(doc, "As ocorrências classificadas como boas práticas, somadas as três "
+                   "páginas, foram:")
+        for regra, (desc, n) in sorted(bp.items(), key=lambda x: -x[1][1]):
+            item_lista(doc, f"{regra} — {n} ocorrência(s): {desc}.")
+    if man:
+        corpo(doc, "A ferramenta ainda devolveu ocorrências que ela própria não consegue "
+                   "decidir sozinha e transfere ao avaliador humano:")
+        for regra, (desc, n) in sorted(man.items(), key=lambda x: -x[1][1]):
+            item_lista(doc, f"{regra} — {n} ocorrência(s): {desc}.")
+    corpo(doc, "O dado mais relevante deste quadro é justamente o que a ferramenta "
+               "devolveu sem resposta: a regra de contraste apareceu como indecidível "
+               "dezenas de vezes porque o texto é desenhado sobre fotografias. Isso não "
+               "significa aprovação — significa que o critério 1.4.3 precisou ser medido "
+               "por outro caminho, descrito na subseção seguinte.")
+
+
+def secao_contraste(doc, d):
+    c = d.get("contraste_pixel") or {}
+    if not c:
+        return
+    titulo_secao(doc, "4.5 Medição de contraste por amostragem de pixels", 2)
+    corpo(doc, str(c.get("metodo", "")))
+    reps = c.get("reprovacoes_confirmadas") or []
+    if reps:
+        tabela(doc, ["Elemento", "Texto", "Fundo", "Razão", "Exigido"],
+               [5.52, 2.99, 2.99, 1.7, 2.7],
+               [[r["elemento"], r["cor_texto"], r["cor_fundo"],
+                 f"{r['razao']}:1", f"{r['exigido']}:1"] for r in reps])
+        legenda(doc, "Quadro 6 - Reprovações de contraste confirmadas por amostragem de "
+                     "pixels na página renderizada. Fonte: os autores.")
+        corpo(doc, "A reprovação mais severa é a dos botões numéricos que controlam o "
+                   "banner rotativo: com 1,66:1, o texto azul sobre o verde institucional "
+                   "fica praticamente indistinguível do fundo. São, ao mesmo tempo, os "
+                   "únicos controles do banner e alvos de apenas 22 por 20 pixels, o que "
+                   "os faz falhar também no critério 2.5.8.")
+    f = c.get("indicador_de_foco") or {}
+    if f:
+        corpo(doc, "O indicador de foco do teclado merece registro separado. Ele está "
+                   f"sempre presente, na cor {f.get('cor')}, e atinge "
+                   f"{f.get('sobre_verde_cabecalho')}:1 sobre o verde do cabeçalho e "
+                   f"{f.get('sobre_verde_rodape')}:1 sobre o verde do rodapé. Sobre o "
+                   f"fundo branco da área de conteúdo, porém, cai para "
+                   f"{f.get('sobre_branco')}:1, abaixo dos {f.get('exigido_1411')}:1 "
+                   "exigidos pelo critério 1.4.11. O resultado é que o foco fica nítido "
+                   "nas bordas da página e quase invisível exatamente onde se concentra "
+                   "a maior parte dos links.")
+    if c.get("nao_mensuravel"):
+        corpo(doc, "Registra-se, por honestidade metodológica, o que não foi possível "
+                   "medir: " + str(c["nao_mensuravel"]))
+
+
+def secao_vlibras(doc, d):
+    r = ((d.get("recursos_assistivos") or {}).get("vlibras") or {})
+    if not r.get("presente"):
+        return
+    titulo_secao(doc, "4.7 Recurso de tradução para Libras (VLibras)", 2)
+    corpo(doc, "O portal disponibiliza o VLibras, tradutor automático de Português para "
+               "Língua Brasileira de Sinais mantido pelo Governo Federal, por meio de um "
+               "botão flutuante presente em todas as páginas. " + str(r.get("origem", "")))
+    corpo(doc, "O modo como esse recurso foi identificado merece registro metodológico, "
+               "por expor um limite das três frentes automatizadas empregadas até aqui. "
+               + str(r.get("por_que_escapou", "")) + " O recurso só apareceu porque um dos "
+               "avaliadores abriu o portal em seu próprio aparelho Android e fotografou a "
+               "tela, episódio que ilustra de forma concreta a razão pela qual o W3C "
+               "recomenda que a avaliação automática jamais seja empregada isoladamente.")
+    caminho = "evidencias/telas/14-vlibras-botao-flutuante.jpg"
+    if os.path.exists(os.path.join(RAIZ, caminho)):
+        try:
+            doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            legenda(doc, "Figura 6 - Botão flutuante do VLibras, à direita, sobre a página "
+                         "institucional de Acessibilidade aberta em aparelho Android. Na "
+                         "mesma captura aparece o link que exibe a URL completa do Decreto "
+                         "n. 5.296/2004 como texto visível. Fonte: captura feita pelos "
+                         "autores em aparelho real.")
+        except Exception:
+            pass
+    if r.get("lacuna_documental"):
+        corpo(doc, "Há, porém, uma incoerência a assinalar. " + str(r["lacuna_documental"])
+              + " Um recurso de acessibilidade que o público não sabe existir tem seu "
+                "alcance reduzido, e a própria página que deveria anunciá-lo é a que o "
+                "omite.")
+    if r.get("nao_auditado"):
+        corpo(doc, "Delimita-se o alcance desta constatação: registra-se a presença do "
+                   "recurso, não a sua qualidade. " + str(r["nao_auditado"]))
+
+
+FIGURAS = [
+    ("evidencias/telas/02-topo-barra-acessibilidade.png",
+     "Barra de acessibilidade do portal, com os quatro atalhos de salto (Alt+1 a "
+     "Alt+4) e os links Acessibilidade, Alto Contraste e Mapa do site."),
+    ("evidencias/telas/13-carrossel-banner-rotativo.png",
+     "Banner rotativo da página inicial. Os botões numéricos no canto inferior "
+     "direito são os únicos controles do carrossel: medem 22 por 20 pixels, "
+     "apresentam razão de contraste de 1,66:1 e sinalizam o slide em exibição "
+     "apenas pela cor de fundo."),
+    ("evidencias/telas/04-foco-teclado.png",
+     "Indicador de foco do teclado sobre o link Acessibilidade. Sobre o verde do "
+     "cabeçalho o contorno âmbar é nítido (5,81:1); sobre o branco da área de "
+     "conteúdo cai para 1,56:1."),
+    ("evidencias/telas/08-reflow-320px.png",
+     "Página inicial renderizada em 320 pixels de largura. O conteúdo ocupa 330 "
+     "pixels e provoca rolagem horizontal, contrariando o critério 1.4.10."),
+    ("evidencias/telas/05-pagina-acessibilidade.png",
+     "Página institucional de Acessibilidade, publicada em 2013 e modificada pela "
+     "última vez em 2020. Descreve apenas três dos sete atalhos existentes e "
+     "expande a sigla WCAG incorretamente."),
+]
+
+
+def secao_evidencias(doc, d):
+    """Insere as capturas de tela como figuras numeradas, se existirem no disco."""
+    disponiveis = [(c, l) for c, l in FIGURAS if os.path.exists(os.path.join(RAIZ, c))]
+    if not disponiveis:
+        return
+    titulo_secao(doc, "4.6 Evidências visuais da avaliação", 2)
+    corpo(doc, "As figuras a seguir registram o estado do portal no momento da "
+               "avaliação e sustentam as medições apresentadas nas subseções "
+               "anteriores. Todas foram capturadas em Chromium, sobre as folhas de "
+               "estilo e as imagens do próprio sítio.")
+    for i, (caminho, texto) in enumerate(disponiveis, 1):
+        try:
+            doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        except Exception:
+            continue
+        legenda(doc, f"Figura {i} - {texto} Fonte: os autores.")
+
+
 def secao_auditoria(doc, d):
-    titulo_secao(doc, "4.4 Resultados da auditoria programática do código-fonte", 2)
+    titulo_secao(doc, "4.8 Resultados da auditoria programática do código-fonte", 2)
     corpo(doc, "Como terceira frente de verificação, desenvolveu-se um auditor próprio em "
                "Python (ferramenta/auditor_wcag.py), que percorre o HTML das páginas e "
                "verifica programaticamente os nove itens automatizáveis do checklist. Seu "
@@ -468,30 +696,30 @@ def secao_auditoria(doc, d):
     paginas = d["_auto"].get("paginas", [])
     if not paginas:
         item_lista(doc, V(None, "execute 'python3 ferramenta/auditor_wcag.py <URL>' e gere "
-                                "novamente este relatório para preencher o Quadro 4"))
+                                "novamente este relatório para preencher o Quadro 7"))
         return
     linhas = []
     for p in paginas:
         linhas.append([p["pagina"], str(p["total_nao_conforme"]), str(p["total_conforme"]),
                        str(p["total_manual"]), str(p["total_ocorrencias"])])
     tabela(doc, ["Página auditada", "Não conf.", "Conformes", "Manual", "Ocorrências"],
-           [7.0, 2.2, 2.2, 1.8, 2.8], linhas)
-    legenda(doc, "Quadro 4 - Síntese da auditoria programática por página. "
+           [6.96, 2.19, 2.19, 1.79, 2.77], linhas)
+    legenda(doc, "Quadro 7 - Síntese da auditoria programática por página. "
                  "Fonte: elaborado pelos autores.")
     pior = max(paginas, key=lambda p: p["total_ocorrencias"])
     falhas = [i for i in pior["itens"] if i["status"] == "nao_conforme"]
     if falhas:
         corpo(doc, f"A página com maior número de ocorrências foi {pior['pagina']}, "
                    f"com {pior['total_ocorrencias']} problemas somados. O detalhamento das "
-                   "falhas identificadas nessa página é apresentado no Quadro 5.")
-        tabela(doc, ["#", "Item", "Diagnóstico automático"], [0.9, 4.0, 11.1],
+                   "falhas identificadas nessa página é apresentado no Quadro 8.")
+        tabela(doc, ["#", "Item", "Diagnóstico automático"], [0.89, 3.98, 11.03],
                [[str(f["item"]), f["nome"], f["detalhe"]] for f in falhas])
-        legenda(doc, "Quadro 5 - Falhas detectadas pela auditoria programática. "
+        legenda(doc, "Quadro 8 - Falhas detectadas pela auditoria programática. "
                      "Fonte: elaborado pelos autores.")
 
 
 def secao_mobile_auto(doc, d):
-    titulo_secao(doc, "4.5 Simulação automatizada de acesso por smartphone", 2)
+    titulo_secao(doc, "4.9 Simulação automatizada de acesso por smartphone", 2)
     corpo(doc, "Para tornar a avaliação mobile reproduzível e verificável, construiu-se um "
                "ambiente de teste automatizado (ferramenta/simulador_mobile.py) que emula um "
                "aparelho real em Chromium - com viewport, densidade de pixels, eventos de "
@@ -508,9 +736,9 @@ def secao_mobile_auto(doc, d):
     rf, zm, ct = e["reflow_320px"], e["zoom"], e["contraste"]
     corpo(doc, f"A simulação foi executada sobre {e['url']}, emulando o aparelho "
                f"{e['aparelho']} em viewport de {e['viewport']['width']}x"
-               f"{e['viewport']['height']} pixels lógicos. O Quadro 6 reúne as medições.")
+               f"{e['viewport']['height']} pixels lógicos. O Quadro 9 reúne as medições.")
     d_cont = lt["deslizes_ate_conteudo"]
-    tabela(doc, ["Medição", "Resultado", "Critério WCAG 2.1"], [6.4, 3.6, 6.0], [
+    tabela(doc, ["Medição", "Resultado", "Critério WCAG 2.1"], [6.36, 3.58, 5.96], [
         ["Elementos anunciados sem rótulo", str(lt["elementos_sem_rotulo"]),
          "1.1.1 / 4.1.2 (A)"],
         ["Deslizes até o conteúdo principal",
@@ -528,36 +756,36 @@ def secao_mobile_auto(doc, d):
         ["Trechos reprovados no contraste",
          f"{ct['reprovados']} de {ct['trechos_analisados']}", "1.4.3 (AA)"],
     ])
-    legenda(doc, "Quadro 6 - Medições da simulação automatizada em smartphone. "
+    legenda(doc, "Quadro 9 - Medições da simulação automatizada em smartphone. "
                  "Fonte: elaborado pelos autores.")
     trans = lt["transcricao"][:12]
     if trans:
-        corpo(doc, "O Quadro 7 reproduz os primeiros anúncios que o leitor de tela emitiria ao "
+        corpo(doc, "O Quadro 10 reproduz os primeiros anúncios que o leitor de tela emitiria ao "
                    "percorrer a página, permitir verificar como a estrutura do código se "
                    "converte em experiência sonora.")
-        tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.2, 13.8],
+        tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.19, 13.71],
                [[str(i), t] for i, t in enumerate(trans, 1)])
-        legenda(doc, "Quadro 7 - Transcricao dos anúncios do leitor de tela. "
+        legenda(doc, "Quadro 10 - Transcricao dos anúncios do leitor de tela. "
                      "Fonte: elaborado pelos autores.")
     if ct["exemplos"]:
         corpo(doc, "Quanto ao contraste, o pior resultado encontrado foi a razão de "
                    f"{ct['pior_razao']}:1, medida sobre a página efetivamente renderizada. "
-                   "Os trechos reprovados de maior severidade estao no Quadro 8.")
-        tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [9.0, 3.5, 3.5],
+                   "Os trechos reprovados de maior severidade estao no Quadro 11.")
+        tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [8.94, 3.48, 3.48],
                [[x["texto"], f"{x['razao']}:1", f"{x['exigido']}:1"] for x in ct["exemplos"][:6]])
-        legenda(doc, "Quadro 8 - Trechos reprovados no critério de contraste. "
+        legenda(doc, "Quadro 11 - Trechos reprovados no critério de contraste. "
                      "Fonte: elaborado pelos autores.")
 
 
 def secao_mobile_real(doc, d):
     m = d.get("mobile", {})
-    titulo_secao(doc, "4.6 Tarefa complementar: uso real com leitor de tela", 2)
+    titulo_secao(doc, "4.10 Tarefa complementar: uso real com leitor de tela", 2)
     corpo(doc, "A simulação automatizada mede o que a máquina consegue medir; a experiência "
                "de uso, porém, só se revela no uso. Por isso a avaliação foi complementada "
                "com um teste presencial: um dos autores acessou o sítio pelo próprio "
                "smartphone, com o leitor de tela ativado e a tela desligada do seu campo de "
                "visão, e tentou executar uma tarefa real de ponta a ponta.")
-    tabela(doc, ["Parâmetro do teste", "Registro"], [6.0, 10.0], [
+    tabela(doc, ["Parâmetro do teste", "Registro"], [5.96, 9.94], [
         ["Aparelho utilizado", V(m.get("dispositivo"), "modelo do aparelho")],
         ["Sistema operacional", V(m.get("sistema"), "ex.: Android 14 / iOS 17")],
         ["Leitor de tela", V(m.get("leitor_tela"), "TalkBack ou VoiceOver")],
@@ -565,7 +793,7 @@ def secao_mobile_real(doc, d):
         ["Tempo gasto", V(m.get("tempo_gasto"), "ex.: 6 min 40 s")],
         ["Tarefa concluida", V(m.get("tarefa_concluida"), "Sim / Não / Parcialmente")],
     ])
-    legenda(doc, "Quadro 9 - Condições do teste com leitor de tela. "
+    legenda(doc, "Quadro 12 - Condições do teste com leitor de tela. "
                  "Fonte: elaborado pelos autores.")
     corpo(doc, "Relato da experiência: " + V(m.get("relato"),
           "descreva em 8 a 12 linhas: como foi ativar o leitor, o que o aparelho anunciou "
@@ -574,21 +802,21 @@ def secao_mobile_real(doc, d):
           "sensação ao depender apenas do áudio"))
     corpo(doc, "A confrontação entre este relato e as medições automatizadas da seção "
                "anterior é o ponto central da avaliação: cada elemento anunciado sem rótulo "
-               "no Quadro 7 corresponde, na experiência real, a um momento de interrupção em "
+               "no Quadro 10 corresponde, na experiência real, a um momento de interrupção em "
                "que o usuário precisa adivinhar a função do que esta tocando.")
 
 
 def secao_recomendacoes(doc, d):
-    titulo_secao(doc, "5 RECOMENDAÇÕES DE CORREÇÃO")
+    titulo_secao(doc, "5. RECOMENDAÇÕES DE CORREÇÃO")
     corpo(doc, "As recomendações a seguir estão ordenadas por severidade, considerando o "
                "impacto sobre o usuário e o nível WCAG afetado. Problemas de severidade "
                "crítica bloqueiam integralmente o acesso de determinados grupos e devem ser "
                "corrigidos com prioridade, até porque, sendo falhas de Nível A, são "
                "justamente as que impedem qualquer declaração de conformidade.")
     tabela(doc, ["Severidade", "Problema", "Correção recomendada", "Critério"],
-           [2.2, 3.6, 7.6, 2.6],
+           [2.19, 3.58, 7.55, 2.58],
            [[s, p, c, cr] for s, p, c, cr in T.RECOMENDACOES])
-    legenda(doc, "Quadro 10 - Recomendações de correção priorizadas. "
+    legenda(doc, "Quadro 13 - Recomendações de correção priorizadas. "
                  "Fonte: elaborado pelos autores.")
     corpo(doc, "Estima-se que as correções de severidade crítica e alta sejam implementáveis "
                "sem redesenho visual do sítio, uma vez que dizem respeito a camada de "
@@ -599,23 +827,28 @@ def secao_recomendacoes(doc, d):
 def gerar_docx(d):
     doc = Document()
     estilo_base(doc)
-    numerar_paginas(doc)
     capa(doc, d)
     folha_rosto(doc, d)
+    # Capa e folha de rosto ficam sem rodapé: a numeração começa no sumário.
+    corpo_doc = doc.add_section(WD_SECTION.NEW_PAGE)
+    corpo_doc.page_width, corpo_doc.page_height = Cm(21.01), Cm(29.69)
+    corpo_doc.left_margin = corpo_doc.right_margin = Cm(2.54)
+    corpo_doc.top_margin = corpo_doc.bottom_margin = Cm(2.54)
+    numerar_paginas(corpo_doc)
     sumario(doc)
 
-    titulo_secao(doc, "1 INTRODUÇÃO")
+    titulo_secao(doc, "1. INTRODUÇÃO")
     for p in T.introducao(d):
         corpo(doc, p)
 
-    titulo_secao(doc, "2 OBJETIVO")
+    titulo_secao(doc, "2. OBJETIVO")
     titulo_secao(doc, "2.1 Objetivo geral", 2)
     corpo(doc, T.objetivo_geral(d))
     titulo_secao(doc, "2.2 Objetivos específicos", 2)
     for o in T.OBJETIVOS_ESPECIFICOS:
         item_lista(doc, o)
 
-    titulo_secao(doc, "3 METODOLOGIA")
+    titulo_secao(doc, "3. METODOLOGIA")
     titulo_secao(doc, "3.1 Site avaliado e justificativa da escolha", 2)
     corpo(doc, "O sítio selecionado para a avaliação foi o "
                + V(d["site"].get("nome"), "nome do site") + ", acessível em "
@@ -626,13 +859,17 @@ def gerar_docx(d):
     for p in T.metodologia(d):
         corpo(doc, p)
     titulo_secao(doc, "3.3 Instrumentos utilizados", 2)
-    tabela(doc, ["Instrumento", "Natureza", "Finalidade na avaliação"], [4.2, 3.4, 8.4], [
+    tabela(doc, ["Instrumento", "Natureza", "Finalidade na avaliação"], [3.99, 3.19, 8.72], [
         ["Checklist de 15 itens", "Manual",
          "Verificação guiada dos requisitos essenciais, com julgamento humano."],
         ["WAVE (WebAIM)", "Automática",
          "Detecção de erros sobre a página renderizada e contagem por categoria."],
         ["ASES (Governo Federal)", "Automática",
          "Nota de aderência ao eMAG 3.1 e ocorrências por seção do modelo."],
+        ["axe-core 4.10.2 (Deque)", "Automática",
+         "Verificação das regras WCAG 2.1 sobre a página já renderizada."],
+        ["Amostragem de pixels", "Automática (própria)",
+         "Contraste medido na imagem da tela, sem supor a cor do fundo."],
         ["auditor_wcag.py", "Automática (própria)",
          "Conferência cruzada dos itens automatizáveis diretamente no HTML."],
         ["simulador_mobile.py", "Automática (própria)",
@@ -640,31 +877,35 @@ def gerar_docx(d):
         ["Leitor de tela em smartphone", "Empírica",
          "Execução de tarefa real sem apoio visual, para avaliar a experiência de uso."],
     ])
-    legenda(doc, "Quadro 11 - Instrumentos empregados na avaliação. "
+    legenda(doc, "Quadro 1 - Instrumentos empregados na avaliação. "
                  "Fonte: elaborado pelos autores.")
 
-    titulo_secao(doc, "4 AVALIAÇÃO E RESULTADOS")
+    titulo_secao(doc, "4. AVALIAÇÃO E RESULTADOS")
     corpo(doc, "Esta seção apresenta os resultados obtidos em cada frente de avaliação, "
                "partindo da inspeção humana, passando pelas medições automatizadas e "
                "encerrando na análise consolidada de conformidade.")
     secao_checklist(doc, d)
     secao_wave(doc, d)
     secao_ases(doc, d)
+    secao_axe(doc, d)
+    secao_contraste(doc, d)
+    secao_evidencias(doc, d)
+    secao_vlibras(doc, d)
     secao_auditoria(doc, d)
     secao_mobile_auto(doc, d)
     secao_mobile_real(doc, d)
 
-    titulo_secao(doc, "4.7 Análise do nível de conformidade WCAG", 2)
+    titulo_secao(doc, "4.11 Análise do nível de conformidade WCAG", 2)
     for p in T.analise_conformidade(d):
         corpo(doc, p)
 
     secao_recomendacoes(doc, d)
 
-    titulo_secao(doc, "6 CONCLUSÃO")
+    titulo_secao(doc, "6. CONCLUSÃO")
     for p in T.conclusao(d):
         corpo(doc, p)
 
-    titulo_secao(doc, "7 REFERÊNCIAS")
+    titulo_secao(doc, "7. REFERÊNCIAS")
     data = d["instituicao"].get("data_acesso", "")
     for ref in T.REFERENCIAS:
         p = doc.add_paragraph()
@@ -755,6 +996,50 @@ def slide_conteudo(prs, titulo, linhas, tamanho=18):
             break
     if corpo_ph is not None:
         escrever(corpo_ph.text_frame, linhas, tamanho=tamanho)
+    return s
+
+
+def slide_imagem(prs, titulo, caminho, nota=""):
+    """Slide com uma captura de tela ocupando a área de conteúdo."""
+    completo = os.path.join(RAIZ, caminho)
+    if not os.path.exists(completo):
+        return None
+    s = prs.slides.add_slide(layout(prs, "Título e Conteúdo"))
+    if s.shapes.title:
+        tf = s.shapes.title.text_frame
+        tf.text = ""
+        escrever(tf, [titulo], tamanho=26, espaco=0)
+    for ph in list(s.placeholders):
+        if ph.placeholder_format.idx != 0:
+            ph._element.getparent().remove(ph._element)
+
+    from PIL import Image as _Img
+    with _Img.open(completo) as im:
+        prop = im.height / im.width
+
+    # A imagem começa abaixo do título e reserva o rodapé da área de conteúdo
+    # para a legenda. Sem isso a figura sobe e cobre o título do slide.
+    base_titulo = (s.shapes.title.top + s.shapes.title.height) if s.shapes.title \
+        else Inches(2.3)
+    topo = int(base_titulo) + Inches(0.12)
+    altura_legenda = Inches(0.95) if nota else Inches(0.15)
+    alt_max = int(prs.slide_height - topo - altura_legenda - Inches(0.15))
+    larg_max = int(prs.slide_width * 0.80)
+
+    larg = larg_max
+    alt = int(larg * prop)
+    if alt > alt_max:
+        alt = alt_max
+        larg = int(alt / prop)
+    s.shapes.add_picture(completo, Emu(int((prs.slide_width - larg) / 2)), Emu(int(topo)),
+                         width=Emu(larg), height=Emu(alt))
+    if nota:
+        cx = Emu(int(prs.slide_width * 0.08))
+        cy = Emu(int(topo + alt + Inches(0.10)))
+        cw = Emu(int(prs.slide_width * 0.84))
+        cxn = s.shapes.add_textbox(cx, cy, cw, Emu(int(altura_legenda)))
+        cxn.text_frame.word_wrap = True
+        escrever(cxn.text_frame, [nota], tamanho=13)
     return s
 
 
@@ -850,7 +1135,73 @@ def gerar_pptx(d):
          f"Conteúdo {limpo(V(a.get('conteudo_erros'), '?'))} erros · "
          f"Formulários {limpo(V(a.get('formularios_erros'), '?'))} erros", 1),
         "Limitação: detectam ausência de alt, mas não julgam se o alt descreve bem a imagem",
+        "WAVE e ASES exigem execução no navegador — o ASES protege o envio com CAPTCHA",
     ], tamanho=16)
+
+    # 8b axe-core
+    ax = (d.get("axe") or {}).get("paginas") or {}
+    if ax:
+        regras = {}
+        manual = {}
+        for r in ax.values():
+            for b in r.get("boas_praticas", []):
+                regras[b["regra"]] = regras.get(b["regra"], 0) + b.get("ocorrencias", 0)
+            for m in r.get("revisao_manual", []):
+                manual[m["regra"]] = manual.get(m["regra"], 0) + m.get("ocorrencias", 0)
+        linhas = [
+            "axe-core 4.10.2 (Deque) — motor usado pelas extensões WAVE e Lighthouse",
+            f"Violações diretas de critério WCAG A/AA: "
+            f"{sum(r.get('violacoes_wcag', 0) for r in ax.values())} nas 3 páginas",
+            (f"Regras aprovadas: "
+             f"{' · '.join(str(r.get('passes')) for r in ax.values())}", 1),
+            "Ocorrências de boas práticas:",
+        ]
+        for regra, n in sorted(regras.items(), key=lambda x: -x[1]):
+            linhas.append((f"{regra} — {n}x", 1))
+        if manual:
+            linhas.append("Devolvido para julgamento humano:")
+            for regra, n in sorted(manual.items(), key=lambda x: -x[1]):
+                linhas.append((f"{regra} — {n}x", 1))
+        slide_conteudo(prs, "Avaliador automático: axe-core", linhas, tamanho=15)
+
+    # 8c contraste medido por pixel
+    cp = d.get("contraste_pixel") or {}
+    if cp.get("reprovacoes_confirmadas"):
+        linhas = ["Método: o texto é apagado, a área é fotografada e a cor dominante "
+                  "da imagem vira o fundo — sem supor nada pela árvore do DOM.",
+                  "Reprovações confirmadas:"]
+        for r in cp["reprovacoes_confirmadas"]:
+            linhas.append((f"{r['razao']}:1 (exige {r['exigido']}:1) — {r['elemento']}", 1))
+        f = cp.get("indicador_de_foco") or {}
+        if f:
+            linhas.append(f"Indicador de foco: {f.get('sobre_verde_cabecalho')}:1 sobre o "
+                          f"verde, mas {f.get('sobre_branco')}:1 sobre o branco "
+                          f"(exige {f.get('exigido_1411')}:1)")
+        slide_conteudo(prs, "Contraste medido na tela renderizada", linhas, tamanho=15)
+
+    # 8d evidências visuais
+    slide_imagem(prs, "Barra de acessibilidade do portal",
+                 "evidencias/telas/02-topo-barra-acessibilidade.png",
+                 "Quatro atalhos de salto (Alt+1 a Alt+4), Alto Contraste e Mapa do site: "
+                 "o portal acerta o essencial da navegação assistida.")
+    slide_imagem(prs, "Onde estão as piores falhas: o banner rotativo",
+                 "evidencias/telas/13-carrossel-banner-rotativo.png",
+                 "Botões de 22x20 px, contraste de 1,66:1, slide ativo marcado só pela cor "
+                 "e troca automática a cada 4 segundos sem botão de pausa.")
+    slide_imagem(prs, "Reflow em 320 px",
+                 "evidencias/telas/08-reflow-320px.png",
+                 "O conteúdo ocupa 330 px em uma tela de 320 px e obriga a rolagem "
+                 "horizontal — WCAG 1.4.10 (AA).")
+
+    # 8e VLibras: achado que só apareceu no aparelho real
+    vl = ((d.get("recursos_assistivos") or {}).get("vlibras") or {})
+    if vl.get("presente"):
+        slide_imagem(prs, "O que só o aparelho real mostrou: VLibras",
+                     "evidencias/telas/14-vlibras-botao-flutuante.jpg",
+                     "O tradutor de Libras existe em todas as páginas, injetado por "
+                     "barra.brasil.gov.br. Não aparece no HTML entregue pelo servidor e "
+                     "escapou às três frentes automatizadas — mas a página de "
+                     "Acessibilidade do portal nunca o menciona.")
 
     # 9 simulação mobile
     if e:

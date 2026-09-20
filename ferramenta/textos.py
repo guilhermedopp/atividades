@@ -142,28 +142,33 @@ def conclusao(d):
     s = d["site"]
     c = d.get("conformidade", {})
     return [
-        ("A avaliação do " + V(s.get("nome_curto"), "nome curto do site") + " evidenciou o "
-         "descompasso, recorrente em sítios institucionais brasileiros, entre a aparência "
-         "cuidada da interface e a qualidade da marcação que a sustenta. Problemas que passam "
-         "despercebidos ao usuário vidente - uma imagem sem atributo alt, um campo de busca "
-         "sem rótulo, um cabeçalho usado por efeito visual e não por hierarquia - convertem-se "
-         "em bloqueios absolutos para quem depende de tecnologia assistiva."),
+        ("A avaliação do " + V(s.get("nome_curto"), "nome curto do site") + " produziu um "
+         "resultado menos simples do que o esperado. A base técnica herdada do Plone com a "
+         "Identidade Digital do Governo cumpre bem o essencial: idioma declarado, títulos "
+         "únicos, campos com rótulo associado, imagens com atributo alt, quatro atalhos de "
+         "salto e indicador de foco em todos os 118 pontos de parada do teclado. O avaliador "
+         "axe-core não encontrou uma única violação direta de critério de sucesso nas três "
+         "páginas analisadas. As barreiras concentram-se, em vez disso, em um componente "
+         "específico e em detalhes de apresentação que nenhuma verificação superficial "
+         "revelaria."),
 
         ("A triangulação metodológica mostrou-se decisiva. Os avaliadores automáticos "
          "quantificaram com precisão as falhas de código, mas não julgam se um texto "
          "alternativo descreve adequadamente a imagem, nem se a ordem de foco faz sentido "
-         "para quem navega. A inspeção manual e, sobretudo, o teste com leitor de tela em "
-         "dispositivo móvel revelaram barreiras de uso que nenhuma métrica automatizada "
-         "poderia ter apontado, confirmando a orientação do W3C de que a avaliação "
-         "automática cobre apenas parte dos critérios de sucesso."),
+         "para quem navega. O caso do contraste é exemplar: o axe-core devolveu dezenas de "
+         "ocorrências como indecidíveis, por serem textos desenhados sobre fotografias, e a "
+         "falha mais grave - botões a 1,66:1 - só apareceu ao medir os pixels efetivamente "
+         "pintados na tela. Do mesmo modo, a ausência de controle de pausa no banner exigiu "
+         "a leitura do código-fonte do script que o governa. Isso confirma a orientação do "
+         "W3C de que a avaliação automática cobre apenas parte dos critérios de sucesso."),
 
         ("O diagnóstico final aponta para o nível de conformidade "
          + V(c.get("nivel_atingido"), "nível atingido") + ". As correções recomendadas na "
-         "seção anterior são, em sua maioria, de baixo custo de implementação: tratam-se "
-         "majoritariamente de ajustes de marcação HTML - inclusão de atributos alt, "
-         "associação de labels a campos, correção da hierarquia de cabeçalhos e adoção de "
-         "elementos semânticos de região - que não exigem redesenho visual nem reescrita da "
-         "aplicação. A desproporção entre o baixo esforço técnico das correções e o alto "
+         "seção anterior são, em sua maioria, de baixo custo de implementação: um botão de "
+         "pausa no banner rotativo, um segundo indicador não cromático para o slide ativo, "
+         "a troca da cor dos botões numéricos, a declaração de um <h1> por página e a "
+         "marcação dos menus como região de navegação - ajustes pontuais que não exigem "
+         "redesenho visual nem reescrita da aplicação. A desproporção entre o baixo esforço técnico das correções e o alto "
          "impacto que produzem na vida dos usuários e, talvez, a lição mais importante deste "
          "trabalho."),
 
@@ -176,37 +181,82 @@ def conclusao(d):
     ]
 
 
+# Recomendações derivadas das medições desta avaliação, ordenadas pelo efeito
+# sobre a conformidade: primeiro o que impede o Nível A, depois o Nível AA.
 RECOMENDACOES = [
-    ("Crítica", "Imagens sem texto alternativo",
-     "Incluir o atributo alt em todas as imagens informativas, com descrição sucinta do "
-     "conteúdo ou da função; usar alt=\"\" nas puramente decorativas.", "WCAG 1.1.1 (A)"),
-    ("Crítica", "Campos de formulário sem rótulo",
-     "Associar um elemento <label for=\"id\"> a cada campo, ou, quando o rótulo visível for "
-     "inviavel, aplicar aria-label. Placeholder não substitui rótulo.", "WCAG 3.3.2 / 4.1.2 (A)"),
-    ("Crítica", "Hierarquia de cabeçalhos incorreta",
-     "Definir um único <h1> por página e encadear os demais níveis sem saltos, usando "
-     "cabeçalhos por estrutura e não por efeito visual.", "WCAG 1.3.1 (A)"),
-    ("Alta", "Ausência de regiões semânticas",
-     "Substituir <div> genericas por <header>, <nav>, <main>, <footer> e <aside>, permitir "
-     "que o leitor de tela ofereca navegação por regiões.", "WCAG 1.3.1 (A)"),
-    ("Alta", "Links com texto não descritivo",
-     "Reescrever rótulos como 'clique aqui' e 'saiba mais' de modo que descrevam o destino "
-     "mesmo fora de contexto.", "WCAG 2.4.4 (A)"),
-    ("Alta", "Contraste insuficiente",
-     "Ajustar a paleta para razão mínima de 4,5:1 em texto normal e 3:1 em texto grande e "
-     "componentes de interface.", "WCAG 1.4.3 / 1.4.11 (AA)"),
-    ("Media", "Foco de teclado não visível",
-     "Remover declaracoes 'outline: none' sem substituto e definir estilo de :focus-visible "
-     "com contraste adequado.", "WCAG 2.4.7 (AA)"),
-    ("Media", "Ausência de link de salto",
-     "Inserir, como primeiro elemento focável, um link 'Ir para o conteúdo principal' "
-     "apontando para o <main>.", "WCAG 2.4.1 (A)"),
-    ("Media", "Conteúdo em movimento sem controle",
-     "Disponibilizar botão de pausa acessível por teclado em carrosséis e animações com "
-     "duracao superior a cinco segundos.", "WCAG 2.2.2 (A)"),
-    ("Baixa", "Bloqueio de zoom em dispositivos móveis",
-     "Remover user-scalable=no e maximum-scale=1 da meta viewport, permitir ampliacao de "
-     "até 200%.", "WCAG 1.4.4 (AA)"),
+    ("Crítica", "Banner rotativo sem controle de pausa",
+     "O script banner_rotativo.js troca de slide a cada 4000 ms e se reagenda "
+     "indefinidamente. Incluir um botão de pausar/retomar alcançável por teclado e "
+     "anunciado ao leitor de tela, ou suprimir o avanço automático. Enquanto não "
+     "houver esse controle, o portal não atinge sequer o Nível A.", "WCAG 2.2.2 (A)"),
+
+    ("Crítica", "Slide ativo identificado apenas pela cor",
+     "No banner, o slide em exibição é sinalizado somente pela cor de fundo do botão "
+     "numérico (âmbar contra verde). Acrescentar um segundo indicador não cromático "
+     "— contorno, mudança de forma ou aria-current=\"true\" — para que a informação "
+     "não dependa da percepção de cor.", "WCAG 1.4.1 (A)"),
+
+    ("Alta", "Contraste insuficiente nos controles do banner",
+     "Os botões numéricos usam azul rgb(44,103,205) sobre verde rgb(14,86,31), razão "
+     "de 1,66:1, e 3,0:1 quando o slide está ativo. Adotar texto branco ou de "
+     "luminância equivalente, atingindo ao menos 4,5:1.", "WCAG 1.4.3 (AA)"),
+
+    ("Alta", "Página inicial e página de contato sem <h1>",
+     "A página inicial reúne 15 cabeçalhos sem nenhum <h1>, e a página de contato não "
+     "possui cabeçalho algum. Declarar um <h1> único por página, correspondente ao "
+     "título principal, para dar ponto de partida à navegação por cabeçalhos.",
+     "WCAG 1.3.1 / 2.4.6 (A/AA)"),
+
+    ("Alta", "Ausência de região de navegação",
+     "O portal declara role=\"banner\", role=\"main\" e role=\"contentinfo\", mas nenhum "
+     "<nav> ou role=\"navigation\". Marcar o menu principal e o menu lateral como "
+     "regiões de navegação, o que também elimina os blocos de conteúdo que o "
+     "axe-core apontou fora de qualquer região.", "WCAG 1.3.1 (A)"),
+
+    ("Alta", "Rolagem horizontal em telas estreitas",
+     "Em 320 pixels de largura o conteúdo ocupa 330 pixels e obriga a rolagem nos "
+     "dois eixos. Revisar as larguras fixas remanescentes para que o conteúdo reflua "
+     "sem transbordar.", "WCAG 1.4.10 (AA)"),
+
+    ("Média", "Indicador de foco pouco perceptível sobre fundo branco",
+     "O contorno de foco rgb(241,202,127) atinge 5,81:1 sobre o verde do cabeçalho, "
+     "mas apenas 1,56:1 sobre o branco da área de conteúdo, onde está a maior parte "
+     "dos links. Escurecer o contorno ou acrescentar um traço externo de apoio para "
+     "garantir 3:1 em qualquer fundo.", "WCAG 1.4.11 (AA)"),
+
+    ("Média", "Alvos de toque abaixo do mínimo",
+     "Na emulação do Pixel 7, 23 dos 51 elementos interativos medem menos de 24 por "
+     "24 pixels, entre eles os próprios controles do banner (22x20). Ampliar a área "
+     "clicável por meio de preenchimento, sem necessariamente aumentar o texto.",
+     "WCAG 2.5.8 (AA)"),
+
+    ("Média", "Layout quebra com espaçamento de texto ampliado",
+     "Ao aplicar entrelinha 1,5, espaçamento entre letras de 0,12em e entre palavras "
+     "de 0,16em, surge rolagem horizontal e três elementos têm o conteúdo cortado. "
+     "Substituir alturas fixas por alturas mínimas nos blocos afetados.",
+     "WCAG 1.4.12 (AA)"),
+
+    ("Média", "Texto alternativo redundante",
+     "Em quatro imagens da página inicial o atributo alt repete literalmente o texto "
+     "do link vizinho, levando o leitor de tela a anunciar a mesma informação duas "
+     "vezes. Usar alt=\"\" nessas imagens, já que o link adjacente cumpre a função "
+     "descritiva.", "WCAG 1.1.1 (A)"),
+
+    ("Baixa", "URL crua como texto de link",
+     "Na página institucional de Acessibilidade, dois links exibem o endereço "
+     "completo como texto visível, que o leitor de tela soletra caractere a "
+     "caractere. Substituir pelo nome do documento de destino.", "WCAG 2.4.4 (A)"),
+
+    ("Baixa", "Página de Acessibilidade desatualizada",
+     "A página foi modificada pela última vez em 2020, descreve apenas três dos sete "
+     "atalhos existentes, expande a sigla WCAG incorretamente como \"World Content "
+     "Accessibility Guide\" e não declara nível de conformidade. Mais grave: não "
+     "menciona Libras nem o VLibras em nenhum momento, embora o portal ofereça o "
+     "tradutor em todas as páginas — quem procura o recurso não é informado de que "
+     "ele existe. Registrou-se ainda que o script collective.lazysizes referenciado "
+     "pelas páginas responde HTTP 404. Atualizar o conteúdo, anunciar o VLibras e "
+     "publicar a declaração de conformidade prevista pelo eMAG.",
+     "eMAG 3.1 / WCAG 2.4.5"),
 ]
 
 

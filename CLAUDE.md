@@ -16,10 +16,51 @@ plausível ou número inventado. Se uma ferramenta não pôde ser executada, o c
 ## Estado atual
 
 - Texto do relatório e dos slides: **pronto** (introdução, objetivos, metodologia, análise de
-  conformidade, 10 recomendações priorizadas, conclusão, referências)
-- Medições do site real: **pendentes** — dependem de acesso de rede ao site escolhido
+  conformidade, 12 recomendações priorizadas, conclusão, referências)
+- Medições do site real: **feitas** em 20/09/2026 sobre as 3 páginas avaliadas —
+  auditor próprio, axe-core 4.10.2, contraste por amostragem de pixels, percurso completo
+  de teclado e simulação em Pixel 7. Resultados em `dados/dados_trabalho.json`
+  (blocos `checklist_manual`, `axe`, `contraste_pixel`, `conformidade`).
+- Capturas de tela do site em `evidencias/telas/`, embutidas no relatório (Figuras 1 a 6)
+  e nos slides 11 a 14.
+- **Ainda pendentes (26 campos):** WAVE, ASES e o teste em aparelho real com
+  TalkBack/VoiceOver. WAVE e ASES exigem navegador — o ASES protege o envio com CAPTCHA,
+  e o WAVE recebe a URL no fragmento `#`, que não chega ao servidor.
 - `demonstracao/`: exemplo completo das ferramentas rodando sobre um portal fictício local,
   com zero marcadores pendentes. **Não é a entrega.**
+
+## VLibras: o achado que a automação perdeu
+
+O portal **tem VLibras** em todas as páginas. Nenhuma das três frentes automatizadas viu:
+o widget não está no HTML entregue pelo servidor (buscar `vlibras` nas 4 páginas retorna
+zero), é injetado em tempo de execução por `barra.brasil.gov.br/barra.js`, e esse domínio
+de terceiro não carrega no espelho local. Só apareceu porque um dos avaliadores abriu o
+site no próprio Android e fotografou a tela (`evidencias/telas/10-...jpg`).
+
+Lição que vale para a próxima medição: **widget injetado por script de terceiro é ponto
+cego deste pipeline**. Antes de afirmar que um recurso não existe, conferir no aparelho.
+
+Registrado em `dados/dados_trabalho.json` → `recursos_assistivos`, seção 4.7 e Figura 6 do
+relatório, slide 14. O widget em si não foi auditado (contraste, alvo, teclado) porque não
+carregou no ambiente de medição — fica para a inspeção presencial.
+
+## Achados principais (medidos)
+
+O portal não atinge o Nível A, por dois critérios, ambos no banner rotativo da home:
+2.2.2 (troca de slide a cada 4000 ms, sem botão de pausa — confirmado lendo
+`banner_rotativo.js`) e 1.4.1 (slide ativo sinalizado apenas pela cor de fundo).
+Em AA falham 1.4.3, 1.4.10, 1.4.11, 1.4.12 e 2.5.8. O axe-core não encontrou nenhuma
+violação direta de critério WCAG A/AA nas 3 páginas: a base Plone/IDG é sólida.
+
+## Nota sobre a renderização no ambiente de nuvem
+
+O Chromium desta sessão não confia na CA do proxy e não abre o site por HTTPS. As medições
+que exigem renderização foram feitas sobre um **espelho local fiel** (`wget -E -H -k -p`,
+servido em `127.0.0.1:8899`), com 13 folhas de estilo e 19 imagens carregadas. Só não
+carregam recursos de terceiros: `barra.brasil.gov.br`, Google Tag Manager, SDK do Facebook
+e o embed do YouTube. Cuidado: o `wget` converte `url(...)` de CSS para caminhos com espaço
+sem aspas, o que invalida o `@import` e derruba o layout — o espelho precisa desse conserto
+antes de qualquer medição de contraste ou reflow.
 
 ## Site a avaliar
 
@@ -63,6 +104,16 @@ pip install python-docx python-pptx playwright
 ```
 O Chromium já vem instalado em `/opt/pw-browsers` — **não rodar `playwright install`**.
 O simulador usa esse caminho sozinho (variável `CHROMIUM_PATH` sobrescreve).
+
+## Conferir o layout em PDF
+
+`./ferramenta/gerar_pdf.sh` gera os PDFs ao lado do .docx e do .pptx.
+
+Cuidado: o ambiente de nuvem vem só com `libreoffice-core`, que não lê .docx nem
+.pptx — falha com `source file could not be loaded`, inclusive com o modelo da
+disciplina. Instalar antes: `apt-get update && apt-get install -y
+libreoffice-writer libreoffice-impress`. Para ver as páginas como imagem,
+`poppler-utils` (dá o `pdftoppm` e o `pdfinfo`).
 
 ## Convenções
 
