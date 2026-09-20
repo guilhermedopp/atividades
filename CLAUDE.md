@@ -105,6 +105,16 @@ pip install python-docx python-pptx playwright
 O Chromium já vem instalado em `/opt/pw-browsers` — **não rodar `playwright install`**.
 O simulador usa esse caminho sozinho (variável `CHROMIUM_PATH` sobrescreve).
 
+## Conferir o layout em PDF
+
+`./ferramenta/gerar_pdf.sh` gera os PDFs ao lado do .docx e do .pptx.
+
+Cuidado: o ambiente de nuvem vem só com `libreoffice-core`, que não lê .docx nem
+.pptx — falha com `source file could not be loaded`, inclusive com o modelo da
+disciplina. Instalar antes: `apt-get update && apt-get install -y
+libreoffice-writer libreoffice-impress`. Para ver as páginas como imagem,
+`poppler-utils` (dá o `pdftoppm` e o `pdfinfo`).
+
 ## Convenções
 
 - Português do Brasil **com acentuação** em tudo que aparece nos documentos.

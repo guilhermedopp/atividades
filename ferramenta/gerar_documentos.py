@@ -25,7 +25,8 @@ import sys
 
 from docx import Document
 from docx.enum.section import WD_SECTION
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_COLOR_INDEX
+from docx.enum.text import (WD_ALIGN_PARAGRAPH, WD_BREAK, WD_COLOR_INDEX,
+                            WD_TAB_ALIGNMENT, WD_TAB_LEADER)
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
@@ -113,9 +114,15 @@ def estilo_base(doc):
     s.top_margin = s.bottom_margin = Cm(2.54)
 
 
-def numerar_paginas(doc):
-    """Insere o número da página no rodapé (campo PAGE do Word)."""
-    p = doc.sections[0].footer.paragraphs[0]
+def numerar_paginas(sec):
+    """Insere o número da página no rodapé da seção (campo PAGE do Word).
+
+    O modelo da disciplina não numera as páginas, mas ele tem seis páginas e
+    este relatório passa de trinta. Mantém-se a numeração, desligada na capa e
+    na folha de rosto: elas ficam em uma seção própria, sem rodapé.
+    """
+    sec.footer.is_linked_to_previous = False
+    p = sec.footer.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     r = p.add_run()
     r.font.name, r.font.size = FONTE, Pt(10)
@@ -192,8 +199,10 @@ def celula(cel, texto, *, negrito=False, tamanho=10, centralizar=False, cor=None
     p = cel.paragraphs[0]
     p.paragraph_format.line_spacing = 1.0
     p.paragraph_format.space_after = Pt(2)
-    if centralizar:
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    # Em coluna estreita, o justificado do corpo abre vãos enormes entre as
+    # palavras. Dentro de tabela o texto fica alinhado à esquerda.
+    p.alignment = (WD_ALIGN_PARAGRAPH.CENTER if centralizar
+                   else WD_ALIGN_PARAGRAPH.LEFT)
     for conteudo, marcador in segmentos(str(texto)):
         if not conteudo:
             continue
@@ -223,16 +232,39 @@ def tabela(doc, cabecalhos, larguras, linhas):
     t = doc.add_table(rows=1, cols=len(cabecalhos))
     t.style = "Table Grid"
     t.autofit = False
+    # Sem tblLayout fixo o Word e o LibreOffice redistribuem as colunas pelo
+    # conteúdo e ignoram as larguras pedidas.
+    tbl_pr = t._tbl.tblPr
+    layout = OxmlElement("w:tblLayout")
+    layout.set(qn("w:type"), "fixed")
+    tbl_pr.append(layout)
+    grid = OxmlElement("w:tblGrid")
+    for l in larguras:
+        col = OxmlElement("w:gridCol")
+        col.set(qn("w:w"), str(int(Cm(l).twips)))
+        grid.append(col)
+    antigo = t._tbl.find(qn("w:tblGrid"))
+    if antigo is not None:
+        t._tbl.replace(antigo, grid)
+    else:
+        t._tbl.insert(1, grid)
     for i, (h, l) in enumerate(zip(cabecalhos, larguras)):
         celula(t.rows[0].cells[i], h, negrito=True, centralizar=True)
         sombrear(t.rows[0].cells[i])
         for row in t.rows:
             row.cells[i].width = Cm(l)
+    # Centralizar é decisão de coluna, não de célula: só se todos os valores
+    # daquela coluna forem curtos, como a de numeração. Misturar centralizado e
+    # alinhado à esquerda na mesma coluna deixa a tabela visualmente torta.
+    centrar = []
+    for i in range(len(cabecalhos)):
+        valores = [str(limpo(ln[i])) for ln in linhas if i < len(ln)]
+        centrar.append(bool(valores) and max(len(v) for v in valores) <= 6)
+
     for dados in linhas:
         cels = t.add_row().cells
         for i, (valor, l) in enumerate(zip(dados, larguras)):
-            centro = i in (0, len(dados) - 1) and len(str(limpo(valor))) < 16
-            celula(cels[i], valor, centralizar=centro)
+            celula(cels[i], valor, centralizar=centrar[i])
             cels[i].width = Cm(l)
     return t
 
@@ -347,7 +379,8 @@ def folha_rosto(doc, d):
         par(doc, "", espacamento=1.5)
     par(doc, "RELATÓRIO DE AVALIAÇÃO DE ACESSIBILIDADE WEB",
         negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
-    par(doc, V(d["site"].get("nome"), "nome do site avaliado"),
+    nome_site = V(d["site"].get("nome"), "nome do site avaliado")
+    par(doc, nome_site.upper() if not tem_marcador(nome_site) else nome_site,
         negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
     for _ in range(3):
         par(doc, "", espacamento=1.5)
@@ -361,7 +394,6 @@ def folha_rosto(doc, d):
         par(doc, "", espacamento=1.5)
     par(doc, ins["cidade"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     par(doc, ins["data"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
-    doc.add_page_break()
 
 
 SUMARIO = [
@@ -396,12 +428,13 @@ def sumario(doc):
         pf.line_spacing = 1.5
         pf.space_after = Pt(0)
         pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        pf.first_line_indent = Cm(-0.635)
-        if "." in num:
-            pf.left_indent = Cm(0.635)
-        rotulo = f"{num}. {nome}"
-        pontos = "." * max(4, 74 - len(rotulo))
-        r = p.add_run(rotulo + pontos)
+        recuo = Cm(0.635) if "." in num else Cm(0)
+        pf.left_indent = recuo
+        # Tabulação à direita da mancha (15,93 cm) com preenchimento de pontos:
+        # assim toda a linha pontilhada termina rente à margem.
+        pf.tab_stops.add_tab_stop(Cm(15.93) - recuo, WD_TAB_ALIGNMENT.RIGHT,
+                                  WD_TAB_LEADER.DOTS)
+        r = p.add_run(f"{num}. {nome}\t")
         r.font.name, r.font.size = FONTE, Pt(12)
         r.bold = True
     doc.add_page_break()
@@ -430,7 +463,7 @@ def secao_checklist(doc, d):
             obs or V(None, f"observação do item {i}"),
         ])
     tabela(doc, ["#", "Item verificado", "Critério WCAG 2.1 (nível)", "Situação", "Observação"],
-           [0.9, 4.0, 3.7, 2.2, 5.2], linhas)
+           [0.8, 3.19, 2.99, 2.0, 6.92], linhas)
     legenda(doc, "Quadro 2 - Resultado da inspeção manual pelo checklist de 15 itens. "
                  "Fonte: elaborado pelos autores.")
 
@@ -442,7 +475,7 @@ def secao_wave(doc, d):
                "própria renderização da página, distinguindo erros (falhas certas de "
                "acessibilidade), alertas (situações que exigem julgamento humano) e "
                "recursos (boas práticas já aplicadas). O Quadro 3 sintetiza a contagem obtida.")
-    tabela(doc, ["Categoria", "Quantidade", "O que significa"], [4.6, 2.8, 8.6], [
+    tabela(doc, ["Categoria", "Quantidade", "O que significa"], [4.29, 2.6, 9.01], [
         ["Errors", V(w.get("errors"), "n. de Errors no WAVE"),
          "Falhas certas que impedem o acesso por tecnologia assistiva."],
         ["Contrast Errors", V(w.get("contrast_errors"), "n. de Contrast Errors"),
@@ -474,7 +507,7 @@ def secao_ases(doc, d):
                "aderência ao eMAG 3.1, atribuindo nota de 0 a 100 e agrupando as ocorrências "
                "nas seis seções do modelo. A nota geral obtida pelo sítio avaliado foi de "
                + V(a.get("nota_geral"), "nota do ASES, ex.: 78,4") + "%.")
-    tabela(doc, ["Seção do eMAG", "Erros", "Avisos"], [8.0, 4.0, 4.0], [
+    tabela(doc, ["Seção do eMAG", "Erros", "Avisos"], [7.95, 3.98, 3.97], [
         ["1. Marcação", V(a.get("marcacao_erros"), "erros"), V(a.get("marcacao_avisos"), "avisos")],
         ["2. Comportamento", V(a.get("comportamento_erros"), "erros"),
          V(a.get("comportamento_avisos"), "avisos")],
@@ -509,7 +542,7 @@ def secao_axe(doc, d):
                        str(sum(b.get("ocorrencias", 0) for b in r.get("boas_praticas", []))),
                        str(sum(m.get("ocorrencias", 0) for m in r.get("revisao_manual", [])))])
     tabela(doc, ["Página", "Regras aprovadas", "Violações WCAG A/AA",
-                 "Boas práticas", "Revisão manual"], [5.4, 2.4, 2.6, 2.2, 2.4], linhas)
+                 "Boas práticas", "Revisão manual"], [5.32, 2.4, 2.6, 2.2, 3.38], linhas)
     legenda(doc, "Quadro 5 - Resultado do axe-core 4.10.2 por página avaliada. "
                  "Fonte: os autores.")
     corpo(doc, "O resultado exige leitura cuidadosa. O axe-core não encontrou nenhuma "
@@ -549,7 +582,7 @@ def secao_contraste(doc, d):
     reps = c.get("reprovacoes_confirmadas") or []
     if reps:
         tabela(doc, ["Elemento", "Texto", "Fundo", "Razão", "Exigido"],
-               [5.6, 3.0, 3.0, 1.6, 1.8],
+               [5.52, 2.99, 2.99, 1.7, 2.7],
                [[r["elemento"], r["cor_texto"], r["cor_fundo"],
                  f"{r['razao']}:1", f"{r['exigido']}:1"] for r in reps])
         legenda(doc, "Quadro 6 - Reprovações de contraste confirmadas por amostragem de "
@@ -670,7 +703,7 @@ def secao_auditoria(doc, d):
         linhas.append([p["pagina"], str(p["total_nao_conforme"]), str(p["total_conforme"]),
                        str(p["total_manual"]), str(p["total_ocorrencias"])])
     tabela(doc, ["Página auditada", "Não conf.", "Conformes", "Manual", "Ocorrências"],
-           [7.0, 2.2, 2.2, 1.8, 2.8], linhas)
+           [6.96, 2.19, 2.19, 1.79, 2.77], linhas)
     legenda(doc, "Quadro 7 - Síntese da auditoria programática por página. "
                  "Fonte: elaborado pelos autores.")
     pior = max(paginas, key=lambda p: p["total_ocorrencias"])
@@ -679,7 +712,7 @@ def secao_auditoria(doc, d):
         corpo(doc, f"A página com maior número de ocorrências foi {pior['pagina']}, "
                    f"com {pior['total_ocorrencias']} problemas somados. O detalhamento das "
                    "falhas identificadas nessa página é apresentado no Quadro 8.")
-        tabela(doc, ["#", "Item", "Diagnóstico automático"], [0.9, 4.0, 11.1],
+        tabela(doc, ["#", "Item", "Diagnóstico automático"], [0.89, 3.98, 11.03],
                [[str(f["item"]), f["nome"], f["detalhe"]] for f in falhas])
         legenda(doc, "Quadro 8 - Falhas detectadas pela auditoria programática. "
                      "Fonte: elaborado pelos autores.")
@@ -705,7 +738,7 @@ def secao_mobile_auto(doc, d):
                f"{e['aparelho']} em viewport de {e['viewport']['width']}x"
                f"{e['viewport']['height']} pixels lógicos. O Quadro 9 reúne as medições.")
     d_cont = lt["deslizes_ate_conteudo"]
-    tabela(doc, ["Medição", "Resultado", "Critério WCAG 2.1"], [6.4, 3.6, 6.0], [
+    tabela(doc, ["Medição", "Resultado", "Critério WCAG 2.1"], [6.36, 3.58, 5.96], [
         ["Elementos anunciados sem rótulo", str(lt["elementos_sem_rotulo"]),
          "1.1.1 / 4.1.2 (A)"],
         ["Deslizes até o conteúdo principal",
@@ -730,7 +763,7 @@ def secao_mobile_auto(doc, d):
         corpo(doc, "O Quadro 10 reproduz os primeiros anúncios que o leitor de tela emitiria ao "
                    "percorrer a página, permitir verificar como a estrutura do código se "
                    "converte em experiência sonora.")
-        tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.2, 13.8],
+        tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.19, 13.71],
                [[str(i), t] for i, t in enumerate(trans, 1)])
         legenda(doc, "Quadro 10 - Transcricao dos anúncios do leitor de tela. "
                      "Fonte: elaborado pelos autores.")
@@ -738,7 +771,7 @@ def secao_mobile_auto(doc, d):
         corpo(doc, "Quanto ao contraste, o pior resultado encontrado foi a razão de "
                    f"{ct['pior_razao']}:1, medida sobre a página efetivamente renderizada. "
                    "Os trechos reprovados de maior severidade estao no Quadro 11.")
-        tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [9.0, 3.5, 3.5],
+        tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [8.94, 3.48, 3.48],
                [[x["texto"], f"{x['razao']}:1", f"{x['exigido']}:1"] for x in ct["exemplos"][:6]])
         legenda(doc, "Quadro 11 - Trechos reprovados no critério de contraste. "
                      "Fonte: elaborado pelos autores.")
@@ -752,7 +785,7 @@ def secao_mobile_real(doc, d):
                "com um teste presencial: um dos autores acessou o sítio pelo próprio "
                "smartphone, com o leitor de tela ativado e a tela desligada do seu campo de "
                "visão, e tentou executar uma tarefa real de ponta a ponta.")
-    tabela(doc, ["Parâmetro do teste", "Registro"], [6.0, 10.0], [
+    tabela(doc, ["Parâmetro do teste", "Registro"], [5.96, 9.94], [
         ["Aparelho utilizado", V(m.get("dispositivo"), "modelo do aparelho")],
         ["Sistema operacional", V(m.get("sistema"), "ex.: Android 14 / iOS 17")],
         ["Leitor de tela", V(m.get("leitor_tela"), "TalkBack ou VoiceOver")],
@@ -781,7 +814,7 @@ def secao_recomendacoes(doc, d):
                "corrigidos com prioridade, até porque, sendo falhas de Nível A, são "
                "justamente as que impedem qualquer declaração de conformidade.")
     tabela(doc, ["Severidade", "Problema", "Correção recomendada", "Critério"],
-           [2.2, 3.6, 7.6, 2.6],
+           [2.19, 3.58, 7.55, 2.58],
            [[s, p, c, cr] for s, p, c, cr in T.RECOMENDACOES])
     legenda(doc, "Quadro 13 - Recomendações de correção priorizadas. "
                  "Fonte: elaborado pelos autores.")
@@ -794,9 +827,14 @@ def secao_recomendacoes(doc, d):
 def gerar_docx(d):
     doc = Document()
     estilo_base(doc)
-    numerar_paginas(doc)
     capa(doc, d)
     folha_rosto(doc, d)
+    # Capa e folha de rosto ficam sem rodapé: a numeração começa no sumário.
+    corpo_doc = doc.add_section(WD_SECTION.NEW_PAGE)
+    corpo_doc.page_width, corpo_doc.page_height = Cm(21.01), Cm(29.69)
+    corpo_doc.left_margin = corpo_doc.right_margin = Cm(2.54)
+    corpo_doc.top_margin = corpo_doc.bottom_margin = Cm(2.54)
+    numerar_paginas(corpo_doc)
     sumario(doc)
 
     titulo_secao(doc, "1. INTRODUÇÃO")
@@ -821,7 +859,7 @@ def gerar_docx(d):
     for p in T.metodologia(d):
         corpo(doc, p)
     titulo_secao(doc, "3.3 Instrumentos utilizados", 2)
-    tabela(doc, ["Instrumento", "Natureza", "Finalidade na avaliação"], [4.2, 3.4, 8.4], [
+    tabela(doc, ["Instrumento", "Natureza", "Finalidade na avaliação"], [3.99, 3.19, 8.72], [
         ["Checklist de 15 itens", "Manual",
          "Verificação guiada dos requisitos essenciais, com julgamento humano."],
         ["WAVE (WebAIM)", "Automática",
@@ -978,24 +1016,30 @@ def slide_imagem(prs, titulo, caminho, nota=""):
     from PIL import Image as _Img
     with _Img.open(completo) as im:
         prop = im.height / im.width
-    topo = Emu(int(prs.slide_height * 0.20))
-    alt_max = int(prs.slide_height * 0.62)
-    larg_max = int(prs.slide_width * 0.86)
+
+    # A imagem começa abaixo do título e reserva o rodapé da área de conteúdo
+    # para a legenda. Sem isso a figura sobe e cobre o título do slide.
+    base_titulo = (s.shapes.title.top + s.shapes.title.height) if s.shapes.title \
+        else Inches(2.3)
+    topo = int(base_titulo) + Inches(0.12)
+    altura_legenda = Inches(0.95) if nota else Inches(0.15)
+    alt_max = int(prs.slide_height - topo - altura_legenda - Inches(0.15))
+    larg_max = int(prs.slide_width * 0.80)
+
     larg = larg_max
     alt = int(larg * prop)
     if alt > alt_max:
         alt = alt_max
         larg = int(alt / prop)
-    s.shapes.add_picture(completo, Emu(int((prs.slide_width - larg) / 2)), topo,
+    s.shapes.add_picture(completo, Emu(int((prs.slide_width - larg) / 2)), Emu(int(topo)),
                          width=Emu(larg), height=Emu(alt))
     if nota:
-        cx = Emu(int(prs.slide_width * 0.07))
-        cy = Emu(int(topo + alt + prs.slide_height * 0.02))
-        cw = Emu(int(prs.slide_width * 0.86))
-        ch = Emu(int(prs.slide_height * 0.12))
-        cxn = s.shapes.add_textbox(cx, cy, cw, ch)
-        escrever(cxn.text_frame, [nota], tamanho=14)
+        cx = Emu(int(prs.slide_width * 0.08))
+        cy = Emu(int(topo + alt + Inches(0.10)))
+        cw = Emu(int(prs.slide_width * 0.84))
+        cxn = s.shapes.add_textbox(cx, cy, cw, Emu(int(altura_legenda)))
         cxn.text_frame.word_wrap = True
+        escrever(cxn.text_frame, [nota], tamanho=13)
     return s
 
 
