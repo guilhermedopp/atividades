@@ -105,10 +105,12 @@ def estilo_base(doc):
     pf.space_after = Pt(0)
     pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
+    # Medidas retiradas do modelo entregue pela disciplina: margens de 2,54 cm
+    # nos quatro lados, corpo em Arial 12, entrelinha 1,5.
     s = doc.sections[0]
-    s.page_width, s.page_height = Cm(21), Cm(29.7)
-    s.left_margin, s.top_margin = Cm(3), Cm(3)
-    s.right_margin, s.bottom_margin = Cm(2), Cm(2)
+    s.page_width, s.page_height = Cm(21.01), Cm(29.69)
+    s.left_margin = s.right_margin = Cm(2.54)
+    s.top_margin = s.bottom_margin = Cm(2.54)
 
 
 def numerar_paginas(doc):
@@ -128,11 +130,12 @@ def numerar_paginas(doc):
 
 
 def par(doc, texto="", *, negrito=False, tamanho=12, alinhamento=None, espaco_depois=0,
-        recuo=None, espacamento=1.5, maiusculas=False, cor=None):
+        espaco_antes=0, recuo=None, espacamento=1.5, maiusculas=False, cor=None):
     p = doc.add_paragraph()
     pf = p.paragraph_format
     pf.line_spacing = espacamento
     pf.space_after = Pt(espaco_depois)
+    pf.space_before = Pt(espaco_antes)
     if alinhamento is not None:
         pf.alignment = alinhamento
     if recuo is not None:
@@ -152,14 +155,18 @@ def par(doc, texto="", *, negrito=False, tamanho=12, alinhamento=None, espaco_de
 
 
 def titulo_secao(doc, texto, nivel=1):
-    doc.add_paragraph()
-    par(doc, texto, negrito=True, tamanho=12 if nivel == 1 else 12,
-        alinhamento=WD_ALIGN_PARAGRAPH.LEFT, espaco_depois=6,
-        maiusculas=(nivel == 1))
+    """Título de seção no formato do modelo: 14 pt no nível 1, 13 pt no nível 2,
+    negrito, justificado, com 12 pt de espaço antes e depois."""
+    par(doc, texto, negrito=True, tamanho=14 if nivel == 1 else 13,
+        alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY,
+        espaco_antes=12, espaco_depois=12, maiusculas=(nivel == 1))
 
 
 def corpo(doc, texto):
-    par(doc, texto, alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY, recuo=1.25, espaco_depois=6)
+    """Parágrafo de corpo no formato do modelo: Arial 12, justificado,
+    entrelinha 1,5, 12 pt antes e depois, sem recuo de primeira linha."""
+    par(doc, texto, alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY,
+        espaco_antes=12, espaco_depois=12)
 
 
 def item_lista(doc, texto, simbolo="•"):
@@ -279,20 +286,36 @@ def auto_por_item(d):
 
 
 # ------------------------------------------------------------ montagem docx
+LOGO = os.path.join(RAIZ, "ferramenta", "logo_ifal.png")
+
+
+def inserir_logo(doc):
+    """Brasão do IFAL centralizado, nas medidas do modelo (2,15 x 2,75 cm)."""
+    if not os.path.exists(LOGO):
+        return
+    try:
+        doc.add_picture(LOGO, width=Cm(2.15), height=Cm(2.75))
+    except Exception:
+        return
+    p = doc.paragraphs[-1]
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.line_spacing = 1.0
+    p.paragraph_format.space_after = Pt(0)
+
+
 def capa(doc, d):
     ins, eq = d["instituicao"], d["equipe"]
-    for _ in range(1):
-        par(doc, "", espacamento=1.0)
+    inserir_logo(doc)
     for linha in (ins["nome"], ins["campus"], ins["curso"]):
         par(doc, linha, negrito=True, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     for _ in range(6):
         par(doc, "", espacamento=1.5)
     par(doc, "RELATÓRIO DE AVALIAÇÃO DE ACESSIBILIDADE WEB",
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
     par(doc, V(d["site"].get("nome"), "nome do site avaliado").upper()
         if not tem_marcador(V(d["site"].get("nome"), "x"))
         else V(d["site"].get("nome"), "nome do site avaliado"),
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.5)
     for _ in range(6):
         par(doc, "", espacamento=1.5)
     for nome in eq:
@@ -313,6 +336,7 @@ def capa(doc, d):
 
 def folha_rosto(doc, d):
     ins, eq = d["instituicao"], d["equipe"]
+    inserir_logo(doc)
     for linha in (ins["nome"], ins["campus"], ins["curso"]):
         par(doc, linha, negrito=True, alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
     for _ in range(4):
@@ -322,19 +346,17 @@ def folha_rosto(doc, d):
     for _ in range(3):
         par(doc, "", espacamento=1.5)
     par(doc, "RELATÓRIO DE AVALIAÇÃO DE ACESSIBILIDADE WEB",
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
     par(doc, V(d["site"].get("nome"), "nome do site avaliado"),
-        negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
+        negrito=True, tamanho=13, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
     for _ in range(3):
         par(doc, "", espacamento=1.5)
-    p = doc.add_paragraph()
-    p.paragraph_format.left_indent = Cm(8)
-    p.paragraph_format.line_spacing = 1.0
-    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    r = p.add_run("Relatório de avaliação apresentado como requisito integrante à nota da "
-                  f"disciplina de {ins['disciplina']} do curso de "
-                  f"{ins.get('curso_nominal') or ins['curso'].title()}.")
-    r.font.name, r.font.size = FONTE, Pt(11)
+    # No modelo, a natureza do trabalho ocupa a largura da mancha, justificada,
+    # em 12 pt com 12 pt de espaço antes e depois.
+    par(doc, "Relatório de Avaliação apresentado como requisito integrante à nota da "
+             f"disciplina de {ins['disciplina']} do "
+             f"{ins.get('curso_nominal') or ins['curso'].title()}.",
+        alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY, espaco_antes=12, espaco_depois=12)
     for _ in range(6):
         par(doc, "", espacamento=1.5)
     par(doc, ins["cidade"], alinhamento=WD_ALIGN_PARAGRAPH.CENTER, espacamento=1.0)
@@ -364,17 +386,24 @@ SUMARIO = [
 
 
 def sumario(doc):
-    par(doc, "SUMARIO", negrito=True, tamanho=14, alinhamento=WD_ALIGN_PARAGRAPH.CENTER,
-        espaco_depois=12)
+    """Sumário no formato do modelo: título em 16 pt e itens em 12 pt negrito,
+    ligados ao número da seção por uma linha de pontos."""
+    par(doc, "Sumário", negrito=True, tamanho=16, alinhamento=WD_ALIGN_PARAGRAPH.CENTER,
+        espaco_antes=14, espaco_depois=12)
     for num, nome in SUMARIO:
         p = doc.add_paragraph()
-        p.paragraph_format.line_spacing = 1.5
-        p.paragraph_format.space_after = Pt(0)
+        pf = p.paragraph_format
+        pf.line_spacing = 1.5
+        pf.space_after = Pt(0)
+        pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        pf.first_line_indent = Cm(-0.635)
         if "." in num:
-            p.paragraph_format.left_indent = Cm(0.8)
-        r = p.add_run(f"{num}  {nome}")
+            pf.left_indent = Cm(0.635)
+        rotulo = f"{num}. {nome}"
+        pontos = "." * max(4, 74 - len(rotulo))
+        r = p.add_run(rotulo + pontos)
         r.font.name, r.font.size = FONTE, Pt(12)
-        r.bold = "." not in num
+        r.bold = True
     doc.add_page_break()
 
 
@@ -745,7 +774,7 @@ def secao_mobile_real(doc, d):
 
 
 def secao_recomendacoes(doc, d):
-    titulo_secao(doc, "5 RECOMENDAÇÕES DE CORREÇÃO")
+    titulo_secao(doc, "5. RECOMENDAÇÕES DE CORREÇÃO")
     corpo(doc, "As recomendações a seguir estão ordenadas por severidade, considerando o "
                "impacto sobre o usuário e o nível WCAG afetado. Problemas de severidade "
                "crítica bloqueiam integralmente o acesso de determinados grupos e devem ser "
@@ -770,18 +799,18 @@ def gerar_docx(d):
     folha_rosto(doc, d)
     sumario(doc)
 
-    titulo_secao(doc, "1 INTRODUÇÃO")
+    titulo_secao(doc, "1. INTRODUÇÃO")
     for p in T.introducao(d):
         corpo(doc, p)
 
-    titulo_secao(doc, "2 OBJETIVO")
+    titulo_secao(doc, "2. OBJETIVO")
     titulo_secao(doc, "2.1 Objetivo geral", 2)
     corpo(doc, T.objetivo_geral(d))
     titulo_secao(doc, "2.2 Objetivos específicos", 2)
     for o in T.OBJETIVOS_ESPECIFICOS:
         item_lista(doc, o)
 
-    titulo_secao(doc, "3 METODOLOGIA")
+    titulo_secao(doc, "3. METODOLOGIA")
     titulo_secao(doc, "3.1 Site avaliado e justificativa da escolha", 2)
     corpo(doc, "O sítio selecionado para a avaliação foi o "
                + V(d["site"].get("nome"), "nome do site") + ", acessível em "
@@ -813,7 +842,7 @@ def gerar_docx(d):
     legenda(doc, "Quadro 1 - Instrumentos empregados na avaliação. "
                  "Fonte: elaborado pelos autores.")
 
-    titulo_secao(doc, "4 AVALIAÇÃO E RESULTADOS")
+    titulo_secao(doc, "4. AVALIAÇÃO E RESULTADOS")
     corpo(doc, "Esta seção apresenta os resultados obtidos em cada frente de avaliação, "
                "partindo da inspeção humana, passando pelas medições automatizadas e "
                "encerrando na análise consolidada de conformidade.")
@@ -834,11 +863,11 @@ def gerar_docx(d):
 
     secao_recomendacoes(doc, d)
 
-    titulo_secao(doc, "6 CONCLUSÃO")
+    titulo_secao(doc, "6. CONCLUSÃO")
     for p in T.conclusao(d):
         corpo(doc, p)
 
-    titulo_secao(doc, "7 REFERÊNCIAS")
+    titulo_secao(doc, "7. REFERÊNCIAS")
     data = d["instituicao"].get("data_acesso", "")
     for ref in T.REFERENCIAS:
         p = doc.add_paragraph()
