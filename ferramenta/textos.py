@@ -250,10 +250,13 @@ RECOMENDACOES = [
     ("Baixa", "Página de Acessibilidade desatualizada",
      "A página foi modificada pela última vez em 2020, descreve apenas três dos sete "
      "atalhos existentes, expande a sigla WCAG incorretamente como \"World Content "
-     "Accessibility Guide\" e não declara nível de conformidade. Registrou-se ainda "
-     "que o script collective.lazysizes referenciado pelas páginas responde HTTP 404. "
-     "Atualizar o conteúdo e publicar a declaração de conformidade prevista pelo "
-     "eMAG.", "eMAG 3.1 / WCAG 2.4.5"),
+     "Accessibility Guide\" e não declara nível de conformidade. Mais grave: não "
+     "menciona Libras nem o VLibras em nenhum momento, embora o portal ofereça o "
+     "tradutor em todas as páginas — quem procura o recurso não é informado de que "
+     "ele existe. Registrou-se ainda que o script collective.lazysizes referenciado "
+     "pelas páginas responde HTTP 404. Atualizar o conteúdo, anunciar o VLibras e "
+     "publicar a declaração de conformidade prevista pelo eMAG.",
+     "eMAG 3.1 / WCAG 2.4.5"),
 ]
 
 

@@ -21,13 +21,28 @@ plausível ou número inventado. Se uma ferramenta não pôde ser executada, o c
   auditor próprio, axe-core 4.10.2, contraste por amostragem de pixels, percurso completo
   de teclado e simulação em Pixel 7. Resultados em `dados/dados_trabalho.json`
   (blocos `checklist_manual`, `axe`, `contraste_pixel`, `conformidade`).
-- Capturas de tela do site em `evidencias/telas/`, embutidas no relatório (Figuras 1 a 5)
-  e nos slides 11 a 13.
+- Capturas de tela do site em `evidencias/telas/`, embutidas no relatório (Figuras 1 a 6)
+  e nos slides 11 a 14.
 - **Ainda pendentes (26 campos):** WAVE, ASES e o teste em aparelho real com
   TalkBack/VoiceOver. WAVE e ASES exigem navegador — o ASES protege o envio com CAPTCHA,
   e o WAVE recebe a URL no fragmento `#`, que não chega ao servidor.
 - `demonstracao/`: exemplo completo das ferramentas rodando sobre um portal fictício local,
   com zero marcadores pendentes. **Não é a entrega.**
+
+## VLibras: o achado que a automação perdeu
+
+O portal **tem VLibras** em todas as páginas. Nenhuma das três frentes automatizadas viu:
+o widget não está no HTML entregue pelo servidor (buscar `vlibras` nas 4 páginas retorna
+zero), é injetado em tempo de execução por `barra.brasil.gov.br/barra.js`, e esse domínio
+de terceiro não carrega no espelho local. Só apareceu porque um dos avaliadores abriu o
+site no próprio Android e fotografou a tela (`evidencias/telas/10-...jpg`).
+
+Lição que vale para a próxima medição: **widget injetado por script de terceiro é ponto
+cego deste pipeline**. Antes de afirmar que um recurso não existe, conferir no aparelho.
+
+Registrado em `dados/dados_trabalho.json` → `recursos_assistivos`, seção 4.7 e Figura 6 do
+relatório, slide 14. O widget em si não foi auditado (contraste, alvo, teclado) porque não
+carregou no ambiente de medição — fica para a inspeção presencial.
 
 ## Achados principais (medidos)
 

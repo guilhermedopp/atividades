@@ -264,5 +264,15 @@
       "exigido_1411": 3.0
     },
     "nao_mensuravel": "As legendas brancas sobre as fotografias do banner rotativo não puderam ser medidas: os quatro slides ocupam a mesma posição na tela e a amostra de pixels resulta em composição das camadas. Exigem conferência visual humana no site em operação."
+  },
+  "recursos_assistivos": {
+    "vlibras": {
+      "presente": true,
+      "como_foi_constatado": "Observado em captura de tela feita pela equipe em aparelho Android real, e confirmado na leitura do código de barra.brasil.gov.br/barra.js, que injeta no corpo da página o bloco <div vw class=\"enabled\"> com o botão vw-access-button e, em seguida, carrega https://vlibras.gov.br/app2/vlibras-plugin.js chamando window.VLibras.Widget.",
+      "origem": "Barra de identidade do Governo Federal (barra.brasil.gov.br/barra.js), presente em todas as páginas do portal.",
+      "por_que_escapou": "O widget não existe no HTML entregue pelo servidor: é inserido em tempo de execução por script de terceiro. A busca pelo termo \"vlibras\" no código-fonte das quatro páginas retorna zero ocorrências, e o domínio barra.brasil.gov.br não carregou no espelho local usado para as medições de renderização.",
+      "nao_auditado": "Por não ter carregado no ambiente de medição, o próprio widget não foi avaliado quanto a contraste, tamanho de alvo, nome acessível ou operação por teclado. Fica como item para a inspeção presencial da equipe.",
+      "lacuna_documental": "A página institucional de Acessibilidade não menciona Libras nem o VLibras em nenhum momento: o portal oferece o recurso, mas não o informa a quem procuraria por ele."
+    }
   }
 }

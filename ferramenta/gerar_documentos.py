@@ -354,10 +354,11 @@ SUMARIO = [
     ("4.4", "Resultados do avaliador automático axe-core"),
     ("4.5", "Medição de contraste por amostragem de pixels"),
     ("4.6", "Evidências visuais da avaliação"),
-    ("4.7", "Resultados da auditoria programática do código-fonte"),
-    ("4.8", "Simulação automatizada de acesso por smartphone"),
-    ("4.9", "Tarefa complementar: uso real com leitor de tela"),
-    ("4.10", "Análise do nível de conformidade WCAG"),
+    ("4.7", "Recurso de tradução para Libras (VLibras)"),
+    ("4.8", "Resultados da auditoria programática do código-fonte"),
+    ("4.9", "Simulação automatizada de acesso por smartphone"),
+    ("4.10", "Tarefa complementar: uso real com leitor de tela"),
+    ("4.11", "Análise do nível de conformidade WCAG"),
     ("5", "RECOMENDAÇÕES DE CORREÇÃO"), ("6", "CONCLUSÃO"), ("7", "REFERÊNCIAS"),
 ]
 
@@ -545,6 +546,42 @@ def secao_contraste(doc, d):
                    "medir: " + str(c["nao_mensuravel"]))
 
 
+def secao_vlibras(doc, d):
+    r = ((d.get("recursos_assistivos") or {}).get("vlibras") or {})
+    if not r.get("presente"):
+        return
+    titulo_secao(doc, "4.7 Recurso de tradução para Libras (VLibras)", 2)
+    corpo(doc, "O portal disponibiliza o VLibras, tradutor automático de Português para "
+               "Língua Brasileira de Sinais mantido pelo Governo Federal, por meio de um "
+               "botão flutuante presente em todas as páginas. " + str(r.get("origem", "")))
+    corpo(doc, "O modo como esse recurso foi identificado merece registro metodológico, "
+               "por expor um limite das três frentes automatizadas empregadas até aqui. "
+               + str(r.get("por_que_escapou", "")) + " O recurso só apareceu porque um dos "
+               "avaliadores abriu o portal em seu próprio aparelho Android e fotografou a "
+               "tela, episódio que ilustra de forma concreta a razão pela qual o W3C "
+               "recomenda que a avaliação automática jamais seja empregada isoladamente.")
+    caminho = "evidencias/telas/14-vlibras-botao-flutuante.jpg"
+    if os.path.exists(os.path.join(RAIZ, caminho)):
+        try:
+            doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            legenda(doc, "Figura 6 - Botão flutuante do VLibras, à direita, sobre a página "
+                         "institucional de Acessibilidade aberta em aparelho Android. Na "
+                         "mesma captura aparece o link que exibe a URL completa do Decreto "
+                         "n. 5.296/2004 como texto visível. Fonte: captura feita pelos "
+                         "autores em aparelho real.")
+        except Exception:
+            pass
+    if r.get("lacuna_documental"):
+        corpo(doc, "Há, porém, uma incoerência a assinalar. " + str(r["lacuna_documental"])
+              + " Um recurso de acessibilidade que o público não sabe existir tem seu "
+                "alcance reduzido, e a própria página que deveria anunciá-lo é a que o "
+                "omite.")
+    if r.get("nao_auditado"):
+        corpo(doc, "Delimita-se o alcance desta constatação: registra-se a presença do "
+                   "recurso, não a sua qualidade. " + str(r["nao_auditado"]))
+
+
 FIGURAS = [
     ("evidencias/telas/02-topo-barra-acessibilidade.png",
      "Barra de acessibilidade do portal, com os quatro atalhos de salto (Alt+1 a "
@@ -588,7 +625,7 @@ def secao_evidencias(doc, d):
 
 
 def secao_auditoria(doc, d):
-    titulo_secao(doc, "4.7 Resultados da auditoria programática do código-fonte", 2)
+    titulo_secao(doc, "4.8 Resultados da auditoria programática do código-fonte", 2)
     corpo(doc, "Como terceira frente de verificação, desenvolveu-se um auditor próprio em "
                "Python (ferramenta/auditor_wcag.py), que percorre o HTML das páginas e "
                "verifica programaticamente os nove itens automatizáveis do checklist. Seu "
@@ -620,7 +657,7 @@ def secao_auditoria(doc, d):
 
 
 def secao_mobile_auto(doc, d):
-    titulo_secao(doc, "4.8 Simulação automatizada de acesso por smartphone", 2)
+    titulo_secao(doc, "4.9 Simulação automatizada de acesso por smartphone", 2)
     corpo(doc, "Para tornar a avaliação mobile reproduzível e verificável, construiu-se um "
                "ambiente de teste automatizado (ferramenta/simulador_mobile.py) que emula um "
                "aparelho real em Chromium - com viewport, densidade de pixels, eventos de "
@@ -680,7 +717,7 @@ def secao_mobile_auto(doc, d):
 
 def secao_mobile_real(doc, d):
     m = d.get("mobile", {})
-    titulo_secao(doc, "4.9 Tarefa complementar: uso real com leitor de tela", 2)
+    titulo_secao(doc, "4.10 Tarefa complementar: uso real com leitor de tela", 2)
     corpo(doc, "A simulação automatizada mede o que a máquina consegue medir; a experiência "
                "de uso, porém, só se revela no uso. Por isso a avaliação foi complementada "
                "com um teste presencial: um dos autores acessou o sítio pelo próprio "
@@ -786,11 +823,12 @@ def gerar_docx(d):
     secao_axe(doc, d)
     secao_contraste(doc, d)
     secao_evidencias(doc, d)
+    secao_vlibras(doc, d)
     secao_auditoria(doc, d)
     secao_mobile_auto(doc, d)
     secao_mobile_real(doc, d)
 
-    titulo_secao(doc, "4.10 Análise do nível de conformidade WCAG", 2)
+    titulo_secao(doc, "4.11 Análise do nível de conformidade WCAG", 2)
     for p in T.analise_conformidade(d):
         corpo(doc, p)
 
@@ -1081,6 +1119,16 @@ def gerar_pptx(d):
                  "evidencias/telas/08-reflow-320px.png",
                  "O conteúdo ocupa 330 px em uma tela de 320 px e obriga a rolagem "
                  "horizontal — WCAG 1.4.10 (AA).")
+
+    # 8e VLibras: achado que só apareceu no aparelho real
+    vl = ((d.get("recursos_assistivos") or {}).get("vlibras") or {})
+    if vl.get("presente"):
+        slide_imagem(prs, "O que só o aparelho real mostrou: VLibras",
+                     "evidencias/telas/14-vlibras-botao-flutuante.jpg",
+                     "O tradutor de Libras existe em todas as páginas, injetado por "
+                     "barra.brasil.gov.br. Não aparece no HTML entregue pelo servidor e "
+                     "escapou às três frentes automatizadas — mas a página de "
+                     "Acessibilidade do portal nunca o menciona.")
 
     # 9 simulação mobile
     if e:
