@@ -351,10 +351,13 @@ SUMARIO = [
     ("4.1", "Resultados da inspeção manual (checklist de 15 itens)"),
     ("4.2", "Resultados do avaliador automático WAVE"),
     ("4.3", "Resultados do avaliador automático ASES"),
-    ("4.4", "Resultados da auditoria programática do código-fonte"),
-    ("4.5", "Simulação automatizada de acesso por smartphone"),
-    ("4.6", "Tarefa complementar: uso real com leitor de tela"),
-    ("4.7", "Análise do nível de conformidade WCAG"),
+    ("4.4", "Resultados do avaliador automático axe-core"),
+    ("4.5", "Medição de contraste por amostragem de pixels"),
+    ("4.6", "Evidências visuais da avaliação"),
+    ("4.7", "Resultados da auditoria programática do código-fonte"),
+    ("4.8", "Simulação automatizada de acesso por smartphone"),
+    ("4.9", "Tarefa complementar: uso real com leitor de tela"),
+    ("4.10", "Análise do nível de conformidade WCAG"),
     ("5", "RECOMENDAÇÕES DE CORREÇÃO"), ("6", "CONCLUSÃO"), ("7", "REFERÊNCIAS"),
 ]
 
@@ -378,7 +381,7 @@ def secao_checklist(doc, d):
     titulo_secao(doc, "4.1 Resultados da inspeção manual (checklist de 15 itens)", 2)
     corpo(doc, "A inspeção manual aplicou o checklist de 15 itens essenciais sobre as páginas "
                "do recorte, com o sítio aberto no navegador e com uso das ferramentas de "
-               "desenvolvedor para leitura do código-fonte. O Quadro 1 apresenta o resultado "
+               "desenvolvedor para leitura do código-fonte. O Quadro 2 apresenta o resultado "
                "item a item, com a indicacao do critério de sucesso da WCAG 2.1 e da "
                "recomendação correspondente do eMAG 3.1.")
     auto = auto_por_item(d)
@@ -398,7 +401,7 @@ def secao_checklist(doc, d):
         ])
     tabela(doc, ["#", "Item verificado", "Critério WCAG 2.1 (nível)", "Situação", "Observação"],
            [0.9, 4.0, 3.7, 2.2, 5.2], linhas)
-    legenda(doc, "Quadro 1 - Resultado da inspeção manual pelo checklist de 15 itens. "
+    legenda(doc, "Quadro 2 - Resultado da inspeção manual pelo checklist de 15 itens. "
                  "Fonte: elaborado pelos autores.")
 
 
@@ -408,7 +411,7 @@ def secao_wave(doc, d):
     corpo(doc, "O WAVE, desenvolvido pelo WebAIM da Utah State University, sobrepõe ícones a "
                "própria renderização da página, distinguindo erros (falhas certas de "
                "acessibilidade), alertas (situações que exigem julgamento humano) e "
-               "recursos (boas práticas já aplicadas). O Quadro 2 sintetiza a contagem obtida.")
+               "recursos (boas práticas já aplicadas). O Quadro 3 sintetiza a contagem obtida.")
     tabela(doc, ["Categoria", "Quantidade", "O que significa"], [4.6, 2.8, 8.6], [
         ["Errors", V(w.get("errors"), "n. de Errors no WAVE"),
          "Falhas certas que impedem o acesso por tecnologia assistiva."],
@@ -423,7 +426,7 @@ def secao_wave(doc, d):
         ["ARIA", V(w.get("aria"), "n. de itens ARIA"),
          "Atributos ARIA presentes, que podem ajudar ou atrapalhar se mal usados."],
     ])
-    legenda(doc, "Quadro 2 - Síntese do relatório WAVE. Fonte: WebAIM (wave.webaim.org).")
+    legenda(doc, "Quadro 3 - Síntese do relatório WAVE. Fonte: WebAIM (wave.webaim.org).")
     corpo(doc, "Os erros de maior incidência relatados pela ferramenta foram: "
                + V(w.get("principais_erros"),
                    "liste os erros mais frequentes, ex.: 'Missing alternative text (12), "
@@ -454,12 +457,138 @@ def secao_ases(doc, d):
         ["6. Formulários", V(a.get("formularios_erros"), "erros"),
          V(a.get("formularios_avisos"), "avisos")],
     ])
-    legenda(doc, "Quadro 3 - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
+    legenda(doc, "Quadro 4 - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
                  "Fonte: asesweb.governoeletronico.gov.br.")
 
 
+def secao_axe(doc, d):
+    a = d.get("axe") or {}
+    pags = a.get("paginas") or {}
+    if not pags:
+        return
+    titulo_secao(doc, "4.4 Resultados do avaliador automático axe-core", 2)
+    corpo(doc, "O WAVE e o ASES dependem de execução interativa no navegador — o ASES, "
+               "inclusive, protege o envio com CAPTCHA. Para que a etapa de avaliação "
+               "automatizada não ficasse sem medição, utilizou-se o axe-core, motor de "
+               "auditoria mantido pela Deque Systems e empregado pelas próprias extensões "
+               "WAVE e Lighthouse. " + str(a.get("como_foi_executado", "")))
+    linhas = []
+    for url, r in pags.items():
+        linhas.append([url.replace("https://www2.ifal.edu.br", ""),
+                       str(r.get("passes", "-")), str(r.get("violacoes_wcag", "-")),
+                       str(sum(b.get("ocorrencias", 0) for b in r.get("boas_praticas", []))),
+                       str(sum(m.get("ocorrencias", 0) for m in r.get("revisao_manual", [])))])
+    tabela(doc, ["Página", "Regras aprovadas", "Violações WCAG A/AA",
+                 "Boas práticas", "Revisão manual"], [5.4, 2.4, 2.6, 2.2, 2.4], linhas)
+    legenda(doc, "Quadro 5 - Resultado do axe-core 4.10.2 por página avaliada. "
+                 "Fonte: os autores.")
+    corpo(doc, "O resultado exige leitura cuidadosa. O axe-core não encontrou nenhuma "
+               "violação direta de Critério de Sucesso da WCAG 2.1 nos níveis A e AA nas "
+               "três páginas, o que confirma que a base técnica do portal, herdada do "
+               "Plone com a Identidade Digital do Governo, é sólida: idioma declarado, "
+               "títulos presentes, rótulos associados e nenhum identificador duplicado.")
+    bp, man = {}, {}
+    for r in pags.values():
+        for b in r.get("boas_praticas", []):
+            bp.setdefault(b["regra"], [b["descricao"], 0])[1] += b.get("ocorrencias", 0)
+        for m in r.get("revisao_manual", []):
+            man.setdefault(m["regra"], [m["descricao"], 0])[1] += m.get("ocorrencias", 0)
+    if bp:
+        corpo(doc, "As ocorrências classificadas como boas práticas, somadas as três "
+                   "páginas, foram:")
+        for regra, (desc, n) in sorted(bp.items(), key=lambda x: -x[1][1]):
+            item_lista(doc, f"{regra} — {n} ocorrência(s): {desc}.")
+    if man:
+        corpo(doc, "A ferramenta ainda devolveu ocorrências que ela própria não consegue "
+                   "decidir sozinha e transfere ao avaliador humano:")
+        for regra, (desc, n) in sorted(man.items(), key=lambda x: -x[1][1]):
+            item_lista(doc, f"{regra} — {n} ocorrência(s): {desc}.")
+    corpo(doc, "O dado mais relevante deste quadro é justamente o que a ferramenta "
+               "devolveu sem resposta: a regra de contraste apareceu como indecidível "
+               "dezenas de vezes porque o texto é desenhado sobre fotografias. Isso não "
+               "significa aprovação — significa que o critério 1.4.3 precisou ser medido "
+               "por outro caminho, descrito na subseção seguinte.")
+
+
+def secao_contraste(doc, d):
+    c = d.get("contraste_pixel") or {}
+    if not c:
+        return
+    titulo_secao(doc, "4.5 Medição de contraste por amostragem de pixels", 2)
+    corpo(doc, str(c.get("metodo", "")))
+    reps = c.get("reprovacoes_confirmadas") or []
+    if reps:
+        tabela(doc, ["Elemento", "Texto", "Fundo", "Razão", "Exigido"],
+               [5.6, 3.0, 3.0, 1.6, 1.8],
+               [[r["elemento"], r["cor_texto"], r["cor_fundo"],
+                 f"{r['razao']}:1", f"{r['exigido']}:1"] for r in reps])
+        legenda(doc, "Quadro 6 - Reprovações de contraste confirmadas por amostragem de "
+                     "pixels na página renderizada. Fonte: os autores.")
+        corpo(doc, "A reprovação mais severa é a dos botões numéricos que controlam o "
+                   "banner rotativo: com 1,66:1, o texto azul sobre o verde institucional "
+                   "fica praticamente indistinguível do fundo. São, ao mesmo tempo, os "
+                   "únicos controles do banner e alvos de apenas 22 por 20 pixels, o que "
+                   "os faz falhar também no critério 2.5.8.")
+    f = c.get("indicador_de_foco") or {}
+    if f:
+        corpo(doc, "O indicador de foco do teclado merece registro separado. Ele está "
+                   f"sempre presente, na cor {f.get('cor')}, e atinge "
+                   f"{f.get('sobre_verde_cabecalho')}:1 sobre o verde do cabeçalho e "
+                   f"{f.get('sobre_verde_rodape')}:1 sobre o verde do rodapé. Sobre o "
+                   f"fundo branco da área de conteúdo, porém, cai para "
+                   f"{f.get('sobre_branco')}:1, abaixo dos {f.get('exigido_1411')}:1 "
+                   "exigidos pelo critério 1.4.11. O resultado é que o foco fica nítido "
+                   "nas bordas da página e quase invisível exatamente onde se concentra "
+                   "a maior parte dos links.")
+    if c.get("nao_mensuravel"):
+        corpo(doc, "Registra-se, por honestidade metodológica, o que não foi possível "
+                   "medir: " + str(c["nao_mensuravel"]))
+
+
+FIGURAS = [
+    ("evidencias/telas/02-topo-barra-acessibilidade.png",
+     "Barra de acessibilidade do portal, com os quatro atalhos de salto (Alt+1 a "
+     "Alt+4) e os links Acessibilidade, Alto Contraste e Mapa do site."),
+    ("evidencias/telas/13-carrossel-banner-rotativo.png",
+     "Banner rotativo da página inicial. Os botões numéricos no canto inferior "
+     "direito são os únicos controles do carrossel: medem 22 por 20 pixels, "
+     "apresentam razão de contraste de 1,66:1 e sinalizam o slide em exibição "
+     "apenas pela cor de fundo."),
+    ("evidencias/telas/04-foco-teclado.png",
+     "Indicador de foco do teclado sobre o link Acessibilidade. Sobre o verde do "
+     "cabeçalho o contorno âmbar é nítido (5,81:1); sobre o branco da área de "
+     "conteúdo cai para 1,56:1."),
+    ("evidencias/telas/08-reflow-320px.png",
+     "Página inicial renderizada em 320 pixels de largura. O conteúdo ocupa 330 "
+     "pixels e provoca rolagem horizontal, contrariando o critério 1.4.10."),
+    ("evidencias/telas/05-pagina-acessibilidade.png",
+     "Página institucional de Acessibilidade, publicada em 2013 e modificada pela "
+     "última vez em 2020. Descreve apenas três dos sete atalhos existentes e "
+     "expande a sigla WCAG incorretamente."),
+]
+
+
+def secao_evidencias(doc, d):
+    """Insere as capturas de tela como figuras numeradas, se existirem no disco."""
+    disponiveis = [(c, l) for c, l in FIGURAS if os.path.exists(os.path.join(RAIZ, c))]
+    if not disponiveis:
+        return
+    titulo_secao(doc, "4.6 Evidências visuais da avaliação", 2)
+    corpo(doc, "As figuras a seguir registram o estado do portal no momento da "
+               "avaliação e sustentam as medições apresentadas nas subseções "
+               "anteriores. Todas foram capturadas em Chromium, sobre as folhas de "
+               "estilo e as imagens do próprio sítio.")
+    for i, (caminho, texto) in enumerate(disponiveis, 1):
+        try:
+            doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        except Exception:
+            continue
+        legenda(doc, f"Figura {i} - {texto} Fonte: os autores.")
+
+
 def secao_auditoria(doc, d):
-    titulo_secao(doc, "4.4 Resultados da auditoria programática do código-fonte", 2)
+    titulo_secao(doc, "4.7 Resultados da auditoria programática do código-fonte", 2)
     corpo(doc, "Como terceira frente de verificação, desenvolveu-se um auditor próprio em "
                "Python (ferramenta/auditor_wcag.py), que percorre o HTML das páginas e "
                "verifica programaticamente os nove itens automatizáveis do checklist. Seu "
@@ -468,7 +597,7 @@ def secao_auditoria(doc, d):
     paginas = d["_auto"].get("paginas", [])
     if not paginas:
         item_lista(doc, V(None, "execute 'python3 ferramenta/auditor_wcag.py <URL>' e gere "
-                                "novamente este relatório para preencher o Quadro 4"))
+                                "novamente este relatório para preencher o Quadro 7"))
         return
     linhas = []
     for p in paginas:
@@ -476,22 +605,22 @@ def secao_auditoria(doc, d):
                        str(p["total_manual"]), str(p["total_ocorrencias"])])
     tabela(doc, ["Página auditada", "Não conf.", "Conformes", "Manual", "Ocorrências"],
            [7.0, 2.2, 2.2, 1.8, 2.8], linhas)
-    legenda(doc, "Quadro 4 - Síntese da auditoria programática por página. "
+    legenda(doc, "Quadro 7 - Síntese da auditoria programática por página. "
                  "Fonte: elaborado pelos autores.")
     pior = max(paginas, key=lambda p: p["total_ocorrencias"])
     falhas = [i for i in pior["itens"] if i["status"] == "nao_conforme"]
     if falhas:
         corpo(doc, f"A página com maior número de ocorrências foi {pior['pagina']}, "
                    f"com {pior['total_ocorrencias']} problemas somados. O detalhamento das "
-                   "falhas identificadas nessa página é apresentado no Quadro 5.")
+                   "falhas identificadas nessa página é apresentado no Quadro 8.")
         tabela(doc, ["#", "Item", "Diagnóstico automático"], [0.9, 4.0, 11.1],
                [[str(f["item"]), f["nome"], f["detalhe"]] for f in falhas])
-        legenda(doc, "Quadro 5 - Falhas detectadas pela auditoria programática. "
+        legenda(doc, "Quadro 8 - Falhas detectadas pela auditoria programática. "
                      "Fonte: elaborado pelos autores.")
 
 
 def secao_mobile_auto(doc, d):
-    titulo_secao(doc, "4.5 Simulação automatizada de acesso por smartphone", 2)
+    titulo_secao(doc, "4.8 Simulação automatizada de acesso por smartphone", 2)
     corpo(doc, "Para tornar a avaliação mobile reproduzível e verificável, construiu-se um "
                "ambiente de teste automatizado (ferramenta/simulador_mobile.py) que emula um "
                "aparelho real em Chromium - com viewport, densidade de pixels, eventos de "
@@ -508,7 +637,7 @@ def secao_mobile_auto(doc, d):
     rf, zm, ct = e["reflow_320px"], e["zoom"], e["contraste"]
     corpo(doc, f"A simulação foi executada sobre {e['url']}, emulando o aparelho "
                f"{e['aparelho']} em viewport de {e['viewport']['width']}x"
-               f"{e['viewport']['height']} pixels lógicos. O Quadro 6 reúne as medições.")
+               f"{e['viewport']['height']} pixels lógicos. O Quadro 9 reúne as medições.")
     d_cont = lt["deslizes_ate_conteudo"]
     tabela(doc, ["Medição", "Resultado", "Critério WCAG 2.1"], [6.4, 3.6, 6.0], [
         ["Elementos anunciados sem rótulo", str(lt["elementos_sem_rotulo"]),
@@ -528,30 +657,30 @@ def secao_mobile_auto(doc, d):
         ["Trechos reprovados no contraste",
          f"{ct['reprovados']} de {ct['trechos_analisados']}", "1.4.3 (AA)"],
     ])
-    legenda(doc, "Quadro 6 - Medições da simulação automatizada em smartphone. "
+    legenda(doc, "Quadro 9 - Medições da simulação automatizada em smartphone. "
                  "Fonte: elaborado pelos autores.")
     trans = lt["transcricao"][:12]
     if trans:
-        corpo(doc, "O Quadro 7 reproduz os primeiros anúncios que o leitor de tela emitiria ao "
+        corpo(doc, "O Quadro 10 reproduz os primeiros anúncios que o leitor de tela emitiria ao "
                    "percorrer a página, permitir verificar como a estrutura do código se "
                    "converte em experiência sonora.")
         tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.2, 13.8],
                [[str(i), t] for i, t in enumerate(trans, 1)])
-        legenda(doc, "Quadro 7 - Transcricao dos anúncios do leitor de tela. "
+        legenda(doc, "Quadro 10 - Transcricao dos anúncios do leitor de tela. "
                      "Fonte: elaborado pelos autores.")
     if ct["exemplos"]:
         corpo(doc, "Quanto ao contraste, o pior resultado encontrado foi a razão de "
                    f"{ct['pior_razao']}:1, medida sobre a página efetivamente renderizada. "
-                   "Os trechos reprovados de maior severidade estao no Quadro 8.")
+                   "Os trechos reprovados de maior severidade estao no Quadro 11.")
         tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [9.0, 3.5, 3.5],
                [[x["texto"], f"{x['razao']}:1", f"{x['exigido']}:1"] for x in ct["exemplos"][:6]])
-        legenda(doc, "Quadro 8 - Trechos reprovados no critério de contraste. "
+        legenda(doc, "Quadro 11 - Trechos reprovados no critério de contraste. "
                      "Fonte: elaborado pelos autores.")
 
 
 def secao_mobile_real(doc, d):
     m = d.get("mobile", {})
-    titulo_secao(doc, "4.6 Tarefa complementar: uso real com leitor de tela", 2)
+    titulo_secao(doc, "4.9 Tarefa complementar: uso real com leitor de tela", 2)
     corpo(doc, "A simulação automatizada mede o que a máquina consegue medir; a experiência "
                "de uso, porém, só se revela no uso. Por isso a avaliação foi complementada "
                "com um teste presencial: um dos autores acessou o sítio pelo próprio "
@@ -565,7 +694,7 @@ def secao_mobile_real(doc, d):
         ["Tempo gasto", V(m.get("tempo_gasto"), "ex.: 6 min 40 s")],
         ["Tarefa concluida", V(m.get("tarefa_concluida"), "Sim / Não / Parcialmente")],
     ])
-    legenda(doc, "Quadro 9 - Condições do teste com leitor de tela. "
+    legenda(doc, "Quadro 12 - Condições do teste com leitor de tela. "
                  "Fonte: elaborado pelos autores.")
     corpo(doc, "Relato da experiência: " + V(m.get("relato"),
           "descreva em 8 a 12 linhas: como foi ativar o leitor, o que o aparelho anunciou "
@@ -574,7 +703,7 @@ def secao_mobile_real(doc, d):
           "sensação ao depender apenas do áudio"))
     corpo(doc, "A confrontação entre este relato e as medições automatizadas da seção "
                "anterior é o ponto central da avaliação: cada elemento anunciado sem rótulo "
-               "no Quadro 7 corresponde, na experiência real, a um momento de interrupção em "
+               "no Quadro 10 corresponde, na experiência real, a um momento de interrupção em "
                "que o usuário precisa adivinhar a função do que esta tocando.")
 
 
@@ -588,7 +717,7 @@ def secao_recomendacoes(doc, d):
     tabela(doc, ["Severidade", "Problema", "Correção recomendada", "Critério"],
            [2.2, 3.6, 7.6, 2.6],
            [[s, p, c, cr] for s, p, c, cr in T.RECOMENDACOES])
-    legenda(doc, "Quadro 10 - Recomendações de correção priorizadas. "
+    legenda(doc, "Quadro 13 - Recomendações de correção priorizadas. "
                  "Fonte: elaborado pelos autores.")
     corpo(doc, "Estima-se que as correções de severidade crítica e alta sejam implementáveis "
                "sem redesenho visual do sítio, uma vez que dizem respeito a camada de "
@@ -633,6 +762,10 @@ def gerar_docx(d):
          "Detecção de erros sobre a página renderizada e contagem por categoria."],
         ["ASES (Governo Federal)", "Automática",
          "Nota de aderência ao eMAG 3.1 e ocorrências por seção do modelo."],
+        ["axe-core 4.10.2 (Deque)", "Automática",
+         "Verificação das regras WCAG 2.1 sobre a página já renderizada."],
+        ["Amostragem de pixels", "Automática (própria)",
+         "Contraste medido na imagem da tela, sem supor a cor do fundo."],
         ["auditor_wcag.py", "Automática (própria)",
          "Conferência cruzada dos itens automatizáveis diretamente no HTML."],
         ["simulador_mobile.py", "Automática (própria)",
@@ -640,7 +773,7 @@ def gerar_docx(d):
         ["Leitor de tela em smartphone", "Empírica",
          "Execução de tarefa real sem apoio visual, para avaliar a experiência de uso."],
     ])
-    legenda(doc, "Quadro 11 - Instrumentos empregados na avaliação. "
+    legenda(doc, "Quadro 1 - Instrumentos empregados na avaliação. "
                  "Fonte: elaborado pelos autores.")
 
     titulo_secao(doc, "4 AVALIAÇÃO E RESULTADOS")
@@ -650,11 +783,14 @@ def gerar_docx(d):
     secao_checklist(doc, d)
     secao_wave(doc, d)
     secao_ases(doc, d)
+    secao_axe(doc, d)
+    secao_contraste(doc, d)
+    secao_evidencias(doc, d)
     secao_auditoria(doc, d)
     secao_mobile_auto(doc, d)
     secao_mobile_real(doc, d)
 
-    titulo_secao(doc, "4.7 Análise do nível de conformidade WCAG", 2)
+    titulo_secao(doc, "4.10 Análise do nível de conformidade WCAG", 2)
     for p in T.analise_conformidade(d):
         corpo(doc, p)
 
@@ -758,6 +894,44 @@ def slide_conteudo(prs, titulo, linhas, tamanho=18):
     return s
 
 
+def slide_imagem(prs, titulo, caminho, nota=""):
+    """Slide com uma captura de tela ocupando a área de conteúdo."""
+    completo = os.path.join(RAIZ, caminho)
+    if not os.path.exists(completo):
+        return None
+    s = prs.slides.add_slide(layout(prs, "Título e Conteúdo"))
+    if s.shapes.title:
+        tf = s.shapes.title.text_frame
+        tf.text = ""
+        escrever(tf, [titulo], tamanho=26, espaco=0)
+    for ph in list(s.placeholders):
+        if ph.placeholder_format.idx != 0:
+            ph._element.getparent().remove(ph._element)
+
+    from PIL import Image as _Img
+    with _Img.open(completo) as im:
+        prop = im.height / im.width
+    topo = Emu(int(prs.slide_height * 0.20))
+    alt_max = int(prs.slide_height * 0.62)
+    larg_max = int(prs.slide_width * 0.86)
+    larg = larg_max
+    alt = int(larg * prop)
+    if alt > alt_max:
+        alt = alt_max
+        larg = int(alt / prop)
+    s.shapes.add_picture(completo, Emu(int((prs.slide_width - larg) / 2)), topo,
+                         width=Emu(larg), height=Emu(alt))
+    if nota:
+        cx = Emu(int(prs.slide_width * 0.07))
+        cy = Emu(int(topo + alt + prs.slide_height * 0.02))
+        cw = Emu(int(prs.slide_width * 0.86))
+        ch = Emu(int(prs.slide_height * 0.12))
+        cxn = s.shapes.add_textbox(cx, cy, cw, ch)
+        escrever(cxn.text_frame, [nota], tamanho=14)
+        cxn.text_frame.word_wrap = True
+    return s
+
+
 def gerar_pptx(d):
     prs = Presentation(MODELO_PPTX) if os.path.exists(MODELO_PPTX) else Presentation()
     if os.path.exists(MODELO_PPTX):
@@ -850,7 +1024,63 @@ def gerar_pptx(d):
          f"Conteúdo {limpo(V(a.get('conteudo_erros'), '?'))} erros · "
          f"Formulários {limpo(V(a.get('formularios_erros'), '?'))} erros", 1),
         "Limitação: detectam ausência de alt, mas não julgam se o alt descreve bem a imagem",
+        "WAVE e ASES exigem execução no navegador — o ASES protege o envio com CAPTCHA",
     ], tamanho=16)
+
+    # 8b axe-core
+    ax = (d.get("axe") or {}).get("paginas") or {}
+    if ax:
+        regras = {}
+        manual = {}
+        for r in ax.values():
+            for b in r.get("boas_praticas", []):
+                regras[b["regra"]] = regras.get(b["regra"], 0) + b.get("ocorrencias", 0)
+            for m in r.get("revisao_manual", []):
+                manual[m["regra"]] = manual.get(m["regra"], 0) + m.get("ocorrencias", 0)
+        linhas = [
+            "axe-core 4.10.2 (Deque) — motor usado pelas extensões WAVE e Lighthouse",
+            f"Violações diretas de critério WCAG A/AA: "
+            f"{sum(r.get('violacoes_wcag', 0) for r in ax.values())} nas 3 páginas",
+            (f"Regras aprovadas: "
+             f"{' · '.join(str(r.get('passes')) for r in ax.values())}", 1),
+            "Ocorrências de boas práticas:",
+        ]
+        for regra, n in sorted(regras.items(), key=lambda x: -x[1]):
+            linhas.append((f"{regra} — {n}x", 1))
+        if manual:
+            linhas.append("Devolvido para julgamento humano:")
+            for regra, n in sorted(manual.items(), key=lambda x: -x[1]):
+                linhas.append((f"{regra} — {n}x", 1))
+        slide_conteudo(prs, "Avaliador automático: axe-core", linhas, tamanho=15)
+
+    # 8c contraste medido por pixel
+    cp = d.get("contraste_pixel") or {}
+    if cp.get("reprovacoes_confirmadas"):
+        linhas = ["Método: o texto é apagado, a área é fotografada e a cor dominante "
+                  "da imagem vira o fundo — sem supor nada pela árvore do DOM.",
+                  "Reprovações confirmadas:"]
+        for r in cp["reprovacoes_confirmadas"]:
+            linhas.append((f"{r['razao']}:1 (exige {r['exigido']}:1) — {r['elemento']}", 1))
+        f = cp.get("indicador_de_foco") or {}
+        if f:
+            linhas.append(f"Indicador de foco: {f.get('sobre_verde_cabecalho')}:1 sobre o "
+                          f"verde, mas {f.get('sobre_branco')}:1 sobre o branco "
+                          f"(exige {f.get('exigido_1411')}:1)")
+        slide_conteudo(prs, "Contraste medido na tela renderizada", linhas, tamanho=15)
+
+    # 8d evidências visuais
+    slide_imagem(prs, "Barra de acessibilidade do portal",
+                 "evidencias/telas/02-topo-barra-acessibilidade.png",
+                 "Quatro atalhos de salto (Alt+1 a Alt+4), Alto Contraste e Mapa do site: "
+                 "o portal acerta o essencial da navegação assistida.")
+    slide_imagem(prs, "Onde estão as piores falhas: o banner rotativo",
+                 "evidencias/telas/13-carrossel-banner-rotativo.png",
+                 "Botões de 22x20 px, contraste de 1,66:1, slide ativo marcado só pela cor "
+                 "e troca automática a cada 4 segundos sem botão de pausa.")
+    slide_imagem(prs, "Reflow em 320 px",
+                 "evidencias/telas/08-reflow-320px.png",
+                 "O conteúdo ocupa 330 px em uma tela de 320 px e obriga a rolagem "
+                 "horizontal — WCAG 1.4.10 (AA).")
 
     # 9 simulação mobile
     if e:

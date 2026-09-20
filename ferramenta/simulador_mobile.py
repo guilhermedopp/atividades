@@ -100,14 +100,22 @@ JS_CONTRASTE = r"""
     const p = m[1].split(',').map(x => parseFloat(x.trim()));
     return { c: [p[0],p[1],p[2]], a: p.length > 3 ? p[3] : 1 };
   };
+  // Sobe a árvore até achar um fundo opaco. Se cruzar uma imagem de fundo antes
+  // disso, a cor sólida não representa o que a pessoa vê: a razão calculada ali
+  // não vale e o trecho é marcado como indeterminado (exige conferência visual).
   const fundo = (el) => {
-    let n = el;
+    let n = el, img = false;
     while (n && n.nodeType === 1) {
-      const b = rgb(getComputedStyle(n).backgroundColor);
-      if (b && b.a > 0.1) return b.c;
+      const st = getComputedStyle(n);
+      if (st.backgroundImage && st.backgroundImage !== 'none') img = true;
+      const b = rgb(st.backgroundColor);
+      if (b && b.a > 0.1) return { c: b.c, img: img, achou: true };
       n = n.parentElement;
     }
-    return [255,255,255];
+    // Nenhum ancestral pinta fundo: o que aparece atrás vem de um elemento irmão
+    // (cabeçalho posicionado, sobreposição). Assumir branco inventaria um número,
+    // então o trecho fica indeterminado.
+    return { c: [255,255,255], img: img, achou: false };
   };
   const visível = (el) => {
     const s = getComputedStyle(el);
@@ -122,7 +130,8 @@ JS_CONTRASTE = r"""
     if (!txt || txt.length < 2 || !visível(el)) return;
     const st = getComputedStyle(el);
     const f = rgb(st.color); if (!f) return;
-    const b = fundo(el);
+    const fu = fundo(el);
+    const b = fu.c;
     const l1 = lum(f.c), l2 = lum(b);
     const razao = (Math.max(l1,l2) + 0.05) / (Math.min(l1,l2) + 0.05);
     const px = parseFloat(st.fontSize);
@@ -131,7 +140,8 @@ JS_CONTRASTE = r"""
     const exigido = grande ? 3.0 : 4.5;
     out.push({
       texto: txt.slice(0, 60), razao: Math.round(razao * 100) / 100, exigido,
-      aprovado: razao >= exigido, px: Math.round(px * 10) / 10, peso,
+      aprovado: razao >= exigido, indeterminado: (fu.img || !fu.achou),
+      px: Math.round(px * 10) / 10, peso,
       cor: st.color, fundo: 'rgb(' + b.join(',') + ')',
       seletor: el.tagName.toLowerCase() + (el.className && typeof el.className === 'string'
                ? '.' + el.className.trim().split(/\s+/).slice(0,2).join('.') : '')
@@ -386,11 +396,18 @@ def testar(url, ap, swipes, tabs, headless=True):
 
         # F) contraste
         c = pg.evaluate(JS_CONTRASTE)
-        reprov = [x for x in c if not x["aprovado"]]
+        # Só conta como reprovado o trecho cujo fundo é cor sólida. Texto sobre
+        # imagem entra em "indeterminados": a razão medida não descreve o que a
+        # pessoa vê, e o item precisa de conferência visual humana.
+        reprov = [x for x in c if not x["aprovado"] and not x.get("indeterminado")]
+        indet = [x for x in c if not x["aprovado"] and x.get("indeterminado")]
+        confiaveis = [x["razao"] for x in c if not x.get("indeterminado")]
         r["contraste"] = {
             "trechos_analisados": len(c), "reprovados": len(reprov),
-            "pior_razao": min([x["razao"] for x in c], default=None),
+            "indeterminados": len(indet),
+            "pior_razao": min(confiaveis, default=None),
             "exemplos": sorted(reprov, key=lambda x: x["razao"])[:10],
+            "exemplos_indeterminados": sorted(indet, key=lambda x: x["razao"])[:5],
         }
 
         nav.close()
@@ -456,10 +473,13 @@ def imprimir(r):
 
     p("\n[F] CONTRASTE DE CORES (página renderizada)")
     p(f"    Trechos de texto analisados ..... {ct['trechos_analisados']}")
-    p(f"    Reprovados ...................... {ct['reprovados']}   <- WCAG 1.4.3 (AA)")
-    p(f"    Pior razão encontrada ........... {ct['pior_razao']}:1")
+    p(f"    Reprovados (fundo sólido) ....... {ct['reprovados']}   <- WCAG 1.4.3 (AA)")
+    p(f"    Indeterminados (texto s/ imagem)  {ct.get('indeterminados', 0)}   <- exige conferência visual")
+    p(f"    Pior razão confiável ............ {ct['pior_razao']}:1")
     for x in ct["exemplos"][:5]:
         p(f"      - {x['razao']}:1 (exige {x['exigido']}:1)  {x['seletor'][:22]:<22} \"{x['texto'][:26]}\"")
+    for x in ct.get("exemplos_indeterminados", [])[:3]:
+        p(f"      ? sobre imagem            {x['seletor'][:22]:<22} \"{x['texto'][:26]}\"")
 
     if rec.get("medicao_confiavel", True):
         p(f"\n[G] INTEGRIDADE DA MEDIÇÃO")

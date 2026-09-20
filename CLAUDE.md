@@ -16,10 +16,36 @@ plausível ou número inventado. Se uma ferramenta não pôde ser executada, o c
 ## Estado atual
 
 - Texto do relatório e dos slides: **pronto** (introdução, objetivos, metodologia, análise de
-  conformidade, 10 recomendações priorizadas, conclusão, referências)
-- Medições do site real: **pendentes** — dependem de acesso de rede ao site escolhido
+  conformidade, 12 recomendações priorizadas, conclusão, referências)
+- Medições do site real: **feitas** em 20/09/2026 sobre as 3 páginas avaliadas —
+  auditor próprio, axe-core 4.10.2, contraste por amostragem de pixels, percurso completo
+  de teclado e simulação em Pixel 7. Resultados em `dados/dados_trabalho.json`
+  (blocos `checklist_manual`, `axe`, `contraste_pixel`, `conformidade`).
+- Capturas de tela do site em `evidencias/telas/`, embutidas no relatório (Figuras 1 a 5)
+  e nos slides 11 a 13.
+- **Ainda pendentes (26 campos):** WAVE, ASES e o teste em aparelho real com
+  TalkBack/VoiceOver. WAVE e ASES exigem navegador — o ASES protege o envio com CAPTCHA,
+  e o WAVE recebe a URL no fragmento `#`, que não chega ao servidor.
 - `demonstracao/`: exemplo completo das ferramentas rodando sobre um portal fictício local,
   com zero marcadores pendentes. **Não é a entrega.**
+
+## Achados principais (medidos)
+
+O portal não atinge o Nível A, por dois critérios, ambos no banner rotativo da home:
+2.2.2 (troca de slide a cada 4000 ms, sem botão de pausa — confirmado lendo
+`banner_rotativo.js`) e 1.4.1 (slide ativo sinalizado apenas pela cor de fundo).
+Em AA falham 1.4.3, 1.4.10, 1.4.11, 1.4.12 e 2.5.8. O axe-core não encontrou nenhuma
+violação direta de critério WCAG A/AA nas 3 páginas: a base Plone/IDG é sólida.
+
+## Nota sobre a renderização no ambiente de nuvem
+
+O Chromium desta sessão não confia na CA do proxy e não abre o site por HTTPS. As medições
+que exigem renderização foram feitas sobre um **espelho local fiel** (`wget -E -H -k -p`,
+servido em `127.0.0.1:8899`), com 13 folhas de estilo e 19 imagens carregadas. Só não
+carregam recursos de terceiros: `barra.brasil.gov.br`, Google Tag Manager, SDK do Facebook
+e o embed do YouTube. Cuidado: o `wget` converte `url(...)` de CSS para caminhos com espaço
+sem aspas, o que invalida o `@import` e derruba o layout — o espelho precisa desse conserto
+antes de qualquer medição de contraste ou reflow.
 
 ## Site a avaliar
 
