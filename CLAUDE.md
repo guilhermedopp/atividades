@@ -149,6 +149,21 @@ números conferem com o relatório, com três exceções apontadas no `GUIA_DE_E
    feito. A equipe rodou os dois depois e o deck não traz nenhum dos números.
 3. **Slide 13** tem resíduo de fonte: "Visual ≠] acessível".
 
+## Slides corrigidos
+
+`node ferramenta/slides_corrigidos.js` gera `apresentacao/SLIDES_CORRIGIDOS.pptx` com os
+três slides que resolvem as divergências acima, no mesmo design do deck do Kelven. Os
+tokens foram amostrados pixel a pixel do PDF dele: fundo `071A2F`, cartão `0B2B45`,
+ciano `4BD1E4`, claro `F7FBFD`, vermelho `FF6B6B`, âmbar `F5C85B`, verde `4ED68E`.
+
+Ordem no arquivo: 8 (WAVE e ASES, novo), 9 (mobile, números corrigidos), 13 (fechamento,
+sem o resíduo de fonte). Cada um traz nota do apresentador explicando o que mudou.
+
+Exige `pptxgenjs` (`npm install pptxgenjs`). Duas armadilhas que custaram uma rodada:
+tabulação dentro de `addText` não alinha coluna — usar caixas de texto em posição fixa; e
+o título de 36 pt quebrava em duas linhas na renderização, resolvido com 32 pt mais
+`fit: "shrink"`.
+
 ## Conferir o layout em PDF
 
 `./ferramenta/gerar_pdf.sh` gera os PDFs ao lado do .docx e do .pptx.
