@@ -35,14 +35,18 @@ for tipo, txt in (("begin", None), (None, "PAGE"), ("end", None)):
         el.set(qn("xml:space"), "preserve"); el.text = txt
     r._r.append(el)
 
-INLINE = re.compile(r'(\*\*.+?\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\)|<https?://[^>]+>)')
+# A ordem importa: negrito antes de itálico, senão '**x**' casa como itálico duas vezes.
+INLINE = re.compile(
+    r'(\*\*.+?\*\*|\*[^*\n]+?\*|`[^`]+`|\[[^\]]+\]\([^)]+\)|<https?://[^>]+>)')
 
 def escrever(p, texto, tam=11, negrito=False, cor=None):
     for pedaco in INLINE.split(texto):
         if not pedaco: continue
-        b, mono, txt = negrito, False, pedaco
+        b, mono, ital, txt = negrito, False, False, pedaco
         if pedaco.startswith("**") and pedaco.endswith("**"):
             b, txt = True, pedaco[2:-2]
+        elif pedaco.startswith("*") and pedaco.endswith("*") and len(pedaco) > 2:
+            ital, txt = True, pedaco[1:-1]
         elif pedaco.startswith("`") and pedaco.endswith("`"):
             mono, txt = True, pedaco[1:-1]
         elif pedaco.startswith("<http"):
@@ -54,6 +58,7 @@ def escrever(p, texto, tam=11, negrito=False, cor=None):
         run.font.name = MONO if mono else FONTE
         run.font.size = Pt(tam - 1 if mono else tam)
         run.bold = b
+        run.italic = ital
         if mono: run.font.color.rgb = RGBColor(0xA0, 0x30, 0x20)
         elif cor: run.font.color.rgb = cor
 

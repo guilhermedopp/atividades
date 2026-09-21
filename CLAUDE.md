@@ -135,6 +135,20 @@ O `apresentacao/*.pptx` que o gerador produz continua sendo gerado e serve como 
 de conteúdo. Se a equipe decidir que não vai usá-lo, é só parar de chamar `gerar_pptx` no
 fim de `ferramenta/gerar_documentos.py`.
 
+## Divergências pendentes no deck do Kelven
+
+Deck recebido em 21/09/2026 (`evidencias/Slides_Kelven.pdf`, 14 slides). Estrutura e
+números conferem com o relatório, com três exceções apontadas no `GUIA_DE_ESTUDO.md`:
+
+1. **Slide 9** traz "7 / 51 trechos com contraste reprovado" e "1:1 pior razão" — números
+   da versão antiga do simulador, que supunha o fundo subindo a árvore do DOM e lia texto
+   branco sobre cabeçalho verde como branco-no-branco. Eram falsos positivos. O correto,
+   por amostragem de pixels, é **4 reprovações, pior 1,66:1** — o que o próprio slide 8
+   já mostra. O slide 9 contradiz o 8.
+2. **Slide 7** diz que WAVE e ASES exigem navegador, o que era verdade quando o slide foi
+   feito. A equipe rodou os dois depois e o deck não traz nenhum dos números.
+3. **Slide 13** tem resíduo de fonte: "Visual ≠] acessível".
+
 ## Conferir o layout em PDF
 
 `./ferramenta/gerar_pdf.sh` gera os PDFs ao lado do .docx e do .pptx.
