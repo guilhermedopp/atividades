@@ -135,34 +135,31 @@ O `apresentacao/*.pptx` que o gerador produz continua sendo gerado e serve como 
 de conteúdo. Se a equipe decidir que não vai usá-lo, é só parar de chamar `gerar_pptx` no
 fim de `ferramenta/gerar_documentos.py`.
 
-## Divergências pendentes no deck do Kelven
+## Deck do Kelven, corrigido no arquivo original
 
-Deck recebido em 21/09/2026 (`evidencias/Slides_Kelven.pdf`, 14 slides). Estrutura e
-números conferem com o relatório, com três exceções apontadas no `GUIA_DE_ESTUDO.md`:
+Fonte em `evidencias/Slides_Kelven_original.pptx` (14 slides). As correções são aplicadas
+por `python3 ferramenta/corrigir_deck_kelven.py`, que roda sobre um `work.pptx` já com o
+slide duplicado e grava `corrigido.pptx`. Resultado versionado em
+`apresentacao/APRESENTACAO_KELVEN_CORRIGIDA.pptx` (15 slides).
 
-1. **Slide 9** traz "7 / 51 trechos com contraste reprovado" e "1:1 pior razão" — números
-   da versão antiga do simulador, que supunha o fundo subindo a árvore do DOM e lia texto
-   branco sobre cabeçalho verde como branco-no-branco. Eram falsos positivos. O correto,
-   por amostragem de pixels, é **4 reprovações, pior 1,66:1** — o que o próprio slide 8
-   já mostra. O slide 9 contradiz o 8.
-2. **Slide 7** diz que WAVE e ASES exigem navegador, o que era verdade quando o slide foi
-   feito. A equipe rodou os dois depois e o deck não traz nenhum dos números.
-3. **Slide 13** tem resíduo de fonte: "Visual ≠] acessível".
+O que mudou, e só isso: slide 8 novo (WAVE e ASES, duplicado do 7 e reescrito), slide 10
+com "4 reprovações confirmadas" e "1,66:1" no lugar de "7 / 51" e "1:1", slide 14 sem o
+`]` que sobrara depois do sinal de diferente. Os slides 1 a 7 ficam byte a byte iguais no
+texto — conferido por script.
 
-## Slides corrigidos
+### Armadilhas deste deck
 
-`node ferramenta/slides_corrigidos.js` gera `apresentacao/SLIDES_CORRIGIDOS.pptx` com os
-três slides que resolvem as divergências acima, no mesmo design do deck do Kelven. Os
-tokens foram amostrados pixel a pixel do PDF dele: fundo `071A2F`, cartão `0B2B45`,
-ciano `4BD1E4`, claro `F7FBFD`, vermelho `FF6B6B`, âmbar `F5C85B`, verde `4ED68E`.
-
-Ordem no arquivo: 8 (WAVE e ASES, novo), 9 (mobile, números corrigidos), 13 (fechamento,
-sem o resíduo de fonte). Cada um traz nota do apresentador explicando o que mudou.
-
-Exige `pptxgenjs` (`npm install pptxgenjs`). Duas armadilhas que custaram uma rodada:
-tabulação dentro de `addText` não alinha coluna — usar caixas de texto em posição fixa; e
-o título de 36 pt quebrava em duas linhas na renderização, resolvido com 32 pt mais
-`fit: "shrink"`.
+- **A fonte é Noto Sans.** Sem ela instalada, o LibreOffice substitui por uma mais larga e
+  *todos* os slides parecem quebrados, inclusive os que ninguém tocou. A QA visual mente.
+  `apt-get install -y fonts-noto-core` antes de renderizar.
+- **Todas as caixas usam `spAutoFit` e foram dimensionadas para o texto que tinham.** A do
+  número grande cabia um caractere ("0"), a do rodapé cabia um dígito, a de rótulo cabia
+  "Página 1". Texto mais largo quebra linha. Corrige-se com `word_wrap = False` nas caixas
+  de linha única e reposicionamento nas demais.
+- **Não casar forma por substring.** `acha(slide, "erros")` pegou a nota do cartão, não o
+  rótulo do WAVE, e desligou a quebra na caixa errada. Para os rótulos, buscar por posição.
+- **Inserir slide desloca a numeração.** O rodapé é texto literal, não campo: renumerar
+  todos os slides seguintes.
 
 ## Conferir o layout em PDF
 
