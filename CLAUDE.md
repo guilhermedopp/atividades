@@ -122,6 +122,19 @@ pip install python-docx python-pptx playwright
 O Chromium já vem instalado em `/opt/pw-browsers` — **não rodar `playwright install`**.
 O simulador usa esse caminho sozinho (variável `CHROMIUM_PATH` sobrescreve).
 
+## Quem monta a apresentação
+
+O Kelven monta os slides por fora do gerador. Para o deck não divergir do relatório,
+`python3 ferramenta/resumo_para_slides.py` emite o `RESUMO_PARA_SLIDES.md` com todos os
+números lidos de `dados/dados_trabalho.json` — o mesmo arquivo que alimenta o relatório.
+Inclui a seção "quatro coisas que o deck NÃO deve dizer", com os erros que só apareceram
+depois de medir (VLibras, atribuição dos erros do WAVE, a região de navegação, e a leitura
+ingênua da nota do ASES).
+
+O `apresentacao/*.pptx` que o gerador produz continua sendo gerado e serve como referência
+de conteúdo. Se a equipe decidir que não vai usá-lo, é só parar de chamar `gerar_pptx` no
+fim de `ferramenta/gerar_documentos.py`.
+
 ## Conferir o layout em PDF
 
 `./ferramenta/gerar_pdf.sh` gera os PDFs ao lado do .docx e do .pptx.
