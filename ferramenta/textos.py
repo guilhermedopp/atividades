@@ -207,10 +207,12 @@ RECOMENDACOES = [
      "título principal, para dar ponto de partida à navegação por cabeçalhos.",
      "WCAG 1.3.1 / 2.4.6 (A/AA)"),
 
-    ("Alta", "Ausência de região de navegação",
+    ("Alta", "Ausência de região de navegação no código do campus",
      "O portal declara role=\"banner\", role=\"main\" e role=\"contentinfo\", mas nenhum "
-     "<nav> ou role=\"navigation\". Marcar o menu principal e o menu lateral como "
-     "regiões de navegação, o que também elimina os blocos de conteúdo que o "
+     "<nav> ou role=\"navigation\". A única região de navegação que o WAVE encontra na "
+     "página é injetada pelo script da Barra de Identidade do Governo Federal e "
+     "delimita os links do gov.br. Marcar o menu principal e o menu lateral do campus "
+     "como regiões de navegação, o que também elimina os blocos de conteúdo que o "
      "axe-core apontou fora de qualquer região.", "WCAG 1.3.1 (A)"),
 
     ("Alta", "Rolagem horizontal em telas estreitas",

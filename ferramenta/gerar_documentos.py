@@ -494,6 +494,14 @@ def secao_wave(doc, d):
                + V(w.get("principais_erros"),
                    "liste os erros mais frequentes, ex.: 'Missing alternative text (12), "
                    "Empty link (7), Missing form label (3)'") + ".")
+    if w.get("pontuacao_aim"):
+        corpo(doc, "A ferramenta resumiu o conjunto em uma pontuação AIM de "
+                   + str(w["pontuacao_aim"]) + ".")
+    if w.get("observacao_atribuicao"):
+        corpo(doc, "A leitura desses erros exige uma distinção que o próprio WAVE não faz. "
+              + str(w["observacao_atribuicao"]))
+    if w.get("observacao_landmark"):
+        corpo(doc, str(w["observacao_landmark"]))
     corpo(doc, "Cabe registrar a limitação intrínseca desse tipo de ferramenta: o WAVE "
                "identifica a ausência do atributo alt, mas não avalia se o texto alternativo "
                "existente descreve adequadamente a imagem. Por isso os números deste quadro "
@@ -522,6 +530,22 @@ def secao_ases(doc, d):
     ])
     legenda(doc, "Quadro 4 - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
                  "Fonte: asesweb.governoeletronico.gov.br.")
+    if a.get("total_erros") is not None:
+        corpo(doc, f"O somatório alcança {a['total_erros']} erros e "
+                   f"{a['total_avisos']} avisos, concentrados em duas seções.")
+    if a.get("detalhamento"):
+        corpo(doc, str(a["detalhamento"]))
+    corpo(doc, "Dois aspectos deste resultado merecem atenção. O primeiro é a distância "
+               "entre a nota e a contagem bruta: uma aderência de 90,48% convive com "
+               "centenas de avisos porque o ASES pondera as ocorrências pela gravidade da "
+               "recomendação violada, e a maior parte dos avisos recai sobre a "
+               "recomendação 1.1, de conformidade com os padrões web, cujo peso é menor. "
+               "O segundo é a convergência com as demais ferramentas: o erro registrado na "
+               "recomendação 1.3, sobre níveis de cabeçalho, é a mesma falha que o WAVE "
+               "relata como \"Missing first level heading\" e que a auditoria de "
+               "código-fonte havia identificado como ausência de <h1>. Três instrumentos "
+               "independentes apontando o mesmo defeito dão a ele uma solidez que nenhum "
+               "deles teria isoladamente.")
 
 
 def secao_axe(doc, d):
@@ -571,6 +595,12 @@ def secao_axe(doc, d):
                "dezenas de vezes porque o texto é desenhado sobre fotografias. Isso não "
                "significa aprovação — significa que o critério 1.4.3 precisou ser medido "
                "por outro caminho, descrito na subseção seguinte.")
+
+
+def secao_corroboracao(doc, d):
+    txt = (d.get("conformidade") or {}).get("corroboracao")
+    if txt:
+        corpo(doc, str(txt))
 
 
 def secao_contraste(doc, d):
@@ -898,6 +928,7 @@ def gerar_docx(d):
     titulo_secao(doc, "4.11 Análise do nível de conformidade WCAG", 2)
     for p in T.analise_conformidade(d):
         corpo(doc, p)
+    secao_corroboracao(doc, d)
 
     secao_recomendacoes(doc, d)
 
@@ -1146,8 +1177,10 @@ def gerar_pptx(d):
         for r in ax.values():
             for b in r.get("boas_praticas", []):
                 regras[b["regra"]] = regras.get(b["regra"], 0) + b.get("ocorrencias", 0)
-            for m in r.get("revisao_manual", []):
-                manual[m["regra"]] = manual.get(m["regra"], 0) + m.get("ocorrencias", 0)
+            # Não usar 'm' aqui: é o dicionário do teste em aparelho real, usado
+            # mais adiante no slide da tarefa complementar.
+            for rv in r.get("revisao_manual", []):
+                manual[rv["regra"]] = manual.get(rv["regra"], 0) + rv.get("ocorrencias", 0)
         linhas = [
             "axe-core 4.10.2 (Deque) — motor usado pelas extensões WAVE e Lighthouse",
             f"Violações diretas de critério WCAG A/AA: "

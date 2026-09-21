@@ -23,9 +23,12 @@ plausível ou número inventado. Se uma ferramenta não pôde ser executada, o c
   (blocos `checklist_manual`, `axe`, `contraste_pixel`, `conformidade`).
 - Capturas de tela do site em `evidencias/telas/`, embutidas no relatório (Figuras 1 a 6)
   e nos slides 11 a 14.
-- **Ainda pendentes (26 campos):** WAVE, ASES e o teste em aparelho real com
-  TalkBack/VoiceOver. WAVE e ASES exigem navegador — o ASES protege o envio com CAPTCHA,
-  e o WAVE recebe a URL no fragmento `#`, que não chega ao servidor.
+- **Pendências: nenhuma.** A equipe entregou WAVE, ASES e o teste em aparelho real em
+  21/09/2026 (`evidencias/Resultados_testes_equipe.pdf`, prints em `evidencias/wave/` e
+  `evidencias/ases/`). O gerador confirma "Todos os campos preenchidos".
+  WAVE: 4 erros, 21 de contraste, 32 alertas, 16 recursos, 42 elementos estruturais,
+  0 ARIA, pontuação AIM 5,3/10. ASES: nota 90,48%, 40 erros e 310 avisos no total.
+  Aparelho: Samsung Galaxy A15 5G, Android 16, TalkBack — tarefa concluída na 2ª tentativa.
 - `demonstracao/`: exemplo completo das ferramentas rodando sobre um portal fictício local,
   com zero marcadores pendentes. **Não é a entrega.**
 
@@ -43,6 +46,20 @@ cego deste pipeline**. Antes de afirmar que um recurso não existe, conferir no 
 Registrado em `dados/dados_trabalho.json` → `recursos_assistivos`, seção 4.7 e Figura 6 do
 relatório, slide 14. O widget em si não foi auditado (contraste, alvo, teclado) porque não
 carregou no ambiente de medição — fica para a inspeção presencial.
+
+## Atribuição dos erros do WAVE (não é código do IFAL)
+
+Os 4 erros do WAVE não pertencem ao que o IFAL entrega. A auditoria de código-fonte já
+registrara 0 imagens sem alt e 0 links sem texto acessível nas 3 páginas. O
+`barra.brasil.gov.br/barra.js` contém exatamente 1 imagem sem alt e 2 âncoras vazias
+(`menu-icon` e o logotipo do VLibras) — explica o erro de alt e 2 dos 3 links vazios;
+o terceiro não foi possível atribuir.
+
+O mesmo vale para a região de navegação: o WAVE conta 1, mas ela vem do único `<nav>` do
+`barra.js`. As 3 páginas servidas pelo IFAL têm **zero** `<nav>` e zero
+`role="navigation"`. É o mesmo ponto cego do VLibras — conteúdo injetado por script de
+terceiro. **Antes de atribuir um achado do WAVE ao site, conferir se ele está no HTML
+servido ou na barra federal.**
 
 ## Achados principais (medidos)
 

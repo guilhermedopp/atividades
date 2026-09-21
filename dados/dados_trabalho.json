@@ -85,50 +85,60 @@
     },
     "15": {
       "situacao": "parcial",
-      "observacao": "Não há identificadores duplicados, iframes sem title, tabelas sem <th>, botões sem nome acessível nem manipuladores de evento embutidos. O portal declara as regiões role=\"banner\", role=\"main\" e role=\"contentinfo\", mas não declara nenhuma região de navegação (<nav> ou role=\"navigation\"). Em consequência, o axe-core apontou de 3 a 4 blocos de conteúdo fora de qualquer região em cada página."
+      "observacao": "Não há identificadores duplicados, iframes sem title, tabelas sem <th>, botões sem nome acessível nem manipuladores de evento embutidos. O portal declara as regiões role=\"banner\", role=\"main\" e role=\"contentinfo\", mas nenhuma região de navegação: as três páginas servidas pelo IFAL não trazem <nav> nem role=\"navigation\". O WAVE contabiliza uma região de navegação, porém ela é injetada em tempo de execução pelo script da Barra de Identidade do Governo Federal e delimita os links do gov.br, não os menus do campus. Em consequência, o axe-core apontou de 3 a 4 blocos de conteúdo fora de qualquer região em cada página."
     }
   },
   "wave": {
     "ferramenta": "WAVE Web Accessibility Evaluation Tool (WebAIM)",
     "url_ferramenta": "https://wave.webaim.org/",
-    "errors": null,
-    "contrast_errors": null,
-    "alerts": null,
-    "features": null,
-    "structural_elements": null,
-    "aria": null,
-    "principais_erros": null
+    "errors": 4,
+    "contrast_errors": 21,
+    "alerts": 32,
+    "features": 16,
+    "structural_elements": 42,
+    "aria": 0,
+    "principais_erros": "os 4 erros dividem-se em 1 \"Missing alternative text\" e 3 \"Empty link\"; os 21 erros de contraste são todos da categoria \"Very low contrast\". Entre os 32 alertas predominam 8 \"Redundant link\", 7 \"Accesskey\", 5 \"Very small text\", 2 \"Noscript element\", 2 \"Redundant title text\", 1 \"Long alternative text\", 1 \"Missing first level heading\", 1 \"Broken same-page link\" e 1 \"YouTube video\"",
+    "pontuacao_aim": "5,3 de 10",
+    "executado_por": "Kelven Eduardo Terto dos Santos, em 20/09/2026, pela interface web do WAVE",
+    "observacao_atribuicao": "Os quatro erros não pertencem ao código que o IFAL entrega. A auditoria do código-fonte havia registrado, nas três páginas, 13, 10 e 0 imagens, nenhuma sem atributo alt, e 125, 128 e 54 links, nenhum sem texto acessível. O script barra.brasil.gov.br/barra.js, que monta a Barra de Identidade do Governo Federal em tempo de execução, contém exatamente 1 imagem sem alt e 2 âncoras vazias (<a href=\"#\" id=\"menu-icon\"></a> e a do logotipo do VLibras). Isso explica o erro de texto alternativo e dois dos três links vazios; o terceiro não foi possível atribuir com as evidências disponíveis.",
+    "observacao_landmark": "O WAVE contabiliza 1 região de navegação entre os 42 elementos estruturais. Ela também vem da barra federal: o barra.js traz um único elemento <nav>, e as três páginas servidas pelo IFAL não trazem nenhum <nav> nem role=\"navigation\". A região existente delimita os links do gov.br, não os menus do campus."
   },
   "ases": {
     "ferramenta": "ASES - Avaliador e Simulador de Acessibilidade de Sítios (Governo Federal)",
     "url_ferramenta": "https://asesweb.governoeletronico.gov.br/",
-    "nota_geral": null,
-    "marcacao_erros": null,
-    "marcacao_avisos": null,
-    "comportamento_erros": null,
-    "comportamento_avisos": null,
-    "conteudo_erros": null,
-    "conteudo_avisos": null,
-    "apresentacao_erros": null,
-    "apresentacao_avisos": null,
-    "multimidia_erros": null,
-    "multimidia_avisos": null,
-    "formularios_erros": null,
-    "formularios_avisos": null
+    "nota_geral": "90,48",
+    "marcacao_erros": 29,
+    "marcacao_avisos": 236,
+    "comportamento_erros": 0,
+    "comportamento_avisos": 5,
+    "conteudo_erros": 11,
+    "conteudo_avisos": 69,
+    "apresentacao_erros": 0,
+    "apresentacao_avisos": 0,
+    "multimidia_erros": 0,
+    "multimidia_avisos": 0,
+    "formularios_erros": 0,
+    "formularios_avisos": 0,
+    "total_erros": 40,
+    "total_avisos": 310,
+    "executado_por": "Kelven Eduardo Terto dos Santos, em 20/09/2026, pelo ASES Web",
+    "detalhamento": "Na seção Marcação, os 29 erros vêm de 1.1 Respeitar os Padrões Web (21), 1.2 Organizar o código HTML de forma lógica e semântica (7) e 1.3 Utilizar corretamente os níveis de cabeçalho (1). Os 11 erros de Conteúdo/Informação concentram-se integralmente em 3.5 Descrever links clara e sucintamente. Os 5 avisos de Comportamento referem-se a 2.2 Garantir que os objetos programáveis sejam acessíveis. As seções Apresentação/Design, Multimídia e Formulários não apresentaram erro nem aviso."
   },
   "mobile": {
-    "dispositivo": null,
-    "sistema": null,
-    "leitor_tela": null,
+    "dispositivo": "Samsung Galaxy A15 5G",
+    "sistema": "Android 16",
+    "leitor_tela": "TalkBack",
     "tarefa_testada": "Localizar, a partir da página inicial, o edital mais recente publicado pelo campus e abrir o documento correspondente.",
-    "tempo_gasto": null,
-    "tarefa_concluida": null,
-    "relato": null
+    "tempo_gasto": "primeira tentativa abandonada aos 12 min 4 s; segunda tentativa concluída em 10 min 16 s",
+    "tarefa_concluida": "Sim, na segunda tentativa",
+    "relato": "A primeira tentativa não chegou ao edital. Foram necessários 5 min 30 s apenas para concluir o tutorial do TalkBack, seguidos de 5 min de tentativas frustradas para sair da própria tela de configuração do aparelho e 8 min 46 s para conseguir desativar o leitor. Já no portal, a busca pelo edital foi abandonada aos 12 min 4 s. Na segunda tentativa, depois de desativar os atalhos de gesto, a navegação fluiu e a tarefa foi concluída em 10 min 16 s, contados do painel de ativação do TalkBack até abrir o primeiro edital.\n\nA utilização do TalkBack mostrou-se desafiadora desde o momento de sua ativação. Inicialmente, foram observadas dificuldades relacionadas à própria navegação nas configurações do dispositivo, incluindo a saída da página de configuração e a compreensão dos comandos necessários para a movimentação pela interface.\n\nDurante a avaliação, verificou-se que o TalkBack apresenta uma sequência de leitura diferente daquela normalmente utilizada por quem não depende de leitores de tela. Essa característica dificultou a compreensão da estrutura da interface e exigiu um período maior de adaptação aos comandos e à lógica de navegação do recurso.\n\nA navegação até o navegador Google Chrome foi a etapa mais simples do processo. Em seguida, realizou-se a pesquisa por comandos de voz. Na primeira tentativa houve dificuldade para concluir a tarefa; na segunda, foi possível realizá-la com êxito.\n\nApesar da conclusão da atividade, o processo foi considerado bastante dificultoso, principalmente em razão da sequência de leitura apresentada pelo TalkBack e da quantidade de elementos que precisavam ser percorridos antes de alcançar a informação desejada. A experiência evidenciou a importância de uma organização adequada dos elementos da interface e de uma sequência de navegação coerente para proporcionar maior eficiência a quem utiliza tecnologia assistiva.",
+    "leitura_critica": "Boa parte do tempo da primeira tentativa foi consumida pela curva de aprendizado do próprio TalkBack e pela navegação no sistema operacional, não pelo portal avaliado. Registrar essa distinção é necessário para não atribuir ao sítio uma dificuldade que pertence à tecnologia assistiva. O que cabe ao portal é o trecho final: a quantidade de elementos a percorrer até alcançar o edital, apesar de existirem os quatro atalhos de salto da barra de acessibilidade, e a sequência de leitura percebida como pouco coerente com a organização visual da página — indícios que remetem aos critérios 1.3.2 Sequência significativa e 2.4.3 Ordem de foco."
   },
   "conformidade": {
     "nivel_atingido": "Não atinge o Nível A",
     "criterios_a_falhos": "1.4.1 Uso de cores (marcador do slide ativo diferenciado apenas pela cor de fundo) e 2.2.2 Pausar, Parar, Ocultar (banner rotativo com avanço automático a cada 4 segundos, sem mecanismo de pausa).",
-    "criterios_aa_falhos": "1.4.3 Contraste mínimo (4 reprovações confirmadas por amostragem de pixels, a pior em 1,66:1); 1.4.10 Reflow (conteúdo de 330 px em tela de 320 px, gerando rolagem horizontal); 1.4.11 Contraste não textual (indicador de foco em 1,56:1 sobre o fundo branco do conteúdo); 1.4.12 Espaçamento de texto (rolagem horizontal e 3 elementos cortados); 2.5.8 Tamanho do alvo (23 dos 51 alvos interativos da versão móvel medem menos de 24x24 px)."
+    "criterios_aa_falhos": "1.4.3 Contraste mínimo (4 reprovações confirmadas por amostragem de pixels, a pior em 1,66:1); 1.4.10 Reflow (conteúdo de 330 px em tela de 320 px, gerando rolagem horizontal); 1.4.11 Contraste não textual (indicador de foco em 1,56:1 sobre o fundo branco do conteúdo); 1.4.12 Espaçamento de texto (rolagem horizontal e 3 elementos cortados); 2.5.8 Tamanho do alvo (23 dos 51 alvos interativos da versão móvel medem menos de 24x24 px).",
+    "corroboracao": "Os três avaliadores automáticos convergem quanto à qualidade da base técnica: o axe-core não registrou violação direta de critério WCAG A/AA, o ASES atribuiu nota 90,48% de aderência ao eMAG 3.1 e o WAVE apurou apenas 4 erros, nenhum deles no código entregue pelo IFAL. Convergem também no cabeçalho ausente: o alerta \"Missing first level heading\" do WAVE e o erro da recomendação 1.3 do ASES apontam para a mesma falha que a auditoria de código-fonte havia detectado. Nenhuma das três ferramentas, porém, verifica os dois critérios que impedem o Nível A: o avanço automático do banner (2.2.2) exigiu a leitura do script que o governa, e a sinalização do slide ativo apenas pela cor (1.4.1) exigiu medir os pixels efetivamente pintados na tela. A aprovação nos avaliadores automáticos não é, portanto, atestado de conformidade."
   },
   "axe": {
     "ferramenta": "axe-core 4.10.2 (Deque Systems)",
