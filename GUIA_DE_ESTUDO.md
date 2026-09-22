@@ -1,7 +1,10 @@
 # Guia de estudo — apresentação final
 
 Baseado nos dois documentos entregues: o relatório de 28 páginas e o deck de 14 slides.
-Serve para as duas pessoas defenderem o trabalho sem ler slide.
+
+**A professora sorteia quem apresenta.** Quem for sorteado apresenta sozinho, o deck
+inteiro. Então os dois precisam dar conta dos 14 slides, inclusive das partes que o outro
+executou. Este guia é escrito para isso.
 
 ---
 
@@ -53,8 +56,42 @@ O que dizer em cada um. Os números estão todos no relatório.
 | 13 | Fechamento | As quatro lições. A mais forte: **automação não é experiência**. |
 | 14 | Obrigado | Abrir para perguntas. |
 
-**Divisão sugerida:** slides 1 a 6 para quem abre (contexto e método), 7 a 14 para quem
-fecha (resultados e conclusão). A virada de turno cai bem no slide 7.
+### Ritmo, para 14 slides sozinho
+
+Em 15 minutos dá pouco mais de 1 minuto por slide. Os slides 5 e 6 (checklist) e o 12
+(recomendações) são os que mais tentam roubar tempo — **não leia item por item**, aponte o
+padrão e siga. O tempo economizado ali vale nos slides 7, 8 e 11, que são o argumento.
+
+Se o tempo apertar, estes cinco sustentam o trabalho sozinhos: **3** (a regra da
+conformidade integral), **7** (nota 90,48%), **8** (o banner), **11** (não atinge o Nível A)
+e **13** (fechamento). Os outros nove podem ser passados em poucos segundos cada.
+
+### As quatro viradas
+
+O que amarra a narrativa. Decorar estas quatro frases vale mais que decorar números.
+
+1. **Do slide 3 para o 4:** "Guardem essa regra: uma falha de Nível A derruba a
+   conformidade em qualquer nível. Ela vai decidir o resultado deste trabalho."
+2. **Do slide 7 para o 8:** "Nota 90,48%, quatro erros que nem são do IFAL. Parece um site
+   conforme. Mas nenhuma dessas ferramentas olha para o que vem agora."
+3. **Do slide 10 para o 11:** "O recurso de acessibilidade mais visível do portal foi o
+   único que nenhuma ferramenta automática encontrou. Isso muda o que a gente conclui."
+4. **Do slide 11 para o 12:** "Não atinge o Nível A por dois critérios. E os dois têm
+   correção de baixo custo."
+
+### Se o sorteio cair em você
+
+O teste com TalkBack foi feito por um de vocês, num aparelho só. Quem apresentar **não deve
+narrar em primeira pessoa** uma experiência que não teve — a banca percebe, e o relatório
+registra o teste como da equipe, não de um indivíduo.
+
+A forma honesta e que soa melhor: *"a equipe executou a tarefa com TalkBack num Galaxy A15;
+a primeira tentativa foi abandonada aos 12 minutos e a segunda concluída em 10 min 16 s"*.
+Descreva o que foi observado, não o que você sentiu.
+
+Vale o mesmo para o WAVE e o ASES, executados por um só: os números são da equipe. O que
+importa é saber **de onde saiu cada um** — está na tabela da seção 4 e nas perguntas da
+seção 5.
 
 ---
 

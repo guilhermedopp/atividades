@@ -153,10 +153,15 @@ sumiu. O histórico da correção está em `ferramenta/corrigir_deck_kelven.py` 
 preservado em `evidencias/Slides_Kelven_original.pptx`.
 
 `GUIA_DE_ESTUDO.md` (5 páginas, PDF ao lado) é o material de estudo baseado nos dois
-documentos finais: essencial da WCAG, roteiro slide a slide com divisão de fala, os
-achados com o porquê de cada um, números de cabeceira, seis perguntas prováveis com
-resposta e glossário. Os números são conferidos por script contra
-`dados/dados_trabalho.json` e contra o texto do relatório final.
+documentos finais: essencial da WCAG, roteiro dos 14 slides, ritmo para apresentar sozinho,
+as quatro viradas da narrativa, os achados com o porquê de cada um, números de cabeceira,
+seis perguntas prováveis com resposta e glossário. Os números são conferidos por script
+contra `dados/dados_trabalho.json` e contra o texto do relatório final.
+
+**A professora sorteia quem apresenta, e quem for sorteado apresenta sozinho o deck
+inteiro.** Não há divisão de fala — o guia foi escrito para isso. Inclui a orientação de
+não narrar em primeira pessoa o teste com TalkBack, que foi executado por um só: o
+relatório registra o teste como da equipe, e quem apresentar descreve o que foi observado.
 
 ### Armadilhas do deck (valem se ele for editado de novo)
 
