@@ -135,31 +135,37 @@ O `apresentacao/*.pptx` que o gerador produz continua sendo gerado e serve como 
 de conteúdo. Se a equipe decidir que não vai usá-lo, é só parar de chamar `gerar_pptx` no
 fim de `ferramenta/gerar_documentos.py`.
 
-## Deck do Kelven, corrigido no arquivo original
+## Entrega final (22/09/2026)
 
-Fonte em `evidencias/Slides_Kelven_original.pptx` (14 slides). As correções são aplicadas
-por `python3 ferramenta/corrigir_deck_kelven.py`, que roda sobre um `work.pptx` já com o
-slide duplicado e grava `corrigido.pptx`. Resultado versionado em
-`apresentacao/APRESENTACAO_KELVEN_CORRIGIDA.pptx` (15 slides).
+Os dois documentos finais estão em `evidencias/Apresentacao_FINAL.pdf` (14 slides) e
+`evidencias/Relatorio_FINAL.pdf` (28 páginas). O relatório final é **idêntico** ao que
+`ferramenta/gerar_documentos.py` produz — conferido por comparação de texto.
 
-O que mudou, e só isso: slide 8 novo (WAVE e ASES, duplicado do 7 e reescrito), slide 10
-com "4 reprovações confirmadas" e "1,66:1" no lugar de "7 / 51" e "1:1", slide 14 sem o
-`]` que sobrara depois do sinal de diferente. Os slides 1 a 7 ficam byte a byte iguais no
-texto — conferido por script.
+O deck final tem **14 slides, não 15**: a equipe aproveitou o slide de WAVE e ASES que foi
+acrescentado, mas **removeu o slide do axe-core** que existia antes. Consequência para a
+defesa: o resultado do axe-core (zero violações A/AA) só existe no relatório, seção 4.4.
+Se a banca perguntar por outras ferramentas, é de lá que se responde — está previsto no
+`GUIA_DE_ESTUDO.md`, pergunta 4.
 
-### Armadilhas deste deck
+As correções pedidas foram todas aplicadas pela equipe: o slide de contraste traz
+"4 reprovações confirmadas" e "1,66:1", e o `]` sobrando depois do sinal de diferente
+sumiu. O histórico da correção está em `ferramenta/corrigir_deck_kelven.py` e no original
+preservado em `evidencias/Slides_Kelven_original.pptx`.
 
-- **A fonte é Noto Sans.** Sem ela instalada, o LibreOffice substitui por uma mais larga e
-  *todos* os slides parecem quebrados, inclusive os que ninguém tocou. A QA visual mente.
-  `apt-get install -y fonts-noto-core` antes de renderizar.
-- **Todas as caixas usam `spAutoFit` e foram dimensionadas para o texto que tinham.** A do
-  número grande cabia um caractere ("0"), a do rodapé cabia um dígito, a de rótulo cabia
-  "Página 1". Texto mais largo quebra linha. Corrige-se com `word_wrap = False` nas caixas
-  de linha única e reposicionamento nas demais.
-- **Não casar forma por substring.** `acha(slide, "erros")` pegou a nota do cartão, não o
-  rótulo do WAVE, e desligou a quebra na caixa errada. Para os rótulos, buscar por posição.
-- **Inserir slide desloca a numeração.** O rodapé é texto literal, não campo: renumerar
-  todos os slides seguintes.
+`GUIA_DE_ESTUDO.md` (5 páginas, PDF ao lado) é o material de estudo baseado nos dois
+documentos finais: essencial da WCAG, roteiro slide a slide com divisão de fala, os
+achados com o porquê de cada um, números de cabeceira, seis perguntas prováveis com
+resposta e glossário. Os números são conferidos por script contra
+`dados/dados_trabalho.json` e contra o texto do relatório final.
+
+### Armadilhas do deck (valem se ele for editado de novo)
+
+- **A fonte é Noto Sans.** Sem ela, o LibreOffice substitui por uma mais larga e *todos* os
+  slides parecem quebrados, inclusive os intocados. `apt-get install -y fonts-noto-core`.
+- **As caixas usam `spAutoFit`, dimensionadas para o texto que tinham** — a do número
+  grande cabia um caractere, a do rodapé um dígito. Texto mais largo quebra linha.
+- **Não casar forma por substring:** `acha("erros")` pegou a nota do cartão, não o rótulo.
+- **Inserir slide desloca a numeração:** o rodapé é texto literal, não campo.
 
 ## Conferir o layout em PDF
 
