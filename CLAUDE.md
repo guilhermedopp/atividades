@@ -207,6 +207,25 @@ digitados. Ao conferir a cola por extração de texto, lembrar que o `pdftotext`
 **por coluna**: os rótulos saem todos juntos, depois os valores, então casar string
 esperando a ordem visual dá falso negativo.
 
+### Correções pendentes no deck (22/09)
+
+O deck final foi refeito **no Canva** — o PDF traz `Creator: Canva` e não há `.pptx` dele
+no repositório, só o `APRESENTACAO_KELVEN_CORRIGIDA.pptx`, que é a versão de 15 slides
+anterior. Para editar preservando o design é preciso o *Compartilhar → Baixar → PPTX* do
+Canva.
+
+`CORRECOES_DECK.md` (docx e PDF ao lado) lista as dez trocas, com o texto exato de cada
+caixa: a capa sem espaço em "WCAG2.1"; as pílulas de situação dos slides 5 e 6, que são
+**só cor** e repetem no deck a falha 1.4.1 que ele denuncia; o slide 9, cujo painel
+esquerdo inteiro fala do reflow e deveria receber a tarefa complementar (que não tem slide
+nenhum, embora o enunciado peça); o slide 11 (1.3.1 entra no Nível A, 3 reprovações em vez
+de 4, a linha do 1.4.10 sai, "Rolagem horizontal +" sai do 1.4.12, 23 de 58 e a marca
+WCAG 2.2 no 2.5.8, os números saindo quebrados como "1.4.1 0", e "avançaacada"); e o
+slide 12, onde a recomendação de reflow dá lugar à do 1.4.12.
+
+Cuidado ao propor símbolo no lugar de palavra nas pílulas: **o Noto Sans não tem ✓ nem ✗**
+(conferido no `cmap` da fonte). Os que ele tem: `× – • ° § … › ½ ! + ~ ?`.
+
 ### Armadilhas do deck (valem se ele for editado de novo)
 
 - **A fonte é Noto Sans.** Sem ela, o LibreOffice substitui por uma mais larga e *todos* os
