@@ -132,6 +132,11 @@ JS_CONTRASTE = r"""
     const f = rgb(st.color); if (!f) return;
     const fu = fundo(el);
     const b = fu.c;
+    // Texto e fundo exatamente da mesma cor não descrevem nada que alguém veja:
+    // é sintoma de que a folha de estilo que pintaria o fundo não foi aplicada
+    // (recurso de terceiro bloqueado, fundo desenhado por elemento irmão).
+    // Contar isso como reprovação produziria uma razão 1:1 falsa.
+    const mesmaCor = f.c[0] === b[0] && f.c[1] === b[1] && f.c[2] === b[2];
     const l1 = lum(f.c), l2 = lum(b);
     const razao = (Math.max(l1,l2) + 0.05) / (Math.min(l1,l2) + 0.05);
     const px = parseFloat(st.fontSize);
@@ -140,7 +145,7 @@ JS_CONTRASTE = r"""
     const exigido = grande ? 3.0 : 4.5;
     out.push({
       texto: txt.slice(0, 60), razao: Math.round(razao * 100) / 100, exigido,
-      aprovado: razao >= exigido, indeterminado: (fu.img || !fu.achou),
+      aprovado: razao >= exigido, indeterminado: (fu.img || !fu.achou || mesmaCor),
       px: Math.round(px * 10) / 10, peso,
       cor: st.color, fundo: 'rgb(' + b.join(',') + ')',
       seletor: el.tagName.toLowerCase() + (el.className && typeof el.className === 'string'

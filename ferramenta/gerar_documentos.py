@@ -417,9 +417,28 @@ SUMARIO = [
 ]
 
 
+def paginas_do_sumario():
+    """Página de início de cada seção, medida no PDF da última geração.
+
+    O arquivo é escrito por ferramenta/numerar_sumario.py, que gera o relatório,
+    converte para PDF e lê em que página cada título caiu. Enquanto ele não
+    existir, o sumário sai sem os números — a regra do projeto não admite
+    estimar um número de página que ninguém mediu.
+    """
+    caminho = os.path.join(RAIZ, "dados", "paginas_sumario.json")
+    if not os.path.exists(caminho):
+        return {}
+    try:
+        with open(caminho, encoding="utf-8") as f:
+            return json.load(f).get("paginas", {})
+    except (ValueError, OSError):
+        return {}
+
+
 def sumario(doc):
     """Sumário no formato do modelo: título em 16 pt e itens em 12 pt negrito,
-    ligados ao número da seção por uma linha de pontos."""
+    ligados ao número da página por uma linha de pontos."""
+    paginas = paginas_do_sumario()
     par(doc, "Sumário", negrito=True, tamanho=16, alinhamento=WD_ALIGN_PARAGRAPH.CENTER,
         espaco_antes=14, espaco_depois=12)
     for num, nome in SUMARIO:
@@ -434,7 +453,7 @@ def sumario(doc):
         # assim toda a linha pontilhada termina rente à margem.
         pf.tab_stops.add_tab_stop(Cm(15.93) - recuo, WD_TAB_ALIGNMENT.RIGHT,
                                   WD_TAB_LEADER.DOTS)
-        r = p.add_run(f"{num}. {nome}\t")
+        r = p.add_run(f"{num}. {nome}\t" + str(paginas.get(num, "")))
         r.font.name, r.font.size = FONTE, Pt(12)
         r.bold = True
     doc.add_page_break()
@@ -445,7 +464,7 @@ def secao_checklist(doc, d):
     corpo(doc, "A inspeção manual aplicou o checklist de 15 itens essenciais sobre as páginas "
                "do recorte, com o sítio aberto no navegador e com uso das ferramentas de "
                "desenvolvedor para leitura do código-fonte. O Quadro 2 apresenta o resultado "
-               "item a item, com a indicacao do critério de sucesso da WCAG 2.1 e da "
+               "item a item, com a indicação do critério de sucesso da WCAG 2.1 e da "
                "recomendação correspondente do eMAG 3.1.")
     auto = auto_por_item(d)
     linhas = []
@@ -459,11 +478,13 @@ def secao_checklist(doc, d):
             if a["status"] in ("nao_conforme", "conforme"):
                 obs = "Auditoria automática: " + a["detalhe"]
         linhas.append([
-            str(i), item["nome"], f"{item['wcag']} ({item['nivel']})", rot,
+            str(i), item["nome"], f"{item['wcag']} ({item['nivel']})",
+            item.get("emag", "-"), rot,
             obs or V(None, f"observação do item {i}"),
         ])
-    tabela(doc, ["#", "Item verificado", "Critério WCAG 2.1 (nível)", "Situação", "Observação"],
-           [0.8, 3.19, 2.99, 2.0, 6.92], linhas)
+    tabela(doc, ["#", "Item verificado", "Critério WCAG 2.1 (nível)",
+                 "Recomendação eMAG 3.1", "Situação", "Observação"],
+           [0.72, 2.45, 2.35, 2.75, 2.15, 5.48], linhas)
     legenda(doc, "Quadro 2 - Resultado da inspeção manual pelo checklist de 15 itens. "
                  "Fonte: elaborado pelos autores.")
 
@@ -557,8 +578,9 @@ def secao_axe(doc, d):
     corpo(doc, "O WAVE e o ASES dependem de execução interativa no navegador — o ASES, "
                "inclusive, protege o envio com CAPTCHA. Para que a etapa de avaliação "
                "automatizada não ficasse sem medição, utilizou-se o axe-core, motor de "
-               "auditoria mantido pela Deque Systems e empregado pelas próprias extensões "
-               "WAVE e Lighthouse. " + str(a.get("como_foi_executado", "")))
+               "auditoria mantido pela Deque Systems e empregado, entre outras ferramentas, "
+               "pela extensão Lighthouse do Google Chrome. O WAVE possui motor próprio, "
+               "desenvolvido pelo WebAIM, e não se confunde com o axe-core. " + str(a.get("como_foi_executado", "")))
     linhas = []
     for url, r in pags.items():
         linhas.append([url.replace("https://www2.ifal.edu.br", ""),
@@ -621,7 +643,8 @@ def secao_contraste(doc, d):
                    "banner rotativo: com 1,66:1, o texto azul sobre o verde institucional "
                    "fica praticamente indistinguível do fundo. São, ao mesmo tempo, os "
                    "únicos controles do banner e alvos de apenas 22 por 20 pixels, o que "
-                   "os faz falhar também no critério 2.5.8.")
+                   "os faz falhar também no critério 2.5.8 Tamanho do alvo (mínimo) — critério "
+                   "da WCAG 2.2, aqui adotado como complemento.")
     f = c.get("indicador_de_foco") or {}
     if f:
         corpo(doc, "O indicador de foco do teclado merece registro separado. Ele está "
@@ -676,8 +699,9 @@ def secao_vlibras(doc, d):
 
 FIGURAS = [
     ("evidencias/telas/02-topo-barra-acessibilidade.png",
-     "Barra de acessibilidade do portal, com os quatro atalhos de salto (Alt+1 a "
-     "Alt+4) e os links Acessibilidade, Alto Contraste e Mapa do site."),
+     "Barra de acessibilidade do portal. O portal declara sete teclas de acesso "
+     "(accesskey): quatro atalhos de salto (Alt+1 conteúdo, Alt+2 menu, Alt+3 busca, "
+     "Alt+4 rodapé) e mais três para Acessibilidade, Alto Contraste e Mapa do site."),
     ("evidencias/telas/13-carrossel-banner-rotativo.png",
      "Banner rotativo da página inicial. Os botões numéricos no canto inferior "
      "direito são os únicos controles do carrossel: medem 22 por 20 pixels, "
@@ -688,11 +712,15 @@ FIGURAS = [
      "cabeçalho o contorno âmbar é nítido (5,81:1); sobre o branco da área de "
      "conteúdo cai para 1,56:1."),
     ("evidencias/telas/08-reflow-320px.png",
-     "Página inicial renderizada em 320 pixels de largura. O conteúdo ocupa 330 "
-     "pixels e provoca rolagem horizontal, contrariando o critério 1.4.10."),
+     "Página inicial renderizada em 320 pixels de largura com o script da Barra do "
+     "Governo Federal bloqueado. A faixa cinza do topo é a marcação provisória "
+     "\"Atualize sua Barra de Governo\", cortada à direita: é ela, e só ela, que faz "
+     "o conteúdo ocupar 330 pixels. Com o script carregado o conteúdo mede 320 "
+     "pixels e o critério 1.4.10 é atendido."),
     ("evidencias/telas/05-pagina-acessibilidade.png",
      "Página institucional de Acessibilidade, publicada em 2013 e modificada pela "
-     "última vez em 2020. Descreve apenas três dos sete atalhos existentes e "
+     "última vez em 2020. Descreve apenas três das sete teclas de acesso "
+     "declaradas pelo portal e "
      "expande a sigla WCAG incorretamente."),
 ]
 
@@ -707,13 +735,20 @@ def secao_evidencias(doc, d):
                "avaliação e sustentam as medições apresentadas nas subseções "
                "anteriores. Todas foram capturadas em Chromium, sobre as folhas de "
                "estilo e as imagens do próprio sítio.")
+    # A ABNT põe o título da figura acima dela e a fonte logo abaixo.
     for i, (caminho, texto) in enumerate(disponiveis, 1):
+        if not os.path.exists(os.path.join(RAIZ, caminho)):
+            continue
+        titulo_fig = par(doc, f"Figura {i} - {texto}", tamanho=10, espaco_depois=4,
+                         espacamento=1.0, alinhamento=WD_ALIGN_PARAGRAPH.LEFT)
         try:
             doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
             doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
         except Exception:
+            # sem a imagem, o título solto confundiria a numeração
+            titulo_fig._p.getparent().remove(titulo_fig._p)
             continue
-        legenda(doc, f"Figura {i} - {texto} Fonte: os autores.")
+        legenda(doc, "Fonte: os autores.")
 
 
 def secao_auditoria(doc, d):
@@ -764,7 +799,10 @@ def secao_mobile_auto(doc, d):
         return
     lt, fk, at = e["leitor_tela"], e["foco_teclado"], e["alvos_toque"]
     rf, zm, ct = e["reflow_320px"], e["zoom"], e["contraste"]
-    corpo(doc, f"A simulação foi executada sobre {e['url']}, emulando o aparelho "
+    corpo(doc, "A simulação foi executada sobre uma cópia local fiel da página "
+               "inicial do portal, servida em servidor HTTP próprio porque o navegador "
+               "de automação deste ambiente não estabelece a conexão TLS com o sítio, "
+               f"emulando o aparelho "
                f"{e['aparelho']} em viewport de {e['viewport']['width']}x"
                f"{e['viewport']['height']} pixels lógicos. O Quadro 9 reúne as medições.")
     d_cont = lt["deslizes_ate_conteudo"]
@@ -777,7 +815,8 @@ def secao_mobile_auto(doc, d):
         ["Elementos focáveis sem nome acessível", str(fk["sem_nome_acessivel"]), "4.1.2 (A)"],
         ["Armadilha de foco", "detectada" if fk["possivel_armadilha_foco"] else "não detectada",
          "2.1.2 (A)"],
-        ["Alvos de toque menores que 24x24 px", str(at["menores_que_24px_AA"]), "2.5.8 (AA)"],
+        ["Alvos de toque menores que 24x24 px", str(at["menores_que_24px_AA"]),
+         "2.5.8 (AA, WCAG 2.2)"],
         ["Alvos de toque menores que 44x44 px", str(at["menores_que_44px_AAA"]), "2.5.5 (AAA)"],
         ["Rolagem horizontal em 320 px",
          "sim" if rf["rolagem_horizontal"] else "não", "1.4.10 (AA)"],
@@ -795,12 +834,19 @@ def secao_mobile_auto(doc, d):
                    "converte em experiência sonora.")
         tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.19, 13.71],
                [[str(i), t] for i, t in enumerate(trans, 1)])
-        legenda(doc, "Quadro 10 - Transcricao dos anúncios do leitor de tela. "
+        legenda(doc, "Quadro 10 - Transcrição dos anúncios do leitor de tela. "
                      "Fonte: elaborado pelos autores.")
     if ct["exemplos"]:
-        corpo(doc, "Quanto ao contraste, o pior resultado encontrado foi a razão de "
-                   f"{ct['pior_razao']}:1, medida sobre a página efetivamente renderizada. "
-                   "Os trechos reprovados de maior severidade estao no Quadro 11.")
+        corpo(doc, "Quanto ao contraste, esta bateria calcula a razão supondo o fundo "
+                   "pela subida da árvore do DOM, método que não resolve o fundo quando "
+                   "o texto é desenhado sobre um irmão posicionado ou sobre imagem: por "
+                   "isso ela classifica "
+                   f"{ct.get('indeterminados', 0)} trecho(s) como indeterminados, que "
+                   "exigem conferência visual. A medição de contraste que vale para "
+                   "este relatório é a da seção 4.5, feita por amostragem dos pixels "
+                   "efetivamente pintados na tela; os números abaixo servem apenas de "
+                   "triagem. O pior resultado confiável desta triagem foi "
+                   f"{ct['pior_razao']}:1.")
         tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [8.94, 3.48, 3.48],
                [[x["texto"], f"{x['razao']}:1", f"{x['exigido']}:1"] for x in ct["exemplos"][:6]])
         legenda(doc, "Quadro 11 - Trechos reprovados no critério de contraste. "
@@ -821,7 +867,7 @@ def secao_mobile_real(doc, d):
         ["Leitor de tela", V(m.get("leitor_tela"), "TalkBack ou VoiceOver")],
         ["Tarefa proposta", m.get("tarefa_testada") or V(None, "descreva a tarefa")],
         ["Tempo gasto", V(m.get("tempo_gasto"), "ex.: 6 min 40 s")],
-        ["Tarefa concluida", V(m.get("tarefa_concluida"), "Sim / Não / Parcialmente")],
+        ["Tarefa concluída", V(m.get("tarefa_concluida"), "Sim / Não / Parcialmente")],
     ])
     legenda(doc, "Quadro 12 - Condições do teste com leitor de tela. "
                  "Fonte: elaborado pelos autores.")
@@ -832,7 +878,7 @@ def secao_mobile_real(doc, d):
           "sensação ao depender apenas do áudio"))
     corpo(doc, "A confrontação entre este relato e as medições automatizadas da seção "
                "anterior é o ponto central da avaliação: cada elemento anunciado sem rótulo "
-               "no Quadro 10 corresponde, na experiência real, a um momento de interrupção em "
+               "contado no Quadro 9 corresponde, na experiência real, a um momento de interrupção em "
                "que o usuário precisa adivinhar a função do que esta tocando.")
 
 
@@ -1182,7 +1228,7 @@ def gerar_pptx(d):
             for rv in r.get("revisao_manual", []):
                 manual[rv["regra"]] = manual.get(rv["regra"], 0) + rv.get("ocorrencias", 0)
         linhas = [
-            "axe-core 4.10.2 (Deque) — motor usado pelas extensões WAVE e Lighthouse",
+            "axe-core 4.10.2 (Deque) — motor usado pelo Lighthouse",
             f"Violações diretas de critério WCAG A/AA: "
             f"{sum(r.get('violacoes_wcag', 0) for r in ax.values())} nas 3 páginas",
             (f"Regras aprovadas: "
@@ -1223,8 +1269,9 @@ def gerar_pptx(d):
                  "e troca automática a cada 4 segundos sem botão de pausa.")
     slide_imagem(prs, "Reflow em 320 px",
                  "evidencias/telas/08-reflow-320px.png",
-                 "O conteúdo ocupa 330 px em uma tela de 320 px e obriga a rolagem "
-                 "horizontal — WCAG 1.4.10 (AA).")
+                 "Com a Barra do Governo Federal carregada, o conteúdo cabe em 320 px: "
+                 "1.4.10 atendido. Os 330 px da imagem vêm da marcação provisória da "
+                 "barra, visível só quando o script de terceiro falha.")
 
     # 8e VLibras: achado que só apareceu no aparelho real
     vl = ((d.get("recursos_assistivos") or {}).get("vlibras") or {})
@@ -1247,7 +1294,7 @@ def gerar_pptx(d):
             f"Deslizes até o conteúdo principal: {dc if dc else 'conteúdo principal não identificado'}"
             "  (WCAG 2.4.1 — A)",
             f"Sem indicador de foco visível: {fk['sem_indicador_visivel']}  (WCAG 2.4.7 — AA)",
-            f"Alvos de toque menores que 24×24 px: {at['menores_que_24px_AA']}  (WCAG 2.5.8 — AA)",
+            f"Alvos de toque menores que 24×24 px: {at['menores_que_24px_AA']}  (WCAG 2.2, 2.5.8 — AA)",
             f"Rolagem horizontal em 320 px: "
             f"{'sim' if e['reflow_320px']['rolagem_horizontal'] else 'não'}  (WCAG 1.4.10 — AA)",
             f"Contraste reprovado em {e['contraste']['reprovados']} de "

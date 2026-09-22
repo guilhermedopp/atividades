@@ -15,7 +15,7 @@
     {
       "id": 2,
       "nome": "Hierarquia de cabeçalhos",
-      "wcag": "1.3.1 Informações e relacoes",
+      "wcag": "1.3.1 Informações e relações",
       "nivel": "A",
       "emag": "1.3 - Utilizar corretamente os níveis de cabeçalho",
       "pergunta": "A página possui exatamente um <h1> e os demais cabeçalhos seguem ordem hierárquica sem pular níveis?",
@@ -145,7 +145,7 @@
     {
       "id": 15,
       "nome": "Estrutura semântica e marcação válida",
-      "wcag": "1.3.1 Informações e relacoes / 4.1.1 Análise / 4.1.2 Nome, função, valor",
+      "wcag": "1.3.1 Informações e relações / 4.1.1 Análise / 4.1.2 Nome, função, valor",
       "nivel": "A",
       "emag": "1.1 - Respeitar os padrões Web / 1.2 - Organizar o código de forma lógica e semântica",
       "pergunta": "A página usa landmarks (header, nav, main, footer), listas e tabelas corretamente, sem ids duplicados nem divs clicaveis?",

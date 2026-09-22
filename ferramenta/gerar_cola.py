@@ -143,8 +143,8 @@ tabela([
       (f" (exige 4,5:1) · foco {vg(foco['sobre_branco'])}:1 no branco "
        f"(exige {vg(foco['exigido_1411'])}:1)", False, ESCURO)]],
     [[("Mobile", True, ESCURO)],
-     [("330 px de conteúdo em tela de 320 px · 23 de 51 alvos < 24×24 px · "
-       "viewport 412×915", False, ESCURO)]],
+     [("23 de 58 alvos < 24×24 px · 3 elementos cortados com espaçamento ampliado · "
+       "reflow em 320 px OK · viewport 412×915", False, ESCURO)]],
     [[("Checklist", True, ESCURO)],
      [(f"{sit['conforme']} conformes · {sit['parcial']} parciais · "
        f"{sit['nao_conforme']} não conformes · {sit['nao_aplicavel']} não aplicável",
@@ -162,7 +162,7 @@ faixa("AS QUATRO VIRADAS")
 for origem, frase in [
     ("3 → 4", "Guardem essa regra: uma falha de Nível A derruba a conformidade em "
               "qualquer nível. Ela vai decidir o resultado deste trabalho."),
-    ("7 → 8", "Nota 90,48%, quatro erros que nem são do IFAL. Parece um site conforme. "
+    ("7 → 8", "Nota 90,48% e os erros do WAVE nem são do IFAL. Parece um site conforme. "
               "Mas nenhuma dessas ferramentas olha para o que vem agora."),
     ("10 → 11", "O recurso de acessibilidade mais visível do portal foi o único que "
                 "nenhuma ferramenta automática encontrou. Isso muda o que a gente conclui."),
@@ -184,8 +184,8 @@ for pergunta, resposta in [
      "Não. Vêm do barra.brasil.gov.br: 1 imagem sem alt e 2 âncoras vazias. "
      "O terceiro link vazio não foi possível atribuir — e o relatório diz isso."),
     ("Usaram só WAVE e ASES?",
-     "Também o axe-core 4.10.2, motor das extensões WAVE e Lighthouse: zero violações "
-     "A/AA. Está no relatório, seção 4.4."),
+     "Também o axe-core 4.10.2, da Deque, motor do Lighthouse: zero violações A/AA. "
+     "O WAVE tem motor próprio, do WebAIM. Está no relatório, seção 4.4."),
     ("Como acharam o VLibras se as ferramentas não acharam?",
      "Abrindo no Android real e fotografando. É injetado por script de terceiro, "
      "não existe no HTML que o servidor entrega."),

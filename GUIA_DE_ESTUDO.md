@@ -49,9 +49,9 @@ O que dizer em cada um. Os números estão todos no relatório.
 | 6 | Checklist 2/2 | Destacar o **14 (conteúdo em movimento), não conforme** — é o que derruba o Nível A. |
 | 7 | WAVE e ASES | **90,48%** no ASES, 40 erros e 310 avisos. WAVE: 4 erros, 21 de contraste, 32 alertas. **Ponto-chave:** os 4 erros não são do IFAL, vêm da barra do governo federal. |
 | 8 | Achados críticos | O banner rotativo concentra as piores falhas: botões de 22×20 px, **1,66:1**, slide ativo só pela cor, troca a cada 4 s sem pausa. |
-| 9 | Mobile | 330 px de conteúdo em tela de 320 px → rolagem horizontal. 23 alvos abaixo de 24×24 px. |
+| 9 | Mobile | 23 de 58 alvos abaixo de 24×24 px. 3 elementos cortados com o espaçamento de texto ampliado. |
 | 10 | Tecnologia assistiva | **VLibras existe em todas as páginas** e nenhuma ferramenta automática viu — só apareceu no celular. E a página de Acessibilidade não menciona o recurso. |
-| 11 | Conformidade | **Não atinge o Nível A.** Duas falhas de A (1.4.1 e 2.2.2), cinco de AA. |
+| 11 | Conformidade | **Não atinge o Nível A.** Três falhas de A (1.3.1, 1.4.1 e 2.2.2), quatro de AA. |
 | 12 | Recomendações | Oito, priorizadas. As duas críticas resolvem o Nível A: botão de pausa e marcador não cromático. |
 | 13 | Fechamento | As quatro lições. A mais forte: **automação não é experiência**. |
 | 14 | Obrigado | Abrir para perguntas. |
@@ -113,15 +113,24 @@ perde o conteúdo antes de terminar.
 *Por quê:* a informação "você está no slide 2" depende exclusivamente de perceber cor.
 *Regra prática:* cor pode ser usada, nunca sozinha — precisa vir com forma, contorno ou texto.
 
-### Nível AA — as cinco
+### Nível AA — as quatro
 
 | Critério | O que falha | Por quê |
 |---|---|---|
 | **1.4.3** Contraste mínimo | botões do banner a **1,66:1** | exige 4,5:1 |
-| **1.4.10** Reflow | 330 px em tela de 320 px | força rolagem nos dois eixos |
 | **1.4.11** Contraste não textual | foco a **1,56:1** no branco | exige 3:1 |
 | **1.4.12** Espaçamento de texto | layout quebra, corta 3 elementos | texto deve suportar ajuste |
-| **2.5.8** Tamanho do alvo | 23 de 51 alvos < 24×24 px | dedo não acerta alvo pequeno |
+| **2.5.8** Tamanho do alvo (WCAG **2.2**) | 23 de 58 alvos < 24×24 px | dedo não acerta alvo pequeno |
+
+Cuidado com o 2.5.8: ele **não existe na WCAG 2.1** — entrou na 2.2. O enunciado admite
+"WCAG 2.1 ou mais recentes", então ele vale como complemento. Na 2.1 o equivalente é o
+**2.5.5**, de Nível AAA, que o portal também não cumpre.
+
+**Se perguntarem do 1.4.10 Reflow:** a primeira medição o deu como falho (330 px em tela
+de 320 px) e a reconferência o corrigiu. Os 330 px eram do bloco provisório
+`<div id="barra-brasil">`, que o script da barra federal substitui ao carregar; como no
+espelho de medição esse script não carregava, o bloco ficava na tela e transbordava. Com
+o script no ar o conteúdo mede 320 px exatos. **O critério é atendido.**
 
 ### O que o portal acerta — digam isso também
 
@@ -139,7 +148,7 @@ páginas. Uma avaliação que só lista defeitos é uma avaliação mal feita.
 | **ASES** | nota **90,48%** · 40 erros · 310 avisos |
 | **WAVE** | 4 erros · 21 de contraste · 32 alertas · 16 recursos · 42 estruturais · 0 ARIA |
 | **axe-core** (só no relatório) | **0** violações WCAG A/AA nas 3 páginas |
-| **Contraste** | 4 reprovações confirmadas · pior **1,66:1** |
+| **Contraste** | 3 reprovações confirmadas · pior **1,66:1** |
 | **Checklist** | 5 conformes · 5 parciais · 4 não conformes · 1 não aplicável |
 | **TalkBack** | concluída na 2ª tentativa · **10 min 16 s** |
 | **Veredito** | **não atinge o Nível A** |
@@ -165,8 +174,9 @@ execução, tem exatamente 1 imagem sem `alt` e 2 âncoras vazias. Isso cobre o 
 de fingir que fechou.
 
 **"Usaram só WAVE e ASES?"**
-Não. O relatório traz também o **axe-core 4.10.2**, motor usado pelas próprias extensões
-WAVE e Lighthouse: **zero violações** de critério A/AA nas três páginas. Ficou de fora do
+Não. O relatório traz também o **axe-core 4.10.2**, da Deque, motor usado pelo
+Lighthouse — o WAVE tem motor próprio, do WebAIM, e por isso os dois podem discordar:
+**zero violações** de critério A/AA nas três páginas. Ficou de fora do
 deck por espaço, mas está na seção 4.4. Reforça o argumento: três ferramentas aprovaram um
 portal que não é conforme.
 

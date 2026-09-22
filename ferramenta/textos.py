@@ -36,10 +36,10 @@ def introducao(d):
 
         "O presente relatório apresenta a avaliação de acessibilidade web do "
         + V(s.get("nome"), "nome do site avaliado") + ", disponível em "
-        + V(s.get("url"), "URL do site") + ". A avaliação combinou três abordagens "
-        "complementares - inspeção manual por checklist, avaliação automatizada por "
-        "ferramentas especializadas e teste de uso real com leitor de tela em dispositivo "
-        "móvel -, estratégia recomendada pela literatura porque ferramentas automáticas "
+        + V(s.get("url"), "URL do site") + ". A avaliação combinou quatro frentes "
+        "complementares - inspeção manual por checklist, auditoria do código-fonte das "
+        "páginas servidas, avaliação automatizada por ferramentas especializadas (axe-core, "
+        "WAVE e ASES) e teste de uso real com leitor de tela em dispositivo móvel -, estratégia recomendada pela literatura porque ferramentas automáticas "
         "detectam, isoladamente, apenas parte dos problemas de acessibilidade, restando a "
         "inspeção humana os critérios de natureza semântica e subjetiva.",
     ]
@@ -75,10 +75,10 @@ def metodologia(d):
     paginas = s.get("paginas_avaliadas") or []
     lista = "; ".join(paginas) if paginas else "\x00[PREENCHER: páginas avaliadas]\x01"
     return [
-        ("A avaliação seguiu um desenho metodologico em quatro etapas sequenciais, aplicado "
+        ("A avaliação seguiu um desenho metodológico em quatro etapas sequenciais, aplicado "
          "sobre um recorte de " + str(len(paginas) or 3) + " páginas representativas do sítio: "
          + lista + ". O recorte privilegiou a página inicial, uma página de listagem de "
-         "conteúdo e uma página transacional (com formulário), de modo a cobrir os três "
+         "conteúdo e a página institucional de contato, de modo a cobrir os três "
          "padrões de interação presentes no portal."),
 
         ("Etapa 1 - Inspeção manual por checklist. Aplicou-se um checklist de 15 itens "
@@ -87,17 +87,21 @@ def metodologia(d):
          "2.1 e as recomendações do eMAG 3.1. Cada item foi verificado com o sítio aberto no "
          "navegador Google Chrome, com auxílio das ferramentas de desenvolvedor (F12) para "
          "leitura do código-fonte. A inspeção contemplou testes de operação exclusivamente "
-         "por teclado (Tab, Shift+Tab, Enter, Espaco e Esc), verificação de zoom em 200% e "
+         "por teclado (Tab, Shift+Tab, Enter, Espaço e Esc), verificação de zoom em 200% e "
          "simulação de escala de cinza para checar dependência de cor."),
 
-        ("Etapa 2 - Avaliação automatizada. As mesmas páginas foram submetidas a dois "
-         "avaliadores: o WAVE (WebAIM), de referência internacional, que reporta erros "
-         "diretamente sobre a renderização da página; e o ASES (Avaliador e Simulador de "
-         "Acessibilidade de Sítios), mantido pelo Governo Federal, que emite nota de 0 a 100 "
-         "segundo as recomendações do eMAG. Adicionalmente, desenvolveu-se um auditor próprio "
-         "em Python (ferramenta/auditor_wcag.py), que percorre o HTML e verifica de forma "
-         "programática os nove itens automatizáveis do checklist, servindo de conferência "
-         "cruzada aos dois avaliadores."),
+        ("Etapa 2 - Avaliação automatizada. As mesmas páginas foram submetidas a três "
+         "avaliadores de motores distintos: o WAVE (WebAIM), de referência internacional, "
+         "que reporta erros diretamente sobre a renderização da página; o ASES (Avaliador e "
+         "Simulador de Acessibilidade de Sítios), mantido pelo Governo Federal, que emite "
+         "nota de 0 a 100 segundo as recomendações do eMAG; e o axe-core 4.10.2, da Deque "
+         "Systems, executado sobre a página renderizada em Chromium. São motores "
+         "independentes — o WAVE tem motor próprio, o axe-core é o que o Lighthouse do "
+         "Google Chrome utiliza —, o que torna a convergência entre eles um indício mais "
+         "forte do que a repetição de uma mesma ferramenta. Adicionalmente, desenvolveu-se "
+         "um auditor próprio em Python (ferramenta/auditor_wcag.py), que percorre o HTML e "
+         "verifica de forma programática os nove itens automatizáveis do checklist, "
+         "servindo de conferência cruzada aos três avaliadores."),
 
         ("Etapa 3 - Tarefa complementar com leitor de tela. Um dos avaliadores acessou o "
          "sítio por smartphone com o leitor de tela nativo ativado e tentou executar uma "
@@ -130,11 +134,13 @@ def analise_conformidade(d):
 
         ("Aplicada essa regra aos resultados consolidados, o nível de conformidade atingido "
          "pelo sítio avaliado foi: " + V(c.get("nivel_atingido"),
-         "nível atingido: 'Não conforme', 'A', 'AA' ou 'AAA'") + ". Foram identificadas "
-         + V(c.get("criterios_a_falhos"), "quantidade de critérios de Nível A não atendidos")
-         + " falha(s) em critérios de Nível A e "
-         + V(c.get("criterios_aa_falhos"), "quantidade de critérios de Nível AA não atendidos")
-         + " falha(s) em critérios de Nível AA."),
+         "nível atingido: 'Não conforme', 'A', 'AA' ou 'AAA'") + "."),
+
+        ("Não foram atendidos, em Nível A, os seguintes critérios de sucesso: "
+         + V(c.get("criterios_a_falhos"), "critérios de Nível A não atendidos")),
+
+        ("Em Nível AA, não foram atendidos os critérios: "
+         + V(c.get("criterios_aa_falhos"), "critérios de Nível AA não atendidos")),
     ]
 
 
@@ -169,7 +175,7 @@ def conclusao(d):
          "a troca da cor dos botões numéricos, a declaração de um <h1> por página e a "
          "marcação dos menus como região de navegação - ajustes pontuais que não exigem "
          "redesenho visual nem reescrita da aplicação. A desproporção entre o baixo esforço técnico das correções e o alto "
-         "impacto que produzem na vida dos usuários e, talvez, a lição mais importante deste "
+         "impacto que produzem na vida dos usuários é, talvez, a lição mais importante deste "
          "trabalho."),
 
         ("Conclui-se que acessibilidade não é um requisito acessório a ser considerado ao "
@@ -215,11 +221,6 @@ RECOMENDACOES = [
      "como regiões de navegação, o que também elimina os blocos de conteúdo que o "
      "axe-core apontou fora de qualquer região.", "WCAG 1.3.1 (A)"),
 
-    ("Alta", "Rolagem horizontal em telas estreitas",
-     "Em 320 pixels de largura o conteúdo ocupa 330 pixels e obriga a rolagem nos "
-     "dois eixos. Revisar as larguras fixas remanescentes para que o conteúdo reflua "
-     "sem transbordar.", "WCAG 1.4.10 (AA)"),
-
     ("Média", "Indicador de foco pouco perceptível sobre fundo branco",
      "O contorno de foco rgb(241,202,127) atinge 5,81:1 sobre o verde do cabeçalho, "
      "mas apenas 1,56:1 sobre o branco da área de conteúdo, onde está a maior parte "
@@ -230,7 +231,7 @@ RECOMENDACOES = [
      "Na emulação do Pixel 7, 23 dos 51 elementos interativos medem menos de 24 por "
      "24 pixels, entre eles os próprios controles do banner (22x20). Ampliar a área "
      "clicável por meio de preenchimento, sem necessariamente aumentar o texto.",
-     "WCAG 2.5.8 (AA)"),
+     "WCAG 2.5.8 (AA, WCAG 2.2)"),
 
     ("Média", "Layout quebra com espaçamento de texto ampliado",
      "Ao aplicar entrelinha 1,5, espaçamento entre letras de 0,12em e entre palavras "
@@ -258,7 +259,19 @@ RECOMENDACOES = [
      "ele existe. Registrou-se ainda que o script collective.lazysizes referenciado "
      "pelas páginas responde HTTP 404. Atualizar o conteúdo, anunciar o VLibras e "
      "publicar a declaração de conformidade prevista pelo eMAG.",
-     "eMAG 3.1 / WCAG 2.4.5"),
+     "eMAG 3.1"),
+
+    ("Baixa", "Marcação provisória da Barra do Governo em estado degradado",
+     "Enquanto o barra.brasil.gov.br/barra.js não carrega, o portal exibe o bloco "
+     "provisório <div id=\"barra-brasil\" style=\"background:#7F7F7F\"> com o texto "
+     "\"Atualize sua Barra de Governo\". Esse bloco tem largura fixa e, em tela de 320 "
+     "pixels, é o único elemento a transbordar — o conteúdo passa a ocupar 330 pixels "
+     "e surge rolagem horizontal; seu texto branco sobre o cinza #7F7F7F mede 4,0:1. "
+     "Com o script carregado nada disso ocorre, de modo que não há falha de "
+     "conformidade a registrar; o defeito pertence ao estado degradado, que se "
+     "manifesta sempre que o domínio federal está indisponível ou bloqueado na rede "
+     "do usuário. Dar ao bloco provisório largura fluida e contraste suficiente.",
+     "WCAG 1.4.10 / 1.4.3 (AA), apenas em estado degradado"),
 ]
 
 
@@ -277,6 +290,10 @@ REFERENCIAS = [
     "BRASIL. Governo Federal. ASES - Avaliador e Simulador de Acessibilidade de Sítios. "
     "Disponível em: https://asesweb.governoeletronico.gov.br/. Acesso em: \x02DATA\x02.",
 
+    "BRASIL. Ministério da Gestão e da Inovação em Serviços Públicos. VLibras - suíte de "
+    "ferramentas de tradução automática do Português para a Libras. Disponível em: "
+    "https://www.gov.br/governodigital/pt-br/vlibras. Acesso em: \x02DATA\x02.",
+
     "CEWEB.BR. Cartilha de Acessibilidade na Web - Fascículo III: Metodologias e ferramentas "
     "de avaliação. São Paulo: Comitê Gestor da Internet no Brasil, 2019. Disponível em: "
     "https://ceweb.br/guias/cartilha-de-acessibilidade-na-web-fasciculo-iii/. Acesso em: \x02DATA\x02.",
@@ -285,6 +302,9 @@ REFERENCIAS = [
     "avaliação de acessibilidade. São Paulo: Comitê Gestor da Internet no Brasil, 2020. "
     "Disponível em: https://ceweb.br/cartilhas/cartilha-w3cbr-acessibilidade-web-fasciculo-IV/. "
     "Acesso em: \x02DATA\x02.",
+
+    "DEQUE SYSTEMS. axe-core: accessibility engine for automated Web UI testing, versão "
+    "4.10.2. Disponível em: https://github.com/dequelabs/axe-core. Acesso em: \x02DATA\x02.",
 
     "IBGE. Censo Demográfico 2022: Pessoas com deficiência. Rio de Janeiro: Instituto "
     "Brasileiro de Geografia e Estatística, 2023.",
@@ -295,6 +315,9 @@ REFERENCIAS = [
 
     "W3C. Web Content Accessibility Guidelines (WCAG) 2.1. W3C Recommendation, 5 jun. 2018. "
     "Disponível em: https://www.w3.org/TR/WCAG21/. Acesso em: \x02DATA\x02.",
+
+    "W3C. Web Content Accessibility Guidelines (WCAG) 2.2. W3C Recommendation, 5 out. 2023. "
+    "Disponível em: https://www.w3.org/TR/WCAG22/. Acesso em: \x02DATA\x02.",
 
     "W3C BRASIL. Diretrizes de Acessibilidade para Conteúdo Web (WCAG) 2.1 - tradução "
     "autorizada para o português do Brasil. Disponível em: "
