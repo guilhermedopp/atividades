@@ -417,6 +417,78 @@ SUMARIO = [
 ]
 
 
+ALTURA_MAX_FIGURA_CM = 19.0   # sobra espaço para título, fonte e um parágrafo
+_QUADROS = {"n": 0}
+_FIGURAS_N = {"n": 0}
+
+
+def _nao_separar(paragrafo):
+    """Prende o parágrafo ao seguinte (w:keepNext).
+
+    Sem isto, o Word quebra a página entre o título da figura e a imagem, que
+    foi o que aconteceu com as Figuras 3, 4 e 5.
+    """
+    pPr = paragrafo._p.get_or_add_pPr()
+    for nome in ("w:keepNext", "w:keepLines"):
+        el = OxmlElement(nome)
+        el.set(qn("w:val"), "true")
+        pPr.append(el)
+
+
+def figura(doc, caminho, texto, fonte="Fonte: os autores."):
+    """Figura no padrão ABNT: título acima, imagem, fonte abaixo.
+
+    Devolve o número atribuído, ou None se o arquivo não existir — assim a
+    numeração nunca avança por uma figura que não entrou.
+    """
+    completo = os.path.join(RAIZ, caminho)
+    if not os.path.exists(completo):
+        return None
+    # Capturas de página inteira são muito mais altas do que largas: a 15,5 cm
+    # de largura, a da página de Acessibilidade passaria de 38 cm e sozinha não
+    # cabe em página nenhuma — era por isso que a imagem se separava do título.
+    largura, altura = Cm(15.5), None
+    try:
+        from PIL import Image
+        with Image.open(completo) as img:
+            lado = img.width / img.height
+        if 15.5 / lado > ALTURA_MAX_FIGURA_CM:
+            # limita pela altura; Emu aqui seria o do python-pptx, importado
+            # depois neste módulo — fazer a conta em centímetros evita a troca
+            altura = Cm(ALTURA_MAX_FIGURA_CM)
+            largura = Cm(ALTURA_MAX_FIGURA_CM * lado)
+    except Exception:
+        pass
+
+    n = _FIGURAS_N["n"] + 1
+    titulo = par(doc, f"Figura {n} - {texto}", tamanho=10, espaco_depois=4,
+                 espacamento=1.0, alinhamento=WD_ALIGN_PARAGRAPH.LEFT)
+    _nao_separar(titulo)
+    try:
+        doc.add_picture(completo, width=largura, height=altura)
+    except Exception:
+        titulo._p.getparent().remove(titulo._p)
+        return None
+    imagem = doc.paragraphs[-1]
+    imagem.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    _nao_separar(imagem)
+    legenda(doc, fonte)
+    _FIGURAS_N["n"] = n
+    return n
+
+
+def novo_quadro():
+    """Número do próximo quadro.
+
+    Era literal em cada legenda, e bastava um quadro deixar de ser emitido —
+    o de contraste da simulação móvel, que só aparece quando há reprovação —
+    para a sequência pular um número. Agora cada seção pede o seu na ordem em
+    que escreve, e o texto do corpo usa o mesmo valor.
+    """
+    _QUADROS["n"] += 1
+    return _QUADROS["n"]
+
+
 def paginas_do_sumario():
     """Página de início de cada seção, medida no PDF da última geração.
 
@@ -460,10 +532,12 @@ def sumario(doc):
 
 
 def secao_checklist(doc, d):
+    q = novo_quadro()
     titulo_secao(doc, "4.1 Resultados da inspeção manual (checklist de 15 itens)", 2)
     corpo(doc, "A inspeção manual aplicou o checklist de 15 itens essenciais sobre as páginas "
                "do recorte, com o sítio aberto no navegador e com uso das ferramentas de "
-               "desenvolvedor para leitura do código-fonte. O Quadro 2 apresenta o resultado "
+               "desenvolvedor para leitura do código-fonte. O Quadro " + str(q) +
+               " apresenta o resultado "
                "item a item, com a indicação do critério de sucesso da WCAG 2.1 e da "
                "recomendação correspondente do eMAG 3.1.")
     auto = auto_por_item(d)
@@ -485,17 +559,19 @@ def secao_checklist(doc, d):
     tabela(doc, ["#", "Item verificado", "Critério WCAG 2.1 (nível)",
                  "Recomendação eMAG 3.1", "Situação", "Observação"],
            [0.72, 2.45, 2.35, 2.75, 2.15, 5.48], linhas)
-    legenda(doc, "Quadro 2 - Resultado da inspeção manual pelo checklist de 15 itens. "
+    legenda(doc, f"Quadro {q} - Resultado da inspeção manual pelo checklist de 15 itens. "
                  "Fonte: elaborado pelos autores.")
 
 
 def secao_wave(doc, d):
+    q = novo_quadro()
     w = d.get("wave", {})
     titulo_secao(doc, "4.2 Resultados do avaliador automático WAVE", 2)
-    corpo(doc, "O WAVE, desenvolvido pelo WebAIM da Utah State University, sobrepõe ícones a "
+    corpo(doc, "O WAVE, desenvolvido pelo WebAIM da Utah State University, sobrepõe ícones à "
                "própria renderização da página, distinguindo erros (falhas certas de "
                "acessibilidade), alertas (situações que exigem julgamento humano) e "
-               "recursos (boas práticas já aplicadas). O Quadro 3 sintetiza a contagem obtida.")
+               "recursos (boas práticas já aplicadas). O Quadro " + str(q) +
+               " sintetiza a contagem obtida.")
     tabela(doc, ["Categoria", "Quantidade", "O que significa"], [4.29, 2.6, 9.01], [
         ["Errors", V(w.get("errors"), "n. de Errors no WAVE"),
          "Falhas certas que impedem o acesso por tecnologia assistiva."],
@@ -510,7 +586,8 @@ def secao_wave(doc, d):
         ["ARIA", V(w.get("aria"), "n. de itens ARIA"),
          "Atributos ARIA presentes, que podem ajudar ou atrapalhar se mal usados."],
     ])
-    legenda(doc, "Quadro 3 - Síntese do relatório WAVE. Fonte: WebAIM (wave.webaim.org).")
+    legenda(doc, f"Quadro {q} - Síntese do relatório WAVE. "
+                 "Fonte: WebAIM (wave.webaim.org).")
     corpo(doc, "Os erros de maior incidência relatados pela ferramenta foram: "
                + V(w.get("principais_erros"),
                    "liste os erros mais frequentes, ex.: 'Missing alternative text (12), "
@@ -549,7 +626,7 @@ def secao_ases(doc, d):
         ["6. Formulários", V(a.get("formularios_erros"), "erros"),
          V(a.get("formularios_avisos"), "avisos")],
     ])
-    legenda(doc, "Quadro 4 - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
+    legenda(doc, f"Quadro {novo_quadro()} - Ocorrências por seção do eMAG 3.1 segundo o ASES. "
                  "Fonte: asesweb.governoeletronico.gov.br.")
     if a.get("total_erros") is not None:
         corpo(doc, f"O somatório alcança {a['total_erros']} erros e "
@@ -589,7 +666,7 @@ def secao_axe(doc, d):
                        str(sum(m.get("ocorrencias", 0) for m in r.get("revisao_manual", [])))])
     tabela(doc, ["Página", "Regras aprovadas", "Violações WCAG A/AA",
                  "Boas práticas", "Revisão manual"], [5.32, 2.4, 2.6, 2.2, 3.38], linhas)
-    legenda(doc, "Quadro 5 - Resultado do axe-core 4.10.2 por página avaliada. "
+    legenda(doc, f"Quadro {novo_quadro()} - Resultado do axe-core 4.10.2 por página avaliada. "
                  "Fonte: os autores.")
     corpo(doc, "O resultado exige leitura cuidadosa. O axe-core não encontrou nenhuma "
                "violação direta de Critério de Sucesso da WCAG 2.1 nos níveis A e AA nas "
@@ -603,7 +680,7 @@ def secao_axe(doc, d):
         for m in r.get("revisao_manual", []):
             man.setdefault(m["regra"], [m["descricao"], 0])[1] += m.get("ocorrencias", 0)
     if bp:
-        corpo(doc, "As ocorrências classificadas como boas práticas, somadas as três "
+        corpo(doc, "As ocorrências classificadas como boas práticas, somadas às três "
                    "páginas, foram:")
         for regra, (desc, n) in sorted(bp.items(), key=lambda x: -x[1][1]):
             item_lista(doc, f"{regra} — {n} ocorrência(s): {desc}.")
@@ -620,9 +697,13 @@ def secao_axe(doc, d):
 
 
 def secao_corroboracao(doc, d):
-    txt = (d.get("conformidade") or {}).get("corroboracao")
-    if txt:
-        corpo(doc, str(txt))
+    c = d.get("conformidade") or {}
+    if c.get("corroboracao"):
+        corpo(doc, str(c["corroboracao"]))
+    if c.get("reconferencia_22_09"):
+        par(doc, "Nota de reconferência", negrito=True,
+            alinhamento=WD_ALIGN_PARAGRAPH.JUSTIFY, espaco_antes=12, espaco_depois=2)
+        corpo(doc, str(c["reconferencia_22_09"]))
 
 
 def secao_contraste(doc, d):
@@ -637,7 +718,7 @@ def secao_contraste(doc, d):
                [5.52, 2.99, 2.99, 1.7, 2.7],
                [[r["elemento"], r["cor_texto"], r["cor_fundo"],
                  f"{r['razao']}:1", f"{r['exigido']}:1"] for r in reps])
-        legenda(doc, "Quadro 6 - Reprovações de contraste confirmadas por amostragem de "
+        legenda(doc, f"Quadro {novo_quadro()} - Reprovações de contraste confirmadas por amostragem de "
                      "pixels na página renderizada. Fonte: os autores.")
         corpo(doc, "A reprovação mais severa é a dos botões numéricos que controlam o "
                    "banner rotativo: com 1,66:1, o texto azul sobre o verde institucional "
@@ -670,23 +751,16 @@ def secao_vlibras(doc, d):
                "Língua Brasileira de Sinais mantido pelo Governo Federal, por meio de um "
                "botão flutuante presente em todas as páginas. " + str(r.get("origem", "")))
     corpo(doc, "O modo como esse recurso foi identificado merece registro metodológico, "
-               "por expor um limite das três frentes automatizadas empregadas até aqui. "
+               "por expor um limite comum a todas as frentes automatizadas empregadas. "
                + str(r.get("por_que_escapou", "")) + " O recurso só apareceu porque um dos "
                "avaliadores abriu o portal em seu próprio aparelho Android e fotografou a "
                "tela, episódio que ilustra de forma concreta a razão pela qual o W3C "
                "recomenda que a avaliação automática jamais seja empregada isoladamente.")
-    caminho = "evidencias/telas/14-vlibras-botao-flutuante.jpg"
-    if os.path.exists(os.path.join(RAIZ, caminho)):
-        try:
-            doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
-            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            legenda(doc, "Figura 6 - Botão flutuante do VLibras, à direita, sobre a página "
-                         "institucional de Acessibilidade aberta em aparelho Android. Na "
-                         "mesma captura aparece o link que exibe a URL completa do Decreto "
-                         "n. 5.296/2004 como texto visível. Fonte: captura feita pelos "
-                         "autores em aparelho real.")
-        except Exception:
-            pass
+    figura(doc, "evidencias/telas/14-vlibras-botao-flutuante.jpg",
+           "Botão flutuante do VLibras, à direita, sobre a página institucional de "
+           "Acessibilidade aberta em aparelho Android. Na mesma captura aparece o link "
+           "que exibe a URL completa do Decreto n. 5.296/2004 como texto visível.",
+           fonte="Fonte: captura feita pelos autores em aparelho real.")
     if r.get("lacuna_documental"):
         corpo(doc, "Há, porém, uma incoerência a assinalar. " + str(r["lacuna_documental"])
               + " Um recurso de acessibilidade que o público não sabe existir tem seu "
@@ -735,28 +809,17 @@ def secao_evidencias(doc, d):
                "avaliação e sustentam as medições apresentadas nas subseções "
                "anteriores. Todas foram capturadas em Chromium, sobre as folhas de "
                "estilo e as imagens do próprio sítio.")
-    # A ABNT põe o título da figura acima dela e a fonte logo abaixo.
-    for i, (caminho, texto) in enumerate(disponiveis, 1):
-        if not os.path.exists(os.path.join(RAIZ, caminho)):
-            continue
-        titulo_fig = par(doc, f"Figura {i} - {texto}", tamanho=10, espaco_depois=4,
-                         espacamento=1.0, alinhamento=WD_ALIGN_PARAGRAPH.LEFT)
-        try:
-            doc.add_picture(os.path.join(RAIZ, caminho), width=Cm(15.5))
-            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        except Exception:
-            # sem a imagem, o título solto confundiria a numeração
-            titulo_fig._p.getparent().remove(titulo_fig._p)
-            continue
-        legenda(doc, "Fonte: os autores.")
+    for caminho, texto in disponiveis:
+        figura(doc, caminho, texto)
 
 
 def secao_auditoria(doc, d):
     titulo_secao(doc, "4.8 Resultados da auditoria programática do código-fonte", 2)
-    corpo(doc, "Como terceira frente de verificação, desenvolveu-se um auditor próprio em "
+    corpo(doc, "Como quarta frente de verificação, ao lado do WAVE, do ASES e do axe-core, "
+               "desenvolveu-se um auditor próprio em "
                "Python (ferramenta/auditor_wcag.py), que percorre o HTML das páginas e "
                "verifica programaticamente os nove itens automatizáveis do checklist. Seu "
-               "papel e servir de conferência cruzada aos avaliadores comerciais e permitir "
+               "papel é servir de conferência cruzada aos avaliadores comerciais e permitir "
                "reexecutar a medição sempre que o sítio for atualizado.")
     paginas = d["_auto"].get("paginas", [])
     if not paginas:
@@ -769,7 +832,7 @@ def secao_auditoria(doc, d):
                        str(p["total_manual"]), str(p["total_ocorrencias"])])
     tabela(doc, ["Página auditada", "Não conf.", "Conformes", "Manual", "Ocorrências"],
            [6.96, 2.19, 2.19, 1.79, 2.77], linhas)
-    legenda(doc, "Quadro 7 - Síntese da auditoria programática por página. "
+    legenda(doc, f"Quadro {novo_quadro()} - Síntese da auditoria programática por página. "
                  "Fonte: elaborado pelos autores.")
     pior = max(paginas, key=lambda p: p["total_ocorrencias"])
     falhas = [i for i in pior["itens"] if i["status"] == "nao_conforme"]
@@ -779,7 +842,7 @@ def secao_auditoria(doc, d):
                    "falhas identificadas nessa página é apresentado no Quadro 8.")
         tabela(doc, ["#", "Item", "Diagnóstico automático"], [0.89, 3.98, 11.03],
                [[str(f["item"]), f["nome"], f["detalhe"]] for f in falhas])
-        legenda(doc, "Quadro 8 - Falhas detectadas pela auditoria programática. "
+        legenda(doc, f"Quadro {novo_quadro()} - Falhas detectadas pela auditoria programática. "
                      "Fonte: elaborado pelos autores.")
 
 
@@ -799,12 +862,15 @@ def secao_mobile_auto(doc, d):
         return
     lt, fk, at = e["leitor_tela"], e["foco_teclado"], e["alvos_toque"]
     rf, zm, ct = e["reflow_320px"], e["zoom"], e["contraste"]
+    q_medicoes = novo_quadro()
+    _QUADROS["medicoes_mobile"] = q_medicoes
     corpo(doc, "A simulação foi executada sobre uma cópia local fiel da página "
                "inicial do portal, servida em servidor HTTP próprio porque o navegador "
                "de automação deste ambiente não estabelece a conexão TLS com o sítio, "
                f"emulando o aparelho "
                f"{e['aparelho']} em viewport de {e['viewport']['width']}x"
-               f"{e['viewport']['height']} pixels lógicos. O Quadro 9 reúne as medições.")
+               f"{e['viewport']['height']} pixels lógicos. O Quadro {q_medicoes} "
+               "reúne as medições.")
     d_cont = lt["deslizes_ate_conteudo"]
     tabela(doc, ["Medição", "Resultado", "Critério WCAG 2.1"], [6.36, 3.58, 5.96], [
         ["Elementos anunciados sem rótulo", str(lt["elementos_sem_rotulo"]),
@@ -825,16 +891,37 @@ def secao_mobile_auto(doc, d):
         ["Trechos reprovados no contraste",
          f"{ct['reprovados']} de {ct['trechos_analisados']}", "1.4.3 (AA)"],
     ])
-    legenda(doc, "Quadro 9 - Medições da simulação automatizada em smartphone. "
+    legenda(doc, f"Quadro {q_medicoes} - Medições da simulação automatizada em smartphone. "
                  "Fonte: elaborado pelos autores.")
+    corpo(doc, "Três linhas deste quadro pedem leitura cuidadosa, porque à primeira vista "
+               "contradizem seções anteriores.")
+    item_lista(doc, "Os elementos sem nome acessível e o único elemento sem foco visível não "
+                    "pertencem ao código do IFAL. Conferidos na árvore de acessibilidade do "
+                    "próprio navegador, são três links da Barra de Identidade do Governo "
+                    "Federal — o ícone de menu, o logotipo do VLibras e o selo Acesso à "
+                    "Informação — e é também o link do VLibras o que não recebe contorno de "
+                    "foco. Nenhum deles existe no HTML servido pelo IFAL, o que mantém "
+                    "válido o resultado do item 15 do checklist. A contagem maior que aparece "
+                    "no quadro vem da heurística do próprio simulador, que procura o nome no "
+                    "texto do elemento e não na árvore de acessibilidade, e por isso não "
+                    "enxerga o nome que vem do atributo alt de uma imagem interna.")
+    item_lista(doc, "O contraste desta bateria aparece sem reprovação alguma, em aparente "
+                    "conflito com as três reprovações da seção 4.5. A explicação é simples e "
+                    "vale como limitação registrada: a bateria descarta trechos com menos de "
+                    "dois caracteres, e os controles do banner rotativo — onde estão as duas "
+                    "piores razões medidas — são dígitos isolados, de 1 a 4. Eles nunca "
+                    "entram nesta amostra. Quem os mede é a amostragem de pixels da seção "
+                    "4.5, e é ela que vale.")
     trans = lt["transcricao"][:12]
     if trans:
-        corpo(doc, "O Quadro 10 reproduz os primeiros anúncios que o leitor de tela emitiria ao "
-                   "percorrer a página, permitir verificar como a estrutura do código se "
+        q_transcricao = novo_quadro()
+        corpo(doc, f"O Quadro {q_transcricao} reproduz os primeiros anúncios que o leitor "
+                   "de tela emitiria ao "
+                   "percorrer a página, permitindo verificar como a estrutura do código se "
                    "converte em experiência sonora.")
         tabela(doc, ["Deslize", "Anúncio do leitor de tela"], [2.19, 13.71],
                [[str(i), t] for i, t in enumerate(trans, 1)])
-        legenda(doc, "Quadro 10 - Transcrição dos anúncios do leitor de tela. "
+        legenda(doc, f"Quadro {q_transcricao} - Transcrição dos anúncios do leitor de tela. "
                      "Fonte: elaborado pelos autores.")
     if ct["exemplos"]:
         corpo(doc, "Quanto ao contraste, esta bateria calcula a razão supondo o fundo "
@@ -849,7 +936,7 @@ def secao_mobile_auto(doc, d):
                    f"{ct['pior_razao']}:1.")
         tabela(doc, ["Trecho de texto", "Razão obtida", "Razão exigida"], [8.94, 3.48, 3.48],
                [[x["texto"], f"{x['razao']}:1", f"{x['exigido']}:1"] for x in ct["exemplos"][:6]])
-        legenda(doc, "Quadro 11 - Trechos reprovados no critério de contraste. "
+        legenda(doc, f"Quadro {novo_quadro()} - Trechos reprovados no critério de contraste. "
                      "Fonte: elaborado pelos autores.")
 
 
@@ -869,7 +956,7 @@ def secao_mobile_real(doc, d):
         ["Tempo gasto", V(m.get("tempo_gasto"), "ex.: 6 min 40 s")],
         ["Tarefa concluída", V(m.get("tarefa_concluida"), "Sim / Não / Parcialmente")],
     ])
-    legenda(doc, "Quadro 12 - Condições do teste com leitor de tela. "
+    legenda(doc, f"Quadro {novo_quadro()} - Condições do teste com leitor de tela. "
                  "Fonte: elaborado pelos autores.")
     corpo(doc, "Relato da experiência: " + V(m.get("relato"),
           "descreva em 8 a 12 linhas: como foi ativar o leitor, o que o aparelho anunciou "
@@ -878,8 +965,11 @@ def secao_mobile_real(doc, d):
           "sensação ao depender apenas do áudio"))
     corpo(doc, "A confrontação entre este relato e as medições automatizadas da seção "
                "anterior é o ponto central da avaliação: cada elemento anunciado sem rótulo "
-               "contado no Quadro 9 corresponde, na experiência real, a um momento de interrupção em "
-               "que o usuário precisa adivinhar a função do que esta tocando.")
+               f"contado no Quadro {_QUADROS.get('medicoes_mobile', '-')} corresponde, na "
+               "experiência real, a um momento de interrupção em que o usuário precisa "
+               "adivinhar a função do que está tocando.")
+    corpo(doc, "Cabe separar, no relato acima, o que é do portal e o que é da tecnologia "
+               "assistiva. " + str(m.get("leitura_critica", "")))
 
 
 def secao_recomendacoes(doc, d):
@@ -887,15 +977,20 @@ def secao_recomendacoes(doc, d):
     corpo(doc, "As recomendações a seguir estão ordenadas por severidade, considerando o "
                "impacto sobre o usuário e o nível WCAG afetado. Problemas de severidade "
                "crítica bloqueiam integralmente o acesso de determinados grupos e devem ser "
-               "corrigidos com prioridade, até porque, sendo falhas de Nível A, são "
-               "justamente as que impedem qualquer declaração de conformidade.")
+               "corrigidos com prioridade. A severidade não coincide com o nível WCAG: as "
+               "duas recomendações críticas tratam das falhas de Nível A do banner rotativo, "
+               "que nenhum avaliador automático detectou e que bastam para impedir a "
+               "declaração de conformidade, mas há também uma falha de Nível A entre as "
+               "recomendações de severidade alta — a ausência de cabeçalhos na página de "
+               "contato (1.3.1) —, classificada assim por afetar uma página do recorte, e "
+               "não todas.")
     tabela(doc, ["Severidade", "Problema", "Correção recomendada", "Critério"],
            [2.19, 3.58, 7.55, 2.58],
            [[s, p, c, cr] for s, p, c, cr in T.RECOMENDACOES])
-    legenda(doc, "Quadro 13 - Recomendações de correção priorizadas. "
+    legenda(doc, f"Quadro {novo_quadro()} - Recomendações de correção priorizadas. "
                  "Fonte: elaborado pelos autores.")
     corpo(doc, "Estima-se que as correções de severidade crítica e alta sejam implementáveis "
-               "sem redesenho visual do sítio, uma vez que dizem respeito a camada de "
+               "sem redesenho visual do sítio, uma vez que dizem respeito à camada de "
                "marcação semântica do HTML e a ajustes pontuais de paleta, e não a "
                "arquitetura da aplicação.")
 
@@ -928,7 +1023,7 @@ def gerar_docx(d):
     titulo_secao(doc, "3.1 Site avaliado e justificativa da escolha", 2)
     corpo(doc, "O sítio selecionado para a avaliação foi o "
                + V(d["site"].get("nome"), "nome do site") + ", acessível em "
-               + V(d["site"].get("url"), "URL") + ", mantido por "
+               + V(d["site"].get("url"), "URL") + ", mantido pelo "
                + V(d["site"].get("responsavel"), "instituicao responsavel") + ".")
     corpo(doc, V(d["site"].get("justificativa"), "justificativa da escolha do site"))
     titulo_secao(doc, "3.2 Etapas da avaliação", 2)
@@ -953,7 +1048,7 @@ def gerar_docx(d):
         ["Leitor de tela em smartphone", "Empírica",
          "Execução de tarefa real sem apoio visual, para avaliar a experiência de uso."],
     ])
-    legenda(doc, "Quadro 1 - Instrumentos empregados na avaliação. "
+    legenda(doc, f"Quadro {novo_quadro()} - Instrumentos empregados na avaliação. "
                  "Fonte: elaborado pelos autores.")
 
     titulo_secao(doc, "4. AVALIAÇÃO E RESULTADOS")
@@ -1280,7 +1375,7 @@ def gerar_pptx(d):
                      "evidencias/telas/14-vlibras-botao-flutuante.jpg",
                      "O tradutor de Libras existe em todas as páginas, injetado por "
                      "barra.brasil.gov.br. Não aparece no HTML entregue pelo servidor e "
-                     "escapou às três frentes automatizadas — mas a página de "
+                     "escapou a todas as frentes automatizadas — mas a página de "
                      "Acessibilidade do portal nunca o menciona.")
 
     # 9 simulação mobile

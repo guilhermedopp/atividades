@@ -40,7 +40,7 @@ def introducao(d):
         "complementares - inspeção manual por checklist, auditoria do código-fonte das "
         "páginas servidas, avaliação automatizada por ferramentas especializadas (axe-core, "
         "WAVE e ASES) e teste de uso real com leitor de tela em dispositivo móvel -, estratégia recomendada pela literatura porque ferramentas automáticas "
-        "detectam, isoladamente, apenas parte dos problemas de acessibilidade, restando a "
+        "detectam, isoladamente, apenas parte dos problemas de acessibilidade, restando à "
         "inspeção humana os critérios de natureza semântica e subjetiva.",
     ]
 
@@ -49,23 +49,24 @@ def objetivo_geral(d):
     s = d["site"]
     return ("Avaliar o nível de conformidade de acessibilidade do "
             + V(s.get("nome_curto"), "nome curto do site") + " (" + V(s.get("url"), "URL")
-            + ") frente as Diretrizes de Acessibilidade para o Conteúdo da Web (WCAG) 2.1 "
-            "e as recomendações do eMAG 3.1, identificando as barreiras que impedem o uso "
+            + ") frente às Diretrizes de Acessibilidade para o Conteúdo da Web (WCAG) 2.1 "
+            "e às recomendações do eMAG 3.1, identificando as barreiras que impedem o uso "
             "pleno do sítio por pessoas com deficiência e propondo correções técnicas "
             "viáveis para cada problema encontrado.")
 
 
 OBJETIVOS_ESPECIFICOS = [
     "Inspecionar manualmente o sítio a partir de um checklist de 15 itens essenciais de "
-    "acessibilidade, mapeando cada item aos critérios de sucesso da WCAG 2.1 e as "
+    "acessibilidade, mapeando cada item aos critérios de sucesso da WCAG 2.1 e às "
     "recomendações do eMAG 3.1;",
-    "Submeter as páginas selecionadas a avaliadores automáticos (WAVE e ASES), obtendo o "
+    "Submeter as páginas selecionadas a avaliadores automáticos (WAVE, ASES e axe-core), "
+    "obtendo o "
     "diagnóstico quantitativo dos erros presentes no código-fonte;",
     "Confrontar os resultados manuais e automáticos, distinguindo falhas de marcação de "
     "falhas de experiência de uso;",
     "Vivenciar a navegação no sítio por meio de smartphone com leitor de tela ativado, "
     "registrando as barreiras percebidas na execução de uma tarefa real;",
-    "Determinar o nível de conformidade (A, AA ou AAA) alcancado pelo sítio e elaborar "
+    "Determinar o nível de conformidade (A, AA ou AAA) alcançado pelo sítio e elaborar "
     "recomendações de correção priorizadas por severidade.",
 ]
 
@@ -84,7 +85,7 @@ def metodologia(d):
         ("Etapa 1 - Inspeção manual por checklist. Aplicou-se um checklist de 15 itens "
          "essenciais de acessibilidade, consolidado a partir do material de referência "
          "indicado pela disciplina e mapeado, item a item, aos critérios de sucesso da WCAG "
-         "2.1 e as recomendações do eMAG 3.1. Cada item foi verificado com o sítio aberto no "
+         "2.1 e às recomendações do eMAG 3.1. Cada item foi verificado com o sítio aberto no "
          "navegador Google Chrome, com auxílio das ferramentas de desenvolvedor (F12) para "
          "leitura do código-fonte. A inspeção contemplou testes de operação exclusivamente "
          "por teclado (Tab, Shift+Tab, Enter, Espaço e Esc), verificação de zoom em 200% e "
@@ -109,7 +110,7 @@ def metodologia(d):
          "a conclusão ou não da tarefa e as barreiras percebidas."),
 
         ("Etapa 4 - Consolidação e análise de conformidade. Os achados foram agrupados por "
-         "critério de sucesso da WCAG 2.1 e classificados por severidade. Aplicou-se entao a "
+         "critério de sucesso da WCAG 2.1 e classificados por severidade. Aplicou-se então a "
          "regra de conformidade do W3C, segundo a qual um sítio só atinge determinado nível "
          "se satisfizer integralmente todos os critérios daquele nível e dos anteriores - "
          "basta uma falha de Nível A para que a página não seja conforme em nenhum nível."),
@@ -228,14 +229,14 @@ RECOMENDACOES = [
      "garantir 3:1 em qualquer fundo.", "WCAG 1.4.11 (AA)"),
 
     ("Média", "Alvos de toque abaixo do mínimo",
-     "Na emulação do Pixel 7, 23 dos 51 elementos interativos medem menos de 24 por "
+     "Na emulação do Pixel 7, 23 dos 58 elementos interativos medem menos de 24 por "
      "24 pixels, entre eles os próprios controles do banner (22x20). Ampliar a área "
      "clicável por meio de preenchimento, sem necessariamente aumentar o texto.",
      "WCAG 2.5.8 (AA, WCAG 2.2)"),
 
     ("Média", "Layout quebra com espaçamento de texto ampliado",
      "Ao aplicar entrelinha 1,5, espaçamento entre letras de 0,12em e entre palavras "
-     "de 0,16em, surge rolagem horizontal e três elementos têm o conteúdo cortado. "
+     "de 0,16em, três elementos têm o conteúdo cortado por overflow oculto. "
      "Substituir alturas fixas por alturas mínimas nos blocos afetados.",
      "WCAG 1.4.12 (AA)"),
 
