@@ -63,11 +63,42 @@ servido ou na barra federal.**
 
 ## Achados principais (medidos)
 
-O portal não atinge o Nível A, por dois critérios, ambos no banner rotativo da home:
-2.2.2 (troca de slide a cada 4000 ms, sem botão de pausa — confirmado lendo
-`banner_rotativo.js`) e 1.4.1 (slide ativo sinalizado apenas pela cor de fundo).
-Em AA falham 1.4.3, 1.4.10, 1.4.11, 1.4.12 e 2.5.8. O axe-core não encontrou nenhuma
-violação direta de critério WCAG A/AA nas 3 páginas: a base Plone/IDG é sólida.
+O portal não atinge o Nível A, por três critérios: 2.2.2 (troca de slide a cada 4000 ms,
+sem botão de pausa — confirmado lendo `banner_rotativo.js`), 1.4.1 (slide ativo sinalizado
+apenas pela cor de fundo) e 1.3.1 (a página de contato não declara cabeçalho algum, embora
+apresente seções visualmente tituladas). Os dois primeiros estão no banner rotativo da home
+e são os que **nenhuma** das três ferramentas automáticas viu.
+Em AA falham 1.4.3, 1.4.11 e 1.4.12, mais o 2.5.8, que é da WCAG 2.2 e entra como
+complemento (o enunciado admite "2.1 ou mais recentes"; o equivalente na 2.1 é o 2.5.5,
+AAA, também não cumprido). O axe-core não encontrou nenhuma violação direta de critério
+WCAG A/AA nas 3 páginas: a base Plone/IDG é sólida.
+
+**1.4.10 Reflow não falha** — ver a seção seguinte. E o axe-core é o motor do Lighthouse,
+não do WAVE, que tem motor próprio do WebAIM.
+
+## O bloco provisório da barra federal: o terceiro ponto cego (22/09)
+
+Duas falhas registradas na primeira medição eram artefato do ambiente, com a mesma causa
+do VLibras e da região de navegação: o espelho não carregava `barra.brasil.gov.br/barra.js`.
+Enquanto esse script não chega, o portal exibe um bloco de espera —
+`<div id="barra-brasil" style="background:#7F7F7F">` com o texto "Atualize sua Barra de
+Governo" — que o `barra.js` substitui ao carregar.
+
+- **Reflow:** esse bloco media 330 px e era o **único** elemento a ultrapassar a tela de
+  320 px. Com o `barra.js` no ar o conteúdo mede 320 px exatos. Medido nas duas condições
+  e também com as fontes da barra servidas localmente. 1.4.10 passa a constar atendido.
+- **Contraste:** o cinza `#7F7F7F` lido como "cor da Barra do Governo Federal" era o fundo
+  desse bloco. A barra em operação tem texto `rgb(96,96,96)` sobre `rgb(241,241,241)` e
+  `rgb(238,238,238)`: 5,57:1 e 5,42:1, aprovadas. Restam **3** reprovações de contraste.
+
+As outras três (banner a 1,66:1 e 3,0:1, "Voltar para o topo" a 4,48:1) foram reproduzidas
+sem qualquer alteração, assim como o foco a 1,56:1 (`a:focus{outline:2px solid #f1ca7f}`,
+regra do próprio tema) e os 3 elementos cortados do 1.4.12.
+
+**Regra que sai disso: medir sempre nas duas condições — com e sem o script de terceiro —
+e nunca atribuir ao sítio um número colhido em estado degradado.** O bloco provisório
+merece registro como recomendação de baixa prioridade (é código que o IFAL entrega e que
+transborda quando o domínio federal cai), não como falha de conformidade.
 
 ## Nota sobre a renderização no ambiente de nuvem
 
@@ -87,6 +118,12 @@ bloco e regerar.
 
 ## Próximos passos, em ordem
 
+0. Em 22/09 a rede passou a alcançar `www2.ifal.edu.br` sem liberação extra, e o
+   `barra.brasil.gov.br` também. O Chromium continua sem abrir o site por HTTPS (não
+   confia na CA do proxy), então o espelho local ainda é necessário — mas agora ele
+   carrega o `barra.js`, o que muda o resultado de reflow e de contraste. A página
+   `/campus/maceio/contato` passou a exigir login (302 para `require_login`): as
+   medições sobre ela são as de 20/09, registradas no checklist.
 1. Conferir que a rede alcança o site:
    `curl -sS -o /dev/null -w '%{http_code}\n' https://www2.ifal.edu.br/campus/maceio`
    Se der `000`, o ambiente ainda não libera o domínio — ver "Acesso de rede" abaixo.
@@ -178,6 +215,13 @@ esperando a ordem visual dá falso negativo.
   grande cabia um caractere, a do rodapé um dígito. Texto mais largo quebra linha.
 - **Não casar forma por substring:** `acha("erros")` pegou a nota do cartão, não o rótulo.
 - **Inserir slide desloca a numeração:** o rodapé é texto literal, não campo.
+
+## Números de página do sumário
+
+`python3 ferramenta/numerar_sumario.py` gera o relatório, converte para PDF, lê em que
+página cada seção caiu, grava `dados/paginas_sumario.json` e gera de novo com os números.
+Nenhum é digitado. Ele confere no fim se a paginação se manteve. Sem esse arquivo o
+sumário sai com os pontinhos e sem número — de propósito.
 
 ## Conferir o layout em PDF
 

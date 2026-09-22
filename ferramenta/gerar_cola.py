@@ -117,8 +117,10 @@ def tabela(linhas, larguras, tam=11.5):
 par([("COLA — Avaliação de Acessibilidade WCAG 2.1 · Portal do IFAL Campus Maceió",
       True, ESCURO)], tam=14.5, depois=2)
 par([("Veredito: ", True, ESCURO), (cf["nivel_atingido"].upper(), True, VERM),
-     ("  — por 1.4.1 (slide ativo só pela cor) e 2.2.2 (banner sem pausa). "
-      "Uma falha de Nível A derruba a conformidade em qualquer nível.", False, CINZA)],
+     ("  — 3 falhas de Nível A: 1.3.1 (contato sem cabeçalho algum), 1.4.1 (slide ativo "
+      "só pela cor) e 2.2.2 (banner sem pausa). As duas do banner nenhuma ferramenta "
+      "automática pegou. Uma falha de Nível A derruba a conformidade em qualquer nível.",
+      False, CINZA)],
     tam=11.5, depois=3)
 
 # ─────────────────────────────────────────────────────────────── números
@@ -166,8 +168,8 @@ for origem, frase in [
               "Mas nenhuma dessas ferramentas olha para o que vem agora."),
     ("10 → 11", "O recurso de acessibilidade mais visível do portal foi o único que "
                 "nenhuma ferramenta automática encontrou. Isso muda o que a gente conclui."),
-    ("11 → 12", "Não atinge o Nível A por dois critérios. E os dois têm correção de "
-                "baixo custo."),
+    ("11 → 12", "Não atinge o Nível A. E os dois critérios que nenhuma ferramenta "
+                "pegou têm correção de baixo custo."),
 ]:
     par([(f"{origem}   ", True, VERM), (f"“{frase}”", False, ESCURO)], tam=11.5, depois=4)
 
@@ -176,7 +178,7 @@ faixa("SEIS PERGUNTAS")
 for pergunta, resposta in [
     ("ASES deu 90%, então é acessível?",
      "Mede aderência ao eMAG, não conformidade WCAG. Não testa 2.2.2 nem 1.4.1 — "
-     "os dois que derrubam o Nível A."),
+     "dois dos três de Nível A que o portal não atende."),
     ("90,48% com 310 avisos ao mesmo tempo?",
      "O ASES pondera por gravidade; a maioria dos avisos cai na recomendação 1.1, "
      "de peso menor."),

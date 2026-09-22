@@ -76,8 +76,8 @@ O que amarra a narrativa. Decorar estas quatro frases vale mais que decorar núm
    conforme. Mas nenhuma dessas ferramentas olha para o que vem agora."
 3. **Do slide 10 para o 11:** "O recurso de acessibilidade mais visível do portal foi o
    único que nenhuma ferramenta automática encontrou. Isso muda o que a gente conclui."
-4. **Do slide 11 para o 12:** "Não atinge o Nível A por dois critérios. E os dois têm
-   correção de baixo custo."
+4. **Do slide 11 para o 12:** "Não atinge o Nível A, e os dois critérios que nenhuma
+   ferramenta pegou têm correção de baixo custo."
 
 ### Se o sorteio cair em você
 
@@ -159,8 +159,9 @@ páginas. Uma avaliação que só lista defeitos é uma avaliação mal feita.
 
 **"Se o ASES deu 90%, o site não é acessível?"**
 Não é conforme. O ASES mede aderência ao eMAG, não conformidade WCAG, e não testa 2.2.2
-nem 1.4.1 — os dois critérios que derrubam o Nível A. Nota alta em avaliador automático
-mede qualidade de código, não conformidade. É o achado metodológico central do trabalho.
+nem 1.4.1 — dois dos três critérios de Nível A que o portal não atende, e justamente os
+que nenhum avaliador automático viu. Nota alta em avaliador automático mede qualidade de
+código, não conformidade. É o achado metodológico central do trabalho.
 
 **"Por que 90,48% e 310 avisos ao mesmo tempo?"**
 O ASES pondera por gravidade. A maior parte dos avisos cai na recomendação 1.1
@@ -211,8 +212,9 @@ pouco coerente com a organização visual, que remetem a 1.3.2 e 2.4.3.
 ## 7. O fio da apresentação
 
 O trabalho tem uma história, e ela não é a lista de defeitos: é que **avaliadores
-automáticos aprovaram um portal que não atinge o Nível A**. Os dois critérios que o
-derrubam só apareceram lendo código-fonte e medindo pixel. E o recurso de acessibilidade
+automáticos aprovaram um portal que não atinge o Nível A**. Dos três critérios de Nível A
+não atendidos, os dois do banner (2.2.2 e 1.4.1) só apareceram lendo código-fonte e medindo
+pixel — nenhuma das três ferramentas os testa. E o recurso de acessibilidade
 mais visível do site — o VLibras — só foi encontrado quando alguém pegou o celular e olhou.
 
 Se der para segurar a tensão entre o slide 7 (nota 90,48%) e o slide 11 (não atinge o
