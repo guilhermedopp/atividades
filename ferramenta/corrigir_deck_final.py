@@ -14,12 +14,15 @@ Regras que não se quebram aqui:
 Uso:  python3 ferramenta/corrigir_deck_final.py entrada.pptx saida.pptx
 """
 import copy
+import json
+import os
 import sys
 
 from pptx import Presentation
 from pptx.util import Emu, Inches, Pt
 
 NS = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENT = sys.argv[1] if len(sys.argv) > 1 else "entrada.pptx"
 SAI = sys.argv[2] if len(sys.argv) > 2 else "saida.pptx"
 
@@ -105,7 +108,8 @@ def apagar(shape):
 
 
 pres = Presentation(ENT)
-s1, s5, s6, s8, s9, s11, s12 = (pres.slides[i] for i in (0, 4, 5, 7, 8, 10, 11))
+s1, s4, s5, s6, s7, s8, s9, s10, s11, s12 = (
+    pres.slides[i] for i in (0, 3, 4, 5, 6, 7, 8, 9, 10, 11))
 
 # ───────────────────────────────────────────── slide 1: falta um espaço
 texto(por_id(s1, 10), "WCAG 2.1 · Portal do IFAL — Campus Maceió")
@@ -113,6 +117,11 @@ texto(por_id(s1, 10), "WCAG 2.1 · Portal do IFAL — Campus Maceió")
 # jogava "Maceió" para a segunda linha
 geometria(por_id(s1, 10), quebra=False)
 log("slide 1: 'WCAG2.1' → 'WCAG 2.1'")
+
+# ───────────────────────────── slide 4: faltava o axe-core na lista de frentes
+texto(por_id(s4, 22), "WAVE · ASES · axe-core · Python")
+geometria(por_id(s4, 22), w=2.4, quebra=False)
+log("slide 4: 'WAVE · ASES · Python' → inclui o axe-core")
 
 # ───────────────────────── slides 5 e 6: a situação escrita na cor da pílula
 # O Canva pintou a palavra ("Conforme", "Parcial"...) exatamente da mesma cor
@@ -144,24 +153,92 @@ log(f"slides 5 e 6: {pintadas} selos de situação agora legíveis sobre a pílu
 texto(por_id(s6, 17), "Indicador de foco visível")
 log("slide 6: 'focovisível' → 'foco visível'")
 
+# ─────────────────────────────── slide 7: a atribuição dos erros do WAVE
+texto(por_id(s7, 14), "16 recursos corretos e 42 elementos estruturais. Três dos quatro "
+                      "erros vêm da Barra do Governo Federal, não do código do IFAL; "
+                      "o quarto não foi possível atribuir.")
+log("slide 7: 'Os 4 erros vêm da Barra' → 'Três dos quatro', com o quarto sem atribuição")
+
 # ────────────────────── slide 8: sai a reprovação que era da marcação provisória
 # O painel "CONTRASTE MEDIDO" trazia cinco linhas; a de 4,0:1 atribuída à Barra
 # do Governo Federal media, na verdade, o cinza #7F7F7F do bloco de espera que
 # o barra.js substitui. As quatro restantes redistribuem-se no mesmo espaço.
+# As linhas divisórias do painel são desenhadas dentro da própria forma de
+# fundo, em posições fixas. Redistribuir as quatro linhas restantes ao longo de
+# todo o painel desalinharia texto e divisória, então mantém-se a grade
+# original: a quarta linha sai e a quinta sobe para a vaga dela.
 apagar(por_id(s8, 26))        # o "4,0:1"
 apagar(por_id(s8, 23))        # o rótulo "Barra do Governo Federal"
-LINHAS_CONTRASTE = [(2.60, 29, 24), (3.44, 28, 21), (4.28, 27, 20), (5.12, 18, 22)]
-for y, id_valor, id_rotulo in LINHAS_CONTRASTE:
-    geometria(por_id(s8, id_valor), y=y)
-    geometria(por_id(s8, id_rotulo), y=y + 0.34)
+geometria(por_id(s8, 18), y=4.49)        # "1,56:1" ocupa a vaga da quarta linha
+geometria(por_id(s8, 22), y=4.83)        # e o rótulo "Foco sobre fundo branco"
 log("slide 8: sai a linha '4,0:1 Barra do Governo Federal'; as outras quatro "
     "redistribuídas")
 
+# A imagem era o print de outro slide, ilegível. Entra o recorte da captura real
+# do carrossel — a mesma da Figura 2 do relatório —, enquadrado sem distorcer.
+RECORTE = os.path.join(RAIZ, "evidencias", "telas", "13b-carrossel-recorte-botoes.png")
+moldura = por_id(s8, 4)
+cx, cy = moldura.left, moldura.top
+cw, ch = moldura.width, moldura.height
+apagar(moldura)
+if os.path.exists(RECORTE):
+    from PIL import Image
+    with Image.open(RECORTE) as img:
+        lado = img.width / img.height
+    larg = cw
+    alt = int(larg / lado)
+    if alt > ch:                       # limita pela altura e recentraliza
+        alt, larg = ch, int(ch * lado)
+    s8.shapes.add_picture(RECORTE, int(cx + (cw - larg) / 2),
+                          int(cy + (ch - alt) / 2), larg, alt)
+    log("slide 8: a foto de outro slide dá lugar ao recorte da captura real do "
+        "carrossel (mesma da Figura 2)")
+
 # ───────────────────────────────────────────────── slide 9: números e painel
 texto(por_id(s9, 21), "3")
+texto(por_id(s9, 26), "reprovações confirmadas por amostragem de pixels")
+texto(por_id(s9, 25), "pior razão, medida por amostragem de pixels")
+geometria(por_id(s9, 25), w=2.3, quebra=True)
 texto(por_id(s9, 24), "de 58 alvos < 24×24 px")
 geometria(por_id(s9, 24), w=1.7, quebra=False)
-log("slide 9: '4 reprovações' → 3; 'alvos < 24×24 px' → 'de 58 alvos < 24×24 px'")
+log("slide 9: '4 reprovações' → 3; 'alvos < 24×24 px' → 'de 58 alvos < 24×24 px'; "
+    "os dois números de contraste passam a dizer de onde vêm")
+
+# ─────────────── slide 10: a sequência de anúncios vinha da medição antiga
+# Lida do próprio resultados_mobile.json, o mesmo que alimenta o Quadro do
+# relatório — assim o slide não volta a divergir sozinho.
+# Cada caixa é posicionada à esquerda, com a largura exata do texto que tinha:
+# o Canva centralizou na mão. Trocar só o texto desalinha a grade, então a
+# largura vem da tabela abaixo (medida no próprio deck) e o x é recalculado
+# a partir do centro da coluna.
+LARGURA_POR_TEXTO = {
+    "lista": 0.348, "cabeçalho da página": 1.242, "região principal": 0.972,
+    "rodapé da página": 1.082, "item de lista": 0.788,
+}
+# (id da caixa, índice na transcrição, centro da coluna)
+CAIXAS_SEQUENCIA = [(17, 0, 7.928), (20, 1, 9.648), (25, 2, 11.376),
+                    (19, 3, 7.933), (22, 4, 9.655), (23, 5, 11.372),
+                    (18, 6, 7.932), (21, 7, 9.652), (24, 8, 11.372)]
+caminho = os.path.join(RAIZ, "dados", "resultados_mobile.json")
+if os.path.exists(caminho):
+    with open(caminho, encoding="utf-8") as f:
+        trans = json.load(f)["execucoes"][-1]["leitor_tela"]["transcricao"]
+    for ident, i, centro in CAIXAS_SEQUENCIA:
+        if i >= len(trans):
+            continue
+        anuncio = trans[i]
+        larg = LARGURA_POR_TEXTO.get(anuncio)
+        if larg is None:                     # anúncio novo: estima pela média
+            larg = 0.062 * len(anuncio) + 0.11
+        caixa = por_id(s10, ident)
+        texto(caixa, f"{i + 1}. {anuncio}")
+        geometria(caixa, x=centro - larg / 2, w=larg, quebra=False)
+    log("slide 10: sequência de anúncios relida de resultados_mobile.json — a do "
+        "deck era a da medição anterior, sem a terceira 'lista'")
+texto(por_id(s10, 13), "O tradutor de Libras é injetado por barra.brasil.gov.br, não "
+                       "aparece no HTML entregue pelo servidor e passou fora de todas as "
+                       "frentes automatizadas.")
+log("slide 10: 'as três frentes automatizadas' → 'todas as frentes automatizadas'")
 
 # O painel da esquerda era todo sobre o reflow, que deixou de ser falha, e a
 # imagem era a foto de outro slide, ilegível. Entra a tarefa complementar, que

@@ -233,6 +233,12 @@ Duas armadilhas novas, do Canva:
 - **Clonar uma caixa clona todos os parágrafos dela.** A caixa dos números do Nível AA
   tinha as cinco linhas dentro; cada clone saiu arrastando a pilha inteira. Há uma função
   `so_um_paragrafo()` no script exatamente para isso.
+- **O Canva centraliza na mão.** As caixas de texto têm alinhamento à esquerda e largura
+  igual à do texto que tinham; o centro vem do `x`. Trocar o texto por outro de tamanho
+  diferente desalinha a grade — reposicionar pelo centro da coluna, não pelo `x` antigo.
+- **As divisórias dos painéis são desenhadas dentro da forma de fundo**, em posições fixas.
+  Remover uma linha e redistribuir as demais pelo painel inteiro desalinha texto e
+  divisória: tirar a linha e subir as de baixo para as vagas que já existiam.
 
 Fica de fora, de propósito: a imagem do slide 8 continua sendo a foto de outro slide. A
 captura real (`13-carrossel-banner-rotativo.png`, 800×620) não cabe sem distorcer na
@@ -240,6 +246,40 @@ moldura de proporção 2,46:1 — no Canva a troca é trivial.
 
 Cuidado se alguém propuser símbolo no lugar de palavra nos selos: **o Noto Sans não tem ✓
 nem ✗** (conferido no `cmap` da fonte). Os que ele tem: `× – • ° § … › ½ ! + ~ ?`.
+
+### Numeração do eMAG: conferir na fonte, nunca de memória
+
+A coluna do eMAG do Quadro 2 saiu errada em 11 dos 15 itens na primeira versão. O caso que
+denuncia o resto: o item 13 citava "1.7 - Descrever links", mas **1.7 é "Separar links
+adjacentes"** e descrever links é a **3.5** — que era o que a própria seção 4.3 já dizia.
+A numeração correta está conferida item a item em `dados/checklist.json`, campo
+`_emag_conferido`, lida dos títulos "Recomendação N.M" em emag.governoeletronico.gov.br.
+
+Regra: o eMAG agrupa por **seção** (1 Marcação, 2 Comportamento, 3 Conteúdo/Informação,
+4 Apresentação/Design, 5 Multimídia, 6 Formulários). Contraste e cor são **4.x**, não 3.x;
+idioma e título de página são **3.x**, não 1.x. Quando a intuição disser 1.x para algo de
+apresentação, ela está errada.
+
+### Duas contagens que parecem falha do IFAL e não são
+
+O Quadro das medições móveis traz "elementos focáveis sem nome acessível" e "sem indicador
+de foco visível" em número maior do que o resto do relatório. Conferido na **árvore de
+acessibilidade do próprio Chromium** (CDP `Accessibility.getFullAXTree`, não heurística de
+`textContent`), são **três** links, todos da barra federal: `#menu-icon`, `#logovlibras` e o
+selo `gov.br/acessoainformacao` — nenhum no HTML servido pelo IFAL. O único sem contorno de
+foco é o link do VLibras. O item 15 do checklist continua válido.
+
+A contagem maior vem da heurística do próprio simulador, que procura o nome no texto do
+elemento e não enxerga o nome vindo do `alt` de uma imagem interna. **Para decidir se um
+elemento tem nome acessível, usar a árvore de acessibilidade, nunca `textContent`.**
+
+### Limitação conhecida do simulador: texto de um caractere
+
+A bateria de contraste descarta trechos com menos de dois caracteres (`txt.length < 2`).
+Os controles do banner rotativo são dígitos isolados, de 1 a 4 — **as duas piores razões
+medidas do sítio nunca entram nessa amostra**, e é por isso que ela devolve zero reprovação
+enquanto a seção 4.5 confirma três. Está registrado no relatório como limitação. Se algum
+dia o limiar baixar para 1, os números do Quadro mudam e o relatório precisa ser reconferido.
 
 ### Armadilhas do deck (valem se ele for editado de novo)
 
