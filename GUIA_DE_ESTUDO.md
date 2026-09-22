@@ -48,11 +48,13 @@ O que dizer em cada um. Os números estão todos no relatório.
 | 5 | Checklist 1/2 | 5 conformes, 5 parciais, 4 não conformes, 1 não aplicável. Não ler item por item — apontar os vermelhos. |
 | 6 | Checklist 2/2 | Destacar o **14 (conteúdo em movimento), não conforme** — é o que derruba o Nível A. |
 | 7 | WAVE e ASES | **90,48%** no ASES, 40 erros e 310 avisos. WAVE: 4 erros, 21 de contraste, 32 alertas. **Ponto-chave:** os 4 erros não são do IFAL, vêm da barra do governo federal. |
-| 8 | Achados críticos | O banner rotativo concentra as piores falhas: botões de 22×20 px, **1,66:1**, slide ativo só pela cor, troca a cada 4 s sem pausa. |
-| 9 | Mobile | 23 de 58 alvos abaixo de 24×24 px. 3 elementos cortados com o espaçamento de texto ampliado. |
+| 8 | Achados críticos | O banner rotativo concentra as piores falhas: botões de 22×20 px, **1,66:1**, slide ativo só pela cor, troca a cada 4 s sem pausa. O painel de contraste traz quatro medições — a quinta, atribuída à barra federal, caiu na reconferência. |
+| 9 | Mobile | Dois lados. À direita, o que a máquina mediu: 23 de 58 alvos abaixo de 24×24 px, 3 reprovações de contraste, pior 1,66:1. À esquerda, **a tarefa complementar**: 1ª tentativa abandonada aos 12 min 4 s, 2ª concluída em 10 min 16 s. Dizer "a equipe executou" — **não narrar em primeira pessoa**. |
 | 10 | Tecnologia assistiva | **VLibras existe em todas as páginas** e nenhuma ferramenta automática viu — só apareceu no celular. E a página de Acessibilidade não menciona o recurso. |
 | 11 | Conformidade | **Não atinge o Nível A.** Três falhas de A (1.3.1, 1.4.1 e 2.2.2), quatro de AA. |
 | 12 | Recomendações | Oito, priorizadas. As duas críticas resolvem o Nível A: botão de pausa e marcador não cromático. |
+
+O deck corrigido está em `apresentacao/APRESENTACAO_FINAL_CORRIGIDA.pptx`; o que mudou nele, e por quê, está em `CORRECOES_DECK.md`.
 | 13 | Fechamento | As quatro lições. A mais forte: **automação não é experiência**. |
 | 14 | Obrigado | Abrir para perguntas. |
 

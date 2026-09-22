@@ -207,24 +207,39 @@ digitados. Ao conferir a cola por extração de texto, lembrar que o `pdftotext`
 **por coluna**: os rótulos saem todos juntos, depois os valores, então casar string
 esperando a ordem visual dá falso negativo.
 
-### Correções pendentes no deck (22/09)
+### O deck final e suas correções (22/09)
 
-O deck final foi refeito **no Canva** — o PDF traz `Creator: Canva` e não há `.pptx` dele
-no repositório, só o `APRESENTACAO_KELVEN_CORRIGIDA.pptx`, que é a versão de 15 slides
-anterior. Para editar preservando o design é preciso o *Compartilhar → Baixar → PPTX* do
-Canva.
+O deck final foi refeito **no Canva** (o PDF traz `Creator: Canva`). A equipe enviou o
+`.pptx` exportado de lá; ele está preservado em `evidencias/Apresentacao_FINAL_original.pptx`.
 
-`CORRECOES_DECK.md` (docx e PDF ao lado) lista as dez trocas, com o texto exato de cada
-caixa: a capa sem espaço em "WCAG2.1"; as pílulas de situação dos slides 5 e 6, que são
-**só cor** e repetem no deck a falha 1.4.1 que ele denuncia; o slide 9, cujo painel
-esquerdo inteiro fala do reflow e deveria receber a tarefa complementar (que não tem slide
-nenhum, embora o enunciado peça); o slide 11 (1.3.1 entra no Nível A, 3 reprovações em vez
-de 4, a linha do 1.4.10 sai, "Rolagem horizontal +" sai do 1.4.12, 23 de 58 e a marca
-WCAG 2.2 no 2.5.8, os números saindo quebrados como "1.4.1 0", e "avançaacada"); e o
-slide 12, onde a recomendação de reflow dá lugar à do 1.4.12.
+`ferramenta/corrigir_deck_final.py` aplica sobre ele todas as correções e produz
+`apresentacao/APRESENTACAO_FINAL_CORRIGIDA.pptx`. O script é idempotente: roda de novo
+sobre o original quando precisar. `CORRECOES_DECK.md` (docx e PDF ao lado) explica cada
+mudança.
 
-Cuidado ao propor símbolo no lugar de palavra nas pílulas: **o Noto Sans não tem ✓ nem ✗**
-(conferido no `cmap` da fonte). Os que ele tem: `× – • ° § … › ½ ! + ~ ?`.
+O achado mais importante não estava na revisão externa: **os 15 selos de situação dos
+slides 5 e 6 estavam escritos na mesma cor da pílula em que estão** — o texto existia no
+XML, invisível. Sobrava só a cor, que é exatamente a falha 1.4.1 que o deck acusa no
+banner do portal. Agora a palavra aparece em `071A2F` sobre a pílula.
+
+Também entrou a **tarefa complementar com TalkBack**, que o enunciado pede e que não tinha
+slide nenhum: ocupa o painel esquerdo do slide 9, antes dedicado ao reflow.
+
+Duas armadilhas novas, do Canva:
+
+- **O Canva grava espaços literais dentro do texto:** `1.4.1 0` para 1.4.10, `1.4. 3` para
+  1.4.3, `Parc ial` para Parcial, `avançaacada` para "avança a cada". Não é espaçamento
+  entre letras — é o texto mesmo. Conferir sempre no `run.text`, não só no render.
+- **Clonar uma caixa clona todos os parágrafos dela.** A caixa dos números do Nível AA
+  tinha as cinco linhas dentro; cada clone saiu arrastando a pilha inteira. Há uma função
+  `so_um_paragrafo()` no script exatamente para isso.
+
+Fica de fora, de propósito: a imagem do slide 8 continua sendo a foto de outro slide. A
+captura real (`13-carrossel-banner-rotativo.png`, 800×620) não cabe sem distorcer na
+moldura de proporção 2,46:1 — no Canva a troca é trivial.
+
+Cuidado se alguém propuser símbolo no lugar de palavra nos selos: **o Noto Sans não tem ✓
+nem ✗** (conferido no `cmap` da fonte). Os que ele tem: `× – • ° § … › ½ ! + ~ ?`.
 
 ### Armadilhas do deck (valem se ele for editado de novo)
 
