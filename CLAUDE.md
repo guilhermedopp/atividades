@@ -163,6 +163,13 @@ inteiro.** Não há divisão de fala — o guia foi escrito para isso. Inclui a 
 não narrar em primeira pessoa o teste com TalkBack, que foi executado por um só: o
 relatório registra o teste como da equipe, e quem apresentar descreve o que foi observado.
 
+`python3 ferramenta/gerar_cola.py` gera a `COLA_APRESENTACAO.docx` (PDF ao lado): uma
+página A4 em Arial 11,5 para levar na mão — veredito, os oito blocos de números, as quatro
+viradas e as seis perguntas. Os valores são lidos de `dados/dados_trabalho.json`, nunca
+digitados. Ao conferir a cola por extração de texto, lembrar que o `pdftotext` lê a tabela
+**por coluna**: os rótulos saem todos juntos, depois os valores, então casar string
+esperando a ordem visual dá falso negativo.
+
 ### Armadilhas do deck (valem se ele for editado de novo)
 
 - **A fonte é Noto Sans.** Sem ela, o LibreOffice substitui por uma mais larga e *todos* os
